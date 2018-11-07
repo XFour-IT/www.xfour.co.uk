@@ -1,0 +1,7 @@
+RewriteEngine On
+
+ErrorDocument 404 /404.html
+ErrorDocument 500 /503.html
+
+RewriteCond %{HTTP_HOST} ^www\.benjisoft\.org\.uk$
+RewriteRule ^/?$ "http\:\/\/benjisoft\.org\.uk\/" [R=301,L]
