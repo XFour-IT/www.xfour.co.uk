@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Xfour IT</title>
+    <title>XFour IT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
@@ -15,7 +15,7 @@
         </video>
             <div id = "logo_area">
                 <img src="lib\res\Benjisoft_Logo_small.svg" id="center_logo" >
-                <h3>Xfour</h3>
+                <h3>XFour</h3>
                 <p>The modern, cool web design company</p>
             </div>
             <div id = "indicator" onclick="scrollto('#sec2')">
