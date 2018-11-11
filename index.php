@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
-    <script scr="lib/js/modal.js"></script>
+    <script src="lib/js/modal.js"></script>
 </head>
 <body>
     <section id="sec1">
