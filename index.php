@@ -29,23 +29,23 @@
             <h1>Projects</h1>
             <div id = "top-sub">
                 <div class="shadow card">
-                    <img id = "placeholder" src="lib/res/100x100.png"/>
+                    <img id = "placeholder" src="lib/res/gh.png"/>
                     <p>The Grand Hack</p>
                 </div>
                 <div  class="shadow card">
-                    <img id = "placeholder" src="lib/res/100x100.png"/>
+                    <img id = "placeholder" src="lib/res/coding.svg"/>
                     <p>Web Design</p>
                 </div>
                 <div class="shadow card" onclick="window.open('http://dataless.network', '_blank')">
                     <img id = "placeholder" src="lib\res\datalesslogo.png"/>
-                    <p>Dataless network</p>
+                    <p>Dataless Network</p>
                 </div>
             </div>
         </section>
         <section id="sec3">
             <h1>Partners</h1>
             <div class="shadow card">
-                <img id = "placeholder" src="lib/res/100x100.png"/>
+                <img id = "placeholder" src="lib/res/shopifySquare.jpg"/>
                 <p>Shopify</p>
             </div>
             <div  class="shadow card" onclick="window.open('http://google.com', '_blank')">
@@ -53,8 +53,8 @@
                 <p>Microsoft</p>
             </div>
             <div  class="shadow card">
-                <img id = "placeholder" src="lib/res/100x100.png"/>
-                <p>Dataless network</p>
+                <img id = "placeholder" src="lib/res/more.svg"/>
+                <p>Coming Soon</p>
             </div>
         </section>
         <!--
