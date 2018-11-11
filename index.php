@@ -84,7 +84,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <p>Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
-        <button id="ctaShopify" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree">Get in Touch!</button>
+        <button id="ctaShopify" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree')">Get in Touch!</button>
     </div>
     </div>
     
