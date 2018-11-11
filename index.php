@@ -6,7 +6,7 @@
     <title>XFour IT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <link rel="stylesheet" type="text/css" href="lib/js/modal.css" />
+    <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
     <script scr="lib/js/modal.js"></script>
@@ -44,7 +44,7 @@
         </section>
         <section id="sec3">
             <h1>Partners</h1>
-            <div class="shadow card" id="btnShopify">
+            <div class="shadow card" id="btnShopify" onclick="displayMod()">
                 <img id = "placeholder" src="lib/res/shopifySquare.jpg"/>
                 <p>Shopify</p>
             </div>
@@ -82,7 +82,7 @@
     <!-- Project Modals -->
     <div id="mdShopify" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="close" onclick="closeMod()">&times;</span>
         <p>Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
         <button id="ctaShopify" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree')">Get in Touch!</button>
     </div>
