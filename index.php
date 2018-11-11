@@ -28,15 +28,15 @@
         <section id="sec2">
             <h1>Projects</h1>
             <div id = "top-sub">
-                <div class="shadow card">
+                <div class="shadow card" id="btnGH">
                     <img id = "placeholder" src="lib/res/gh.png"/>
                     <p>The Grand Hack</p>
                 </div>
-                <div  class="shadow card">
+                <div  class="shadow card" id="btnWD">
                     <img id = "placeholder" src="lib/res/coding.svg"/>
                     <p>Web Design</p>
                 </div>
-                <div class="shadow card" onclick="window.open('http://dataless.network', '_blank')">
+                <div class="shadow card" id="btnDLN">
                     <img id = "placeholder" src="lib\res\datalesslogo.png"/>
                     <p>Dataless Network</p>
                 </div>
@@ -44,15 +44,15 @@
         </section>
         <section id="sec3">
             <h1>Partners</h1>
-            <div class="shadow card">
+            <div class="shadow card" id="btnShopify">
                 <img id = "placeholder" src="lib/res/shopifySquare.jpg"/>
                 <p>Shopify</p>
             </div>
-            <div  class="shadow card" onclick="window.open('http://google.com', '_blank')">
+            <div  class="shadow card" id="btnMicrosoft">
                 <img id = "placeholder" src="lib\res\edu_AEP_badge_vertical_lores.png"/>
                 <p>Microsoft</p>
             </div>
-            <div  class="shadow card">
+            <div  class="shadow card" id="btnSoon">
                 <img id = "placeholder" src="lib/res/more.svg"/>
                 <p>Coming Soon</p>
             </div>
@@ -83,7 +83,8 @@
     <div id="modalGH" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Some text in the Modal..</p>
+        <p>Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <button id="ctaShopify" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree">Get in Touch!</button>
     </div>
     </div>
     
