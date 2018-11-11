@@ -6,8 +6,10 @@
     <title>XFour IT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
+    <script scr="lib/js/modal.js"></script>
 </head>
 <body>
     <section id="sec1">
@@ -55,6 +57,7 @@
                 <p>Dataless network</p>
             </div>
         </section>
+        <!--
         <section id="sec4">
             <form id="reused_form">
                 <div class="form-group">
@@ -70,11 +73,20 @@
                     <textarea rows="5" name="message" id="message" class="form-control" placeholder="Type Your Message"></textarea>
                 </div>
                 <div class="form-group">
-                    <button id="enquire">Post &rarr;</button>
+                    <button id="enquire">Send &rarr;</button>
                 </div>
             </form>
         </section>
+        -->
     </div>
+    <!-- Project Modals -->
+    <div id="modalGH" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Some text in the Modal..</p>
+    </div>
+    </div>
+    
     <script>
         if (window.innerWidth > 600){
             var video = document.getElementById("background")
