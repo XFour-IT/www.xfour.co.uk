@@ -6,7 +6,7 @@
     <title>XFour IT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
+    <link rel="stylesheet" type="text/css" href="lib/js/modal.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
     <script scr="lib/js/modal.js"></script>
