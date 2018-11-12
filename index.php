@@ -167,11 +167,15 @@
         function closeMod(selector){
             modal = document.getElementById(selector)
             modal.setAttribute("style", "dsiplay:none;")
+            document.body.setAttribute("style","overflow:auto;")
         }
 
         function openModal(selector){
             var modal = document.getElementById(selector)
             modal.setAttribute("style", "display:block;")
+            if (window.innerWidth < 600){
+                document.body.setAttribute("style","overflow:hidden;")
+            }
         }
     </script>
 </body>
