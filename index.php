@@ -43,7 +43,7 @@
         </section>
         <section id="sec3">
             <h1>Partners</h1>
-            <div class="shadow card" id="btnShopify" onclick="displayMod()">
+            <div class="shadow card" id="btnShopify" onclick="openModal('mdShopify')">
                 <img id = "placeholder" src="lib/res/shopifySquare.jpg"/>
                 <p>Shopify</p>
             </div>
@@ -91,12 +91,10 @@
         if (window.innerWidth > 600){
             var video = document.getElementById("background")
             var source = document.createElement("source")
-            var modal = document.getElementById("mdShopify")
             source.src = "lib\\res\\background2.mp4"
             //createDocumentFragment('<source src="lib/res/background.mp4" type="video/mp4">')
             video.appendChild(source)
             //console.log("success")
-            modal.setAttribute("style", "display:block;")
         };
 
         function scrollto(selector){
@@ -111,7 +109,11 @@
             modal = document.getElementById(selector)
             modal.setAttribute("style", "dsiplay:none;")
         }
+
+        function openModal(selector){
+            var modal = document.getElementById(selector)
+            modal.setAttribute("style", "display:block;")
+        }
     </script>
-    <script src="form.js"></script>
 </body>
 </html>
