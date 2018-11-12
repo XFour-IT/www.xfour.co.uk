@@ -10,6 +10,7 @@
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    
 }
 
 /* Modal Content/Box */
@@ -70,12 +71,13 @@
     margin: 0;
 }
 /*Phones*/
-@media screen and (max-width: 600px or ){
+@media screen and (max-width: 600px){
     .content-text{
         font-size: 20pt;
     }
     .modal{
         overflow: hidden;
+        top: 100vh;
     }
     .modal-content{
         height: 100vh;
@@ -133,6 +135,7 @@
     }
     .modal{
         overflow: hidden;
+        top: 100vh;
     }
     .modal-content{
         height: 100vh;

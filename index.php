@@ -8,7 +8,8 @@
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
-    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
+    <script src="lib/js/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mobile-detect@1.4.3/mobile-detect.min.js"></script>
 </head>
 <body>
     <section id="sec1">
@@ -52,7 +53,7 @@
                 <p>Microsoft</p>
             </div>
             <div  class="shadow card" id="btnSoon" onclick="openModal('mdCisco')">
-                <img id = "placeholder" src="lib/res/more.svg"/>
+                <img id = "placeholder" src="lib/res/cisco.jpg"/>
                 <p>Coming Soon</p>
             </div>
         </section>
@@ -103,7 +104,7 @@
 
     <div id="mdCisco" class="modal">
     <div class="modal-content">
-    <img class = "modal-logo" src="lib\res\more.svg">
+    <img class = "modal-logo" src="lib\res\cisco.jpg">
         <p class="modal-title">Cisco Partners</p>
         <img class="modal-image" src="lib/res/undraw_connected_8wvi.svg">
         <span class="close" onclick="closeMod('mdCisco')">&times;</span>
@@ -164,17 +165,36 @@
             });
         }
 
-        function closeMod(selector){
+        async function closeMod(selector){
+            var md = new MobileDetect(window.navigator.userAgent)
+            if(md.mobile()){
+                var slideDown = anime({
+                    targets: "#"+selector,
+                    translateY: '100vh',
+                    duration: 500,
+                    easing: 'easeInOutQuart',
+                })
+                var finished = await slideDown.finished
+            }
             modal = document.getElementById(selector)
             modal.setAttribute("style", "dsiplay:none;")
             document.body.setAttribute("style","overflow:auto;")
+            
         }
 
         function openModal(selector){
+            var md = new MobileDetect(window.navigator.userAgent)
             var modal = document.getElementById(selector)
             modal.setAttribute("style", "display:block;")
-            if (window.innerWidth < 600){
+            if (md.mobile()){
                 document.body.setAttribute("style","overflow:hidden;")
+                var slideUp = anime({
+                    targets: "#"+selector,
+                    translateY: '-100vh',
+                    duration: 500,
+                    //direction: 'reverse',
+                    easing: 'easeInOutQuart'
+                })
             }
         }
     </script>
