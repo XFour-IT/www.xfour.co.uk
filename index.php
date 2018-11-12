@@ -81,9 +81,20 @@
     <!-- Project Modals -->
     <div id="mdShopify" class="modal">
     <div class="modal-content">
+    <img class = "modal-logo" src="lib/res/shopifySquare.jpg">
+        <p class="modal-title">Shopify Partners</p>
+        <img class="modal-image" src="lib/res/undraw_printing_invoices_5r4r.svg">
         <span class="close" onclick="closeMod('mdShopify')">&times;</span>
-        <p>Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
         <button id="ctaShopify" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree')">Get in Touch!</button>
+    </div>
+    </div>
+
+    <div id="mdMicrosoft" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeMod('mdShopify')">&times;</span>
+        <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <button id="ctaMicrosoft" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Microsoft Enquiry')">Get in Touch!</button>
     </div>
     </div>
     
