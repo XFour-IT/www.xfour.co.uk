@@ -9,7 +9,6 @@
     <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
-    <script src="lib/js/modal.js"></script>
 </head>
 <body>
     <section id="sec1">
@@ -82,7 +81,7 @@
     <!-- Project Modals -->
     <div id="mdShopify" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeMod()">&times;</span>
+        <span class="close" onclick="closeMod('mdShopify')">&times;</span>
         <p>Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
         <button id="ctaShopify" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree')">Get in Touch!</button>
     </div>
@@ -92,10 +91,12 @@
         if (window.innerWidth > 600){
             var video = document.getElementById("background")
             var source = document.createElement("source")
+            var modal = document.getElementById("mdShopify")
             source.src = "lib\\res\\background2.mp4"
             //createDocumentFragment('<source src="lib/res/background.mp4" type="video/mp4">')
             video.appendChild(source)
             //console.log("success")
+            modal.styles.display = "block"
         };
 
         function scrollto(selector){
@@ -104,6 +105,10 @@
                 inline: "nearest",
                 behavior: 'smooth'
             });
+        }
+        function closeMod(selector){
+            modal = document.getElementById(selector)
+            modal.styles.display = "none"
         }
     </script>
     <script src="form.js"></script>
