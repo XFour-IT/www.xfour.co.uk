@@ -96,7 +96,7 @@
             //createDocumentFragment('<source src="lib/res/background.mp4" type="video/mp4">')
             video.appendChild(source)
             //console.log("success")
-            modal.styles.display = "block"
+            modal.setAttribute("style", "display:block;")
         };
 
         function scrollto(selector){
@@ -106,9 +106,10 @@
                 behavior: 'smooth'
             });
         }
+
         function closeMod(selector){
             modal = document.getElementById(selector)
-            modal.styles.display = "none"
+            modal.setAttribute("style", "dsiplay:none;")
         }
     </script>
     <script src="form.js"></script>
