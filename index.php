@@ -27,15 +27,15 @@
         <section id="sec2">
             <h1>Projects</h1>
             <div id = "top-sub">
-                <div class="shadow card" id="btnGH">
+                <div class="shadow card" id="btnGH" onclick ="openModal('mdHack')">
                     <img id = "placeholder" src="lib/res/gh.png"/>
                     <p>The Grand Hack</p>
                 </div>
-                <div  class="shadow card" id="btnWD">
+                <div  class="shadow card" id="btnWD" onclick = "openModal('mdWeb')">
                     <img id = "placeholder" src="lib/res/coding.svg"/>
                     <p>Web Design</p>
                 </div>
-                <div class="shadow card" id="btnDLN">
+                <div class="shadow card" id="btnDLN" onclick="openModal('mdDataless')">
                     <img id = "placeholder" src="lib\res\datalesslogo.png"/>
                     <p>Dataless Network</p>
                 </div>
@@ -47,11 +47,11 @@
                 <img id = "placeholder" src="lib/res/shopifySquare.jpg"/>
                 <p>Shopify</p>
             </div>
-            <div  class="shadow card" id="btnMicrosoft">
+            <div  class="shadow card" id="btnMicrosoft" onclick="openModal('mdMicrosoft')">
                 <img id = "placeholder" src="lib\res\edu_AEP_badge_vertical_lores.png"/>
                 <p>Microsoft</p>
             </div>
-            <div  class="shadow card" id="btnSoon">
+            <div  class="shadow card" id="btnSoon" onclick="openModal('mdCisco')">
                 <img id = "placeholder" src="lib/res/more.svg"/>
                 <p>Coming Soon</p>
             </div>
@@ -92,9 +92,57 @@
 
     <div id="mdMicrosoft" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeMod('mdShopify')">&times;</span>
+    <img class = "modal-logo" src="lib\res\edu_AEP_badge_vertical_lores.png">
+        <p class="modal-title">Microsoft Partners</p>
+        <img class="modal-image" src="lib/res/undraw_working2_ce2b.svg">
+        <span class="close" onclick="closeMod('mdMicrosoft')">&times;</span>
         <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
-        <button id="ctaMicrosoft" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Microsoft Enquiry')">Get in Touch!</button>
+        <button id="ctaMicrosoft" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree')">Get in Touch!</button>
+    </div>
+    </div>
+
+    <div id="mdCisco" class="modal">
+    <div class="modal-content">
+    <img class = "modal-logo" src="lib\res\more.svg">
+        <p class="modal-title">Cisco Partners</p>
+        <img class="modal-image" src="lib/res/undraw_connected_8wvi.svg">
+        <span class="close" onclick="closeMod('mdCisco')">&times;</span>
+        <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <button id="ctaCisco" class="cta" onclick="window.open('mailto:sales@xfour.co.uk?subject=Shopify Enquiree')">Get in Touch!</button>
+    </div>
+    </div>
+
+    
+    <div id="mdDataless" class="modal">
+    <div class="modal-content">
+    <img class = "modal-logo" src="lib\res\datalesslogo.png">
+        <p class="modal-title">Dataless Network</p>
+        <img class="modal-image" src="lib/res/undraw_no_data_qbuo.svg">
+        <span class="close" onclick="closeMod('mdDataless')">&times;</span>
+        <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <button id="ctaDataless" class="cta" onclick="window.open('https://dataless.network')">Take a look!</button>
+    </div>
+    </div>
+
+    <div id="mdHack" class="modal">
+    <div class="modal-content">
+    <img class = "modal-logo" src="lib\res\gh.png">
+        <p class="modal-title">The Grand Hack</p>
+        <img class="modal-image" src="lib/res/undraw_mission_impossible_bwa2.svg">
+        <span class="close" onclick="closeMod('mdHack')">&times;</span>
+        <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <button id="ctaHack" class="cta" onclick="window.open('https://thegrandhack.info')">Take a look!</button>
+    </div>
+    </div>
+
+    <div id="mdWeb" class="modal">
+    <div class="modal-content">
+    <img class = "modal-logo" src="lib\res\coding.svg">
+        <p class="modal-title">Web Design</p>
+        <img class="modal-image" src="lib/res/undraw_wireframing_nxyi.svg">
+        <span class="close" onclick="closeMod('mdWeb')">&times;</span>
+        <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
+        <button id="ctaWeb" class="cta" onclick="window.open('https://thegrandhack.info')">Take a look!</button>
     </div>
     </div>
     
