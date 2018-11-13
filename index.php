@@ -118,7 +118,7 @@
     <div class="modal-content">
     <img class = "modal-logo" src="lib\res\datalesslogo.png">
         <p class="modal-title">Dataless Network</p>
-        <img class="modal-image" src="lib/res/undraw_no_data_qbuo.svg">
+        <img class="modal-image" src="lib/res/undraw_sync4_xlc6.svg">
         <span class="close" onclick="closeMod('mdDataless')">&times;</span>
         <p class="content-text">Do you require a web e-commerce store? Shopify is the option for you. XFour are official shopify partners, get in touch today and see what we can do for you. </p>
         <button id="ctaDataless" class="cta" onclick="window.open('https://dataless.network')">Take a look!</button>
