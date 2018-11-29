@@ -6,7 +6,7 @@
     <title>XFour IT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <link rel="stylesheet" type="text/css" href="lib/css/modal.css" />
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
     <script src="lib/js/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mobile-detect@1.4.3/mobile-detect.min.js"></script>
@@ -80,7 +80,7 @@
         -->
     </div>
     <!-- Project Modals -->
-    <div id="mdShopify" class="modal">
+    <div id="mdShopify" class="modal ">
     <div class="modal-content">
     <img class = "modal-logo" src="lib/res/shopifySquare.jpg">
         <p class="modal-title">Shopify Partners</p>
@@ -91,7 +91,7 @@
     </div>
     </div>
 
-    <div id="mdMicrosoft" class="modal">
+    <div id="mdMicrosoft" class="modal ">
     <div class="modal-content">
     <img class = "modal-logo" src="lib\res\edu_AEP_badge_vertical_lores.png">
         <p class="modal-title">Microsoft Partners</p>
@@ -102,7 +102,7 @@
     </div>
     </div>
 
-    <div id="mdCisco" class="modal">
+    <div id="mdCisco" class="modal ">
     <div class="modal-content">
     <img class = "modal-logo" src="lib\res\cisco.jpg">
         <p class="modal-title">Cisco Partners</p>
@@ -114,7 +114,7 @@
     </div>
 
     
-    <div id="mdDataless" class="modal">
+    <div id="mdDataless" class="modal ">
     <div class="modal-content">
     <img class = "modal-logo" src="lib\res\datalesslogo.png">
         <p class="modal-title">Dataless Network</p>
@@ -125,7 +125,7 @@
     </div>
     </div>
 
-    <div id="mdHack" class="modal">
+    <div id="mdHack" class="modal ">
     <div class="modal-content">
     <img class = "modal-logo" src="lib\res\gh.png">
         <p class="modal-title">The Grand Hack</p>
@@ -136,7 +136,7 @@
     </div>
     </div>
 
-    <div id="mdWeb" class="modal">
+    <div id="mdWeb" class="modal ">
     <div class="modal-content">
     <img class = "modal-logo" src="lib\res\coding.svg">
         <p class="modal-title">Web Design</p>
@@ -148,6 +148,24 @@
     </div>
     
     <script>
+        let md = new MobileDetect(window.navigator.userAgent)
+        if (md.mobile()){
+            setstyle = document.createElement("LINK")
+            setstyle.setAttribute("rel", "stylesheet")
+            setstyle.setAttribute('type', "text/css")
+            setstyle.setAttribute("media", "screen")
+            setstyle.setAttribute("href", "lib/css/mobile-modal.css")
+            document.body.appendChild(setstyle)
+        }
+        else{
+            setstyle = document.createElement("LINK")
+            setstyle.setAttribute("rel", "stylesheet")
+            setstyle.setAttribute('type', "text/css")
+            setstyle.setAttribute("media", "screen")
+            setstyle.setAttribute("href", "lib/css/desktop-modal.css")
+            document.body.appendChild(setstyle)
+        }
+
         if (window.innerWidth > 600){
             var video = document.getElementById("background")
             var source = document.createElement("source")
@@ -187,6 +205,7 @@
             var modal = document.getElementById(selector)
             modal.setAttribute("style", "display:block;")
             if (md.mobile()){
+                console.log(modal)
                 document.body.setAttribute("style","overflow:hidden;")
                 var slideUp = anime({
                     targets: "#"+selector,
