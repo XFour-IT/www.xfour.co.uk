@@ -149,7 +149,7 @@
     
     <script>
         let md = new MobileDetect(window.navigator.userAgent)
-        if (md.mobile()){
+        if (true){
             setstyle = document.createElement("LINK")
             setstyle.setAttribute("rel", "stylesheet")
             setstyle.setAttribute('type', "text/css")
@@ -157,7 +157,12 @@
             setstyle.setAttribute("href", "lib/css/mobile-modal.css")
             document.body.appendChild(setstyle)
             if (window.innerWidth > 600){
-                document.getElementsByClass("close").setAttribute("style", "font-size: 60px; padding-left: 20px; padding-right: 20px")
+                close = document.getElementsByClassName("close")
+                var i
+                for (i = 0; i <= close.length; i++){
+                close[i].setAttribute("style", "font-size: 60px; padding-left: 20px; padding-right: 20px")
+                console.log(close[i])
+                }
             }
         }
         else{
@@ -188,7 +193,7 @@
 
         async function closeMod(selector){
             var md = new MobileDetect(window.navigator.userAgent)
-            if(md.mobile()){
+            if(true){
                 var slideDown = anime({
                     targets: "#"+selector,
                     translateY: '100vh',
@@ -207,7 +212,7 @@
             var md = new MobileDetect(window.navigator.userAgent)
             var modal = document.getElementById(selector)
             modal.setAttribute("style", "display:block;")
-            if (md.mobile()){
+            if (true){
                 console.log(modal)
                 document.body.setAttribute("style","overflow:hidden;")
                 var slideUp = anime({
