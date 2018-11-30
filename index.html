@@ -156,6 +156,9 @@
             setstyle.setAttribute("media", "screen")
             setstyle.setAttribute("href", "lib/css/mobile-modal.css")
             document.body.appendChild(setstyle)
+            if (window.innerWidth > 600){
+                document.getElementsByClass("close").setAttribute("style", "font-size: 60px; padding-left: 20px; padding-right: 20px")
+            }
         }
         else{
             setstyle = document.createElement("LINK")
