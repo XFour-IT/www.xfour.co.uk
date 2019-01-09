@@ -49,6 +49,11 @@
     font-size: 14pt;
 }
 
+.cta:hover{
+    cursor: pointer;
+    background: rgb(161, 0, 94);
+}
+
  .content-text{
     font-size: 15pt;
 }
