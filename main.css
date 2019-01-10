@@ -54,7 +54,7 @@ body{
 }
 
 #logo_area p{
-    font-family: 'Josefin Slab', serif;
+    font-family: 'Open Sans Condensed', sans-serif;
     color: snow;
     font-size: 20pt;
     z-index: inherit;
