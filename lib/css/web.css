@@ -1,11 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Josefin+Slab|Open+Sans+Condensed:300,400,700');
 
-body{
+body {
 	margin: 0%;
 	background-color: #cc0000;
 	font-family: 'Open Sans Condensed', sans-serif;
 }
-#sec-1{
+
+#sec-1 {
 	color: white;
 	text-align: center;
 	background-color: #cc0000;
@@ -14,34 +15,69 @@ body{
 	min-height: 100vh;
 }
 
-#sec-2{
+#sec-2 {
 	background-color: white;
 	height: 100vh;
+	display: flex;
+	padding: 2vh;
+	padding-right: 0 !important;
+	align-content: center;
 }
 
-@keyframes bounce{
-	0%{bottom: 5%; opacity: 1;}
-	50%{bottom: 7%; opacity: 0.8;}
-	100%{bottom: 5%; opacity: 1;}
- }
-
-#indicator{
-    margin: auto;
-    animation: bounce 1s infinite ease-in-out;
-    -webkit-animation: bounce 1s infinite ease-in-out;
-    display: inline;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%)
+.plan {
+	-webkit-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
+	box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
+	min-width: 20%;
+	margin: 0 5vw;
 }
 
-#indicator:hover{
-    cursor: pointer;
-    animation-play-state: paused;
-    -webkit-animation-play-state: paused;
+#plan-1 {
+	order: 1;
 }
 
-#chevron{
-    height: 30px;
-    width: auto;
+#plan-2 {
+	order: 2;
+}
+
+#plan-3 {
+	order: 3;
+}
+
+@keyframes bounce {
+	0% {
+		bottom: 5%;
+		opacity: 1;
+	}
+
+	50% {
+		bottom: 7%;
+		opacity: 0.8;
+	}
+
+	100% {
+		bottom: 5%;
+		opacity: 1;
+	}
+}
+
+#indicator {
+	margin: auto;
+	animation: bounce 1s infinite ease-in-out;
+	-webkit-animation: bounce 1s infinite ease-in-out;
+	display: inline;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%)
+}
+
+#indicator:hover {
+	cursor: pointer;
+	animation-play-state: paused;
+	-webkit-animation-play-state: paused;
+}
+
+#chevron {
+	height: 30px;
+	width: auto;
 }
