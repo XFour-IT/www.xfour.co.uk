@@ -2,11 +2,40 @@
 
 body{
 	margin: 0%;
-	
+	background-color: #cc0000;
+	font-family: 'Open Sans Condensed', sans-serif;
 }
 #sec-1{
+	color: white;
 	text-align: center;
 	background-color: #cc0000;
 	padding: 0%;
 	margin: 0%;
+	min-height: 100vh;
+}
+
+#sec-2{
+	background-color: white;
+	height: 100vh;
+}
+
+#indicator{
+    margin: auto;
+    animation: bounce 1s infinite ease-in-out;
+    -webkit-animation: bounce 1s infinite ease-in-out;
+    display: inline;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%)
+}
+
+#indicator:hover{
+    cursor: pointer;
+    animation-play-state: paused;
+    -webkit-animation-play-state: paused;
+}
+
+#chevron{
+    height: 30px;
+    width: auto;
 }

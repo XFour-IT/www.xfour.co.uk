@@ -7,17 +7,40 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" media="screen" href="lib/css/web.css" />
 	<script src="lib/js/web.js"></script>
+	<script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+	<script>jQuery(document).ready(function() {jQuery('body').fadeIn("slow");});</script>
 </head>
-<body>
+<body style="display:none;">
 	<div id="sec-1">
 		<img id="placeholder" src="lib/res/coding.svg">
 		<h2>Your <span id="text-here">IT</span> specialists</h2>
-		<div id="indicator" onclick="scrollto('#sec2')">
+		<div id="indicator" onclick="scrollto('#sec-2')">
 			<svg id="chevron" aria-hidden="true" data-prefix="fas" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-w-14"
 			 role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 				<path id="chevron" fill="white" d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"></path>
 			</svg>
 		</div>
 	</div>
+	<div id="sec-2">
+		<div id="plan-1">
+			<span class="planName">Basic</span>
+			<span class="planCost">£5</span>
+			<span class="planFeatures">Features here</span>
+		</div>
+		<div id="plan-2">
+			<span class="planName">Enhanced</span>
+			<span class="planCost">£10</span>
+			<span class="planFeatures">Features here</span>
+		</div>
+		<div id="plan-3">
+			<span class="planName">E-Commerce</span>
+			<span class="planCost">£15</span>
+			<span class="planFeatures">Features here</span>
+		</div>
+	</div>
+	<script src="lib/js/mobile.js"></script>
 </body>
 </html>

@@ -148,7 +148,9 @@
     <script src="lib/js/mobile.js"></script>
     <script>
     jQuery("#btnWD").click(function() {
-        jQuery("body").fadeOut("slow", function(){window.location.href = "web.html"})
+        jQuery("body").fadeOut("slow", async function(){
+            await sleep(100);
+            window.location.href = "web.html"})
     })
     </script>
 </body>
