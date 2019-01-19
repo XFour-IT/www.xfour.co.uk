@@ -1,16 +1,16 @@
 /* TEAM */
     CEO: Benji Lewis
-    Contact: benji@benjisoft.org.uk
-    Twitter: @benjihaztweets
+    Contact: benji@xfour.co.uk
+    Twitter: @benjisoft
     From: Bracknell, UK
 
     ACEO: Oli Beardsall
-    Contact: oli@benjisoft.org.uk
+    Contact: oli@xfour.co.uk
     Twitter: @bubcool1
     From: Reading, UK
 
     Frontend Dev: Reilly Hewitson
-    Contact: reilly@benjisoft.org.uk
+    Contact: reilly@xfour.co.uk
     Twitter: @reilly_hewitson
 
 /* THANKS */
@@ -19,7 +19,7 @@
     From: Reading(ish), UK
 
 /* SITE */
-	Last update:2018/06/24
-	Language: English/ Anything google translate can do!
+	Last update: 19/01/2019
+	Language: English
 	Doctype: HTML5
-	IDE: PHPStorm, Gitkraken, WinSCP, Photoshop
+	IDE: Visual Studio Code, Gitkraken

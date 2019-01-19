@@ -1,0 +1,40 @@
+body{
+    width:100%;
+    height:100%;
+}
+.circle{
+    position:absolute;
+    width:300px;
+    height:300px;
+    top:50%;
+    left:50%;
+    margin-left:-150px;
+    margin-top:-150px;
+    background:transparent;
+    border-radius:50%;
+    -webkit-transition:all 3s;
+}
+
+.circle.active{
+    background: red;
+    width:2000px;
+    height:2000px;
+    top:50%;
+    left:50%;
+    margin-left:-1000px;
+    margin-top:-1000px;
+}
+
+.page{
+    /*background: darkred;*/
+    opacity:0;
+    z-index:99;
+    position:relative;
+    -webkit-transition:all 0.5s;
+    -webkit-transition-delay: 1s; 
+    
+}
+
+.page.active{
+opacity:1;
+}
