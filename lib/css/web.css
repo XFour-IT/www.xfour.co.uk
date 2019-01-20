@@ -33,6 +33,12 @@ body {
 	padding: 2vh;
 	padding-right: 0 !important;
 	align-content: center;
+	flex-direction: column;
+}
+
+#comparison {
+	display: flex;
+	flex-direction: row;
 	justify-content: space-around;
 }
 
@@ -42,6 +48,22 @@ body {
 	box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
 	min-width: 22.2vw;
 	max-height: 90vh;
+	padding-bottom: 5%;
+}
+
+#plan-bespoke {
+	margin: 2% 5%;
+	padding: 1%;
+	-webkit-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
+	box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);	
+	display: flex;
+	justify-content: space-between;
+}
+
+#bespoke-text {
+	font-size: large;
+	font-weight: bold;
 }
 
 .planF {
