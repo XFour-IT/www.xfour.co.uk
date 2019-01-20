@@ -2,7 +2,11 @@
 
 body{
     margin: 0;
-    background-color: #cc0000;
+    background-color: darkblue;
+}
+
+#logo_area, .modal {
+    display: none;
 }
 
 #sec1{

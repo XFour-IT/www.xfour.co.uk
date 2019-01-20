@@ -6,14 +6,15 @@
 	<title>XFour Web Design</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" media="screen" href="lib/css/web.css" />
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<script src="lib/js/web.js"></script>
-	<script
-    src="https://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-90630587-13"></script>
+	<script src="lib/js/gtag.js"></script>
 	<script>jQuery(document).ready(function() {jQuery('body').fadeIn("slow");});</script>
 </head>
 <body style="display:none;">
+	<a><i class="material-icons back">home</i></a>
 	<div id="sec-1">
 		<img id="icon" src="lib/res/coding.svg">
 		<h2>Your <span id="text-here">IT</span> specialists</h2>
@@ -28,21 +29,66 @@
 		<div id="plan-1" class="plan">
 			<span class="planName planF">Basic</span>
 			<span class="planCost planF">£5</span>
-			<span class="planFeatures planF">Features here</span>
+			<span class="planFeatures planF">
+				<i><i class="material-icons">check</i> FREE DOMAIN </i>
+				<p><i class="material-icons">check</i> Unlimited Pages</p>
+				<p><i class="material-icons">check</i> Hosting Included</p>
+				<p><i class="material-icons">check</i> Updates within 48 hours*</p>
+				<p><i class="material-icons">check</i> Search engine friendly</p>
+				<p><i class="material-icons">check</i> You provide the content</p>
+				<h3>Extras</h3>
+				<span class="last"></span>
+				<p>+£1 Analytics</p>
+				<p>+£2 Emails (Per 5 addresses)</p>
+				<p>+£10 Service Level Agreement</p>
+			</span>
 		</div>
 		<div id="plan-2" class="plan">
 			<span class="planName planF">Enhanced</span>
 			<span class="planCost planF italic">£10</span>
-			<span class="planFeatures planF">Features here</span>
+			<span class="planFeatures planF">
+				<i><i class="material-icons">check</i> FREE DOMAIN </i>
+				<p><i class="material-icons">check</i> Unlimited Pages</p>
+				<p><i class="material-icons">check</i> Hosting Included</p>
+				<p><i class="material-icons">check</i> Updates within 48 hours*</p>
+				<p><i class="material-icons">check</i> Search engine friendly</p>
+				<p><i class="material-icons">check</i> We can write your content</p>
+				<h3>Extras</h3>
+				<span class="last"></span>
+				<p><i class="material-icons">check</i> Analytics</p>
+				<p><i class="material-icons">check</i> 2 Free Emails</p>
+				<p>(£2 per additional 5 addresses)</p>
+				<p>+£10 Service Level Agreement</p>
+			</span>
 		</div>
 		<div id="plan-3" class="plan">
 			<span class="planName planF">E-Commerce</span>
 			<span class="planCost planF">£15</span>
-			<span class="planFeatures planF">Features here</span>
+			<span class="planFeatures planF">
+				<i><i class="material-icons">check</i> FREE DOMAIN </i>
+				<p><i class="material-icons">check</i> Unlimited Pages</p>
+				<p><i class="material-icons">check</i> Hosting Included</p>
+				<p><i class="material-icons">check</i> Updates within 48 hours*</p>
+				<p><i class="material-icons">check</i> Search engine friendly</p>
+				<p><i class="material-icons">check</i> A wide variety of e-commerce platforms to choose from</p>
+				<h3>Extras</h3>
+				<span class="last"></span>
+				<p><i class="material-icons">check</i> Analytics</p>
+				<p><i class="material-icons">check</i> 2 Free Emails</p>
+				<p>(£2 per additional 5 addresses)</p> 
+				<p>+£10 Service Level Agreement</p>
+				
+			</span>
 		</div>
 	</div>
 	<script src="lib/js/mobile.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/TypewriterJS/1.0.0/typewriter.min.js"></script>
 	<script src="lib/js/typer.js"></script>
+	<script>
+		jQuery(".back").click(function() {
+			jQuery("body").fadeOut("slow", async function(){
+				window.location.href = "index.html"})
+		})
+	</script>
 </body>
 </html>

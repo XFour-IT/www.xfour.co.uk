@@ -2,14 +2,20 @@
 
 body {
 	margin: 0%;
-	background-color: #cc0000;
+	background-color: darkblue;
 	font-family: 'Open Sans Condensed', sans-serif;
+}
+
+.back {
+	color: white;
+	padding: 1% 0 0 1%;
+	cursor: pointer;
 }
 
 #sec-1 {
 	color: white;
 	text-align: center;
-	background-color: #cc0000;
+	background-color: darkblue;
 	padding: 0%;
 	margin: 0%;
 	min-height: 100vh;
@@ -57,9 +63,10 @@ body {
 .planFeatures {
 	padding-top: 1vh;
 	text-align: center;
+	font-weight: bold;
 }
 
-.planCost:after {
+.planCost:after, .last:after {
     content:' ';
     display:block;
     border:2px solid #d0d0d0;
