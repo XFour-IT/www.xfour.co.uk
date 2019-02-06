@@ -14,10 +14,12 @@
 	<script>jQuery(document).ready(function() {jQuery('body').fadeIn("slow");});</script>
 </head>
 <body style="display:none;">
-	<a><i class="material-icons back">home</i></a>
 	<div id="sec-1">
-		<img id="icon" src="lib/res/coding.svg">
-		<h2>Your <span id="text-here">IT</span> specialists</h2>
+		<a id= "home"><i class="material-icons back">home</i></a>
+		<div id="logoArea">
+			<img id="center_logo" src="lib/res/coding.svg">
+			<p>Your <span id="text-here">IT</span> specialists</p>
+		</div>
 		<div id="indicator" onclick="scrollto('#sec-2')">
 			<svg id="chevron" aria-hidden="true" data-prefix="fas" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-w-14"
 			 role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -25,9 +27,10 @@
 			</svg>
 		</div>
 	</div>
+	<div id="wrapper">
 	<div id="sec-2">
 		<div id="comparison">
-			<div id="plan-1" class="plan">
+			<div class="plan shadow">
 				<span class="planName planF">Basic</span>
 				<span class="planCost planF">£5</span>
 				<span class="planFeatures planF">
@@ -44,7 +47,7 @@
 					<p>+£10 Service Level Agreement</p>
 				</span>
 			</div>
-			<div id="plan-2" class="plan">
+			<div class="plan shadow">
 				<span class="planName planF">Enhanced</span>
 				<span class="planCost planF italic">£10</span>
 				<span class="planFeatures planF">
@@ -62,7 +65,7 @@
 					<p>+£10 Service Level Agreement</p>
 				</span>
 			</div>
-			<div id="plan-3" class="plan">
+			<div class="plan shadow">
 				<span class="planName planF">E-Commerce</span>
 				<span class="planCost planF">£15</span>
 				<span class="planFeatures planF">
@@ -81,11 +84,12 @@
 				</span>
 			</div>
 		</div>
-		<div id="plan-bespoke">
+		<div id="plan-bespoke" class="shadow">
 			<h2>Need something more bespoke?</h2>
 			<p id="bespoke-text">We will customise a plan to your needs</p>
 			<button>Get in touch today!</button>
 		</div>
+	</div>
 	</div>
 	<script src="lib/js/mobile.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/TypewriterJS/1.0.0/typewriter.min.js"></script>

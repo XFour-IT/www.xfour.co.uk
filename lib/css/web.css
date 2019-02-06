@@ -12,23 +12,26 @@ body {
 	cursor: pointer;
 }
 
-#sec-1 {
-	color: white;
-	text-align: center;
-	background-color: darkblue;
-	padding: 0%;
-	margin: 0%;
-	min-height: 100vh;
+#sec-1{
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    max-height: 100vh;
+    max-width: 100%;
+    overflow: hidden;
+    z-index: 1;
 }
 
-#icon {
-	max-width: 40vw;
+#wrapper{
+    z-index: 5;
+    position: absolute;
+    margin-top: 100vh;
+    width: 100%;
 }
 
 #sec-2 {
 	background-color: white;
-	min-height: 96vh;
-	max-height: 100vh;
+	min-height: 100vh;
 	display: flex;
 	padding: 2vh;
 	padding-right: 0 !important;
@@ -38,27 +41,33 @@ body {
 
 #comparison {
 	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
+	flex-grow: 1;
+	position: relative;
 }
 
 .plan {
-	-webkit-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
-	-moz-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
-	box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
-	min-width: 22.2vw;
-	max-height: 90vh;
-	padding-bottom: 5%;
+	/*float: center;*/
+    width: 25%;
+    display: inline-block;
+    margin-bottom: 5%;
+	min-width: 110px;
+	margin-left: 4%;
+    margin-right: 4%;
+    padding-top: 1%;
+	padding-bottom: 1%;
+	vertical-align: top;
+	min-height: 100vh;
 }
 
 #plan-bespoke {
 	margin: 2% 5%;
 	padding: 1%;
-	-webkit-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
-	-moz-box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);
-	box-shadow: 10px 10px 68px 0px rgba(0,0,0,0.75);	
 	display: flex;
 	justify-content: space-between;
+}
+
+.shadow{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); 
 }
 
 #bespoke-text {
@@ -130,6 +139,18 @@ body {
 	}
 }
 
+@media screen and (max-width: 600px){
+	#comparison{
+		display: block;
+	}
+    .plan{
+        display: block;
+        margin: auto;
+        width: 75%;
+        margin-bottom: 5%;
+    }
+}
+
 #indicator {
 	margin: auto;
 	animation: bounce 1s infinite ease-in-out;
@@ -149,4 +170,34 @@ body {
 #chevron {
 	height: 30px;
 	width: auto;
+}
+
+#home{	
+	position: absolute;
+	top: 2%;
+	left: 2%;
+}
+
+#logoArea {
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+#logoArea p{
+    font-family: 'Open Sans Condensed', sans-serif;
+    color: snow;
+    font-size: 20pt;
+    z-index: inherit;
+    font-weight: 400;
+}
+
+#center_logo{
+    margin: 0 auto;
+    height: 150px;
+    width: auto;
+    z-index: inherit;  
 }
