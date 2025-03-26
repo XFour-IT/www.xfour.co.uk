@@ -3,3 +3,8 @@
     background: url("../img/pexels-roberto-nickson-3082341.jpg"); 
     background-size: cover;
 }
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
