@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>App &amp; Prototype Development - XFour</title>
+    <meta name="description" content="XFour Labs builds native iOS apps and working prototypes — fixed price, agreed before we start. See Slay, our app on the App Store.">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=5c13df78c26e51f31fd577e41c4f5937">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+    <link rel="stylesheet" href="assets/css/Highlight-Blue.css?h=91a04f2b18410bc09760f3473788176a">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
+    <link rel="stylesheet" href="assets/css/vanilla-zoom.min.css?h=e737f76df021b46fa7180f48799a5d20">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <!-- Page-scoped styles. Kept in this file rather than the shared stylesheets so a
+         Bootstrap Studio regeneration of the theme CSS cannot strip them silently. -->
+    <style>
+        .app-dev-hero {
+            background: linear-gradient(135deg, #1e6add 0%, #3b99e0 100%);
+            color: #fff;
+            text-align: center;
+            padding: 80px 0 70px;
+        }
+
+        .app-dev-hero h1 {
+            margin-bottom: 1.2rem;
+        }
+
+        .app-dev-hero .lead {
+            max-width: 680px;
+            margin: 0 auto 2rem;
+            opacity: .92;
+        }
+
+        .app-dev-hero .support {
+            max-width: 620px;
+            margin: 1.5rem auto 0;
+            font-size: .95rem;
+            opacity: .85;
+        }
+
+        /* The theme caps .block-heading p at 420px, which is too narrow for these intros. */
+        .page .block-heading p {
+            max-width: 680px;
+        }
+
+        .prose {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .prose p {
+            line-height: 1.7;
+        }
+
+        .package {
+            height: 100%;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, .1);
+            border-radius: 6px;
+            padding: 30px 28px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        .package.recommended {
+            border: 2px solid #1e6add;
+        }
+
+        /* Reserved on every card so the three titles and prices line up whether or not
+           the card carries the "Recommended" flag. */
+        .package .flag-row {
+            min-height: 34px;
+        }
+
+        .package .recommended-flag {
+            display: inline-block;
+            background-color: #1e6add;
+            color: #fff;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            border-radius: 3px;
+            padding: 4px 10px;
+            margin-bottom: 14px;
+        }
+
+        .package h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: .5rem;
+        }
+
+        .package .price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e6add;
+            margin-bottom: .75rem;
+        }
+
+        .package .pitch {
+            opacity: .85;
+        }
+
+        .package h4 {
+            font-size: .95rem;
+            font-weight: 700;
+            margin-top: 1.25rem;
+            margin-bottom: .5rem;
+        }
+
+        .package ul {
+            padding-left: 1.1rem;
+            font-size: .92rem;
+        }
+
+        .package ul li {
+            margin-bottom: .45rem;
+        }
+
+        .package .excludes,
+        .package .duration,
+        .package .assumes {
+            font-size: .92rem;
+            margin-top: 1rem;
+            opacity: .85;
+        }
+
+        .package .closer {
+            font-size: .92rem;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, .1);
+        }
+
+        /* Slay brand gradient — blue #3373FA, purple #9959D9, pink #FF73B8, top-left to bottom-right. */
+        .slay-accent {
+            height: 6px;
+            background: linear-gradient(135deg, #3373FA 0%, #9959D9 50%, #FF73B8 100%);
+        }
+
+        .slay-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .slay-title img {
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, .15);
+        }
+
+        .shot figure {
+            margin: 0;
+        }
+
+        .shot img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, .12);
+        }
+
+        .shot-caption {
+            font-size: .9rem;
+            opacity: .75;
+            text-align: center;
+            margin-top: .75rem;
+        }
+
+        .demonstrates th {
+            width: 42%;
+        }
+
+        /* Apple requires the badge be shown at or above its minimum size, with clear
+           space around it of at least 10% of the badge height. */
+        .appstore-badge img {
+            width: 180px;
+            height: auto;
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-light navbar-expand-lg sticky-top bg-white clean-navbar">
+        <div class="container"><a class="navbar-brand logo" href="index.html"><img src="assets/img/Blue.png?h=6b8329759fd4c709e86de7d2d2736107" style="max-height: 5vh;" alt="XFour"></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item d-none"><a class="nav-link" href="about-us.html">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="app-development.html">App Development</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact-us.html">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="page">
+
+        <!-- ============================= Hero ============================= -->
+        <section class="clean-block app-dev-hero">
+            <div class="container">
+                <h1>We build the app. You get it on the App Store.</h1>
+                <p class="lead">XFour Labs builds native iOS apps and working prototypes for people who need something real in weeks, not a slide deck in months.</p>
+                <!--
+                    TODO XFO-11: replace with the real Microsoft Bookings URL before deploy.
+                    The URL lives in exactly ONE place on this page: the BOOKING_URL constant in the
+                    inline script at the bottom of this file. Both "Book a 30-minute build review"
+                    buttons are marked data-booking-link and get their href from that constant.
+                    Until it is set they fall back to the #book section, which carries the email address.
+                -->
+                <p><a class="btn btn-light btn-lg" role="button" data-booking-link href="#book" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
+                <p class="support">No charge, no obligation. Bring an idea or a half-finished project. You leave with a scope, a timeline and a price.</p>
+            </div>
+        </section>
+
+        <!-- ========================== The problem ========================== -->
+        <section class="clean-block">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Most app ideas die in the gap between the idea and the thing you can hold</h2>
+                </div>
+                <div class="prose">
+                    <p>You have a product in your head. What you need is a version of it on a real phone — one you can open, show to a customer, hand to an investor, or put in front of your own team.</p>
+                    <p>Getting there is where it usually stops.</p>
+                    <p>A development agency quotes a six-figure programme and a four-month discovery phase before anyone writes code. A freelancer is cheaper and faster right up until they go quiet. A no-code builder gets you something that looks like an app but cannot do the things that make an app worth having — a home-screen widget, a Watch face, your data syncing silently across every device you own.</p>
+                    <p><strong>What you actually want is a small team that has already shipped something finished, that quotes a price before it starts, and that hands you a real app you own outright.</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== Three ways in — packages ===================== -->
+        <section class="clean-block clean-pricing dark">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Three ways in</h2>
+                    <p>Start wherever matches your risk. Every package is fixed-price, agreed before any work begins. All prices exclude VAT.</p>
+                </div>
+                <div class="row justify-content-center g-4">
+
+                    <!-- Card 1 — Prototype Sprint -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="package">
+                            <div class="flag-row"></div>
+                            <h3>Prototype Sprint</h3>
+                            <p class="price">£1,600 + VAT</p>
+                            <p class="pitch">One week. You end it holding a working app on your own iPhone.</p>
+                            <h4>You get:</h4>
+                            <ul>
+                                <li>A 45-minute call where we agree the single most important screen or flow in your app</li>
+                                <li>That flow built for real in native Swift and delivered over TestFlight, so you install it on your own iPhone and use it</li>
+                                <li>One round of changes to it</li>
+                                <li>A one-page written build scope for the full app, with a fixed price, valid 30 days</li>
+                            </ul>
+                            <p class="excludes"><strong>You do not get:</strong> an App Store release — this is a TestFlight build for you, not the public — more than one screen or flow, a server or an integration with your existing systems, or design work from a designer. The prototype uses standard Apple components.</p>
+                            <p class="duration"><strong>How long:</strong> one week from the scoping call.</p>
+                            <p class="closer"><strong>If you go ahead with a build within 30 days, £500 + VAT comes off the build price.</strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 — Full Build (recommended) -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="package recommended">
+                            <div class="flag-row"><span class="recommended-flag">Recommended</span></div>
+                            <h3>Full Build</h3>
+                            <p class="price">£7,500 + VAT</p>
+                            <p class="pitch">Four weeks. Your app, on the App Store, under your own developer account.</p>
+                            <h4>You get:</h4>
+                            <ul>
+                                <li>A native iPhone and iPad app written in Swift and SwiftUI. Not a web page in a wrapper</li>
+                                <li>Up to five screens, with the scope fixed in writing before a line of code is written</li>
+                                <li>Your data saved on the device and synced across the user's own iPhone, iPad and Mac through their iCloud — <strong>or</strong> connected to one API you already have. One or the other</li>
+                                <li>Notifications</li>
+                                <li>One home-screen widget</li>
+                                <li>An accessibility pass: Dynamic Type and VoiceOver labels, so the app works for people who need larger text or a screen reader</li>
+                                <li>An automated test suite, so changes later do not quietly break what already worked</li>
+                                <li>Submission to the App Store from <strong>your</strong> Apple Developer account, so you own the listing and the app from day one</li>
+                                <li>The full source code in your own Git repository, yours to keep and to take elsewhere</li>
+                                <li>Fourteen days of free bug fixes after Apple approves the app</li>
+                            </ul>
+                            <p class="excludes"><strong>You do not get:</strong> a server or back end built from scratch, an Android version, bespoke visual design from a designer, your Apple Developer Program membership (about £79 a year, paid by you to your own account), ongoing hosting or content, or a guaranteed Apple approval date — Apple reviews on their own schedule, and we handle the submission and any rejections but cannot control their clock.</p>
+                            <p class="duration"><strong>How long:</strong> four weeks from scope sign-off.</p>
+                            <p class="closer"><strong>Smaller budget?</strong> £4,500 + VAT is a real option, not a bluff: roughly three screens, data on the device only, no widget. Say so on the call and we will scope to it rather than quote you something you cannot buy. The full range is £4,500 – £10,500 + VAT, depending on the scope agreed in the Prototype Sprint.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 — Keep Shipping -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="package">
+                            <div class="flag-row"></div>
+                            <h3>Keep Shipping</h3>
+                            <p class="price">£1,400 + VAT a month</p>
+                            <p class="pitch">For after launch. An app nobody maintains stops working within a year.</p>
+                            <h4>You get:</h4>
+                            <ul>
+                                <li>Two days of development time each month, spent on whatever you have decided matters most</li>
+                                <li>Keeping the app working as Apple ships a new version of iOS each September</li>
+                                <li>Bug fixes, small changes and new features, up to the two days</li>
+                                <li>Re-submission to the App Store whenever something ships</li>
+                                <li>Rolling monthly, 30 days' notice on either side, no minimum term</li>
+                            </ul>
+                            <p class="excludes"><strong>You do not get:</strong> carry-over — unused days do not roll into next month — a 24/7 support desk, or a guaranteed response time. If you need those, say so and we will price them.</p>
+                            <p class="assumes"><strong>What this price assumes:</strong> we built the app, or we have had time to read the code we are taking on.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================= Proof ============================= -->
+        <section class="clean-block">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Here is one we finished</h2>
+                    <p>Slay is a native iOS app XFour designed, built and shipped to the App Store. You can download it right now. The full case study is below.</p>
+                </div>
+                <p class="text-center appstore-badge"><a href="https://apps.apple.com/gb/app/slay-the-genderinator/id6774650158" target="_blank" rel="noopener"><img src="assets/img/download-on-the-app-store.svg" width="180" height="60" alt="Download Slay: The Genderinator on the App Store"></a></p>
+            </div>
+        </section>
+
+        <!-- ======================= Case study: Slay ======================= -->
+        <div class="slay-accent"></div>
+        <section class="clean-block dark">
+            <div class="container">
+                <div class="block-heading">
+                    <div class="slay-title"><img src="assets/img/slay/slay-icon-128w.webp" srcset="assets/img/slay/slay-icon-128w.webp 128w, assets/img/slay/slay-icon-256w.webp 256w" sizes="64px" width="64" height="64" alt="Slay app icon">
+                        <h2 class="text-info mb-0">Case study: Slay</h2>
+                    </div>
+                </div>
+                <div class="prose">
+                    <p><strong>Slay: The Genderinator</strong> is a daily check-in app for iPhone, Apple Watch and Apple Vision Pro. A person logs how they are feeling on two scales — confidence, and where they sit on a gender-expression spectrum — and builds a private history of their own days. Designed, built and shipped to the App Store by XFour.</p>
+                    <p><a href="https://apps.apple.com/gb/app/slay-the-genderinator/id6774650158" target="_blank" rel="noopener">See it on the App Store →</a></p>
+
+                    <h3 class="h4 mt-5">The brief</h3>
+                    <p>Build a private daily check-in app. Someone opens it once a day, records how they are feeling on two scales, and over time gets back a picture of their own patterns. It had to feel genuinely good to use rather than clinical, and it had to keep a person's entries private — their data stays on their own devices and in their own iCloud account, with no XFour server in the middle holding it.</p>
+                    <p>It then had to be finished. Not a demo. On the App Store, with everything a real app needs: an icon, screenshots, a privacy policy, store metadata, accessibility, and a test plan proving it works.</p>
+                </div>
+
+                <!-- iPhone gallery — lead image first -->
+                <div class="row justify-content-center g-3 mt-5">
+                    <div class="col-4 col-sm-4 col-lg-2 shot">
+                        <img src="assets/img/slay/iphone-today-390w.webp" srcset="assets/img/slay/iphone-today-390w.webp 390w, assets/img/slay/iphone-today-780w.webp 780w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 30vw, 30vw" width="390" height="845" loading="lazy" decoding="async" alt="Slay's daily check-in screen">
+                    </div>
+                    <div class="col-4 col-sm-4 col-lg-2 shot">
+                        <img src="assets/img/slay/iphone-welcome-390w.webp" srcset="assets/img/slay/iphone-welcome-390w.webp 390w, assets/img/slay/iphone-welcome-780w.webp 780w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 30vw, 30vw" width="390" height="845" loading="lazy" decoding="async" alt="Slay's welcome screen">
+                    </div>
+                    <div class="col-4 col-sm-4 col-lg-2 shot">
+                        <img src="assets/img/slay/iphone-history-390w.webp" srcset="assets/img/slay/iphone-history-390w.webp 390w, assets/img/slay/iphone-history-780w.webp 780w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 30vw, 30vw" width="390" height="845" loading="lazy" decoding="async" alt="Slay's history charts">
+                    </div>
+                    <div class="col-4 col-sm-4 col-lg-2 shot">
+                        <img src="assets/img/slay/iphone-friends-390w.webp" srcset="assets/img/slay/iphone-friends-390w.webp 390w, assets/img/slay/iphone-friends-780w.webp 780w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 30vw, 30vw" width="390" height="845" loading="lazy" decoding="async" alt="Slay's friends list">
+                    </div>
+                    <div class="col-4 col-sm-4 col-lg-2 shot">
+                        <img src="assets/img/slay/iphone-friend-detail-390w.webp" srcset="assets/img/slay/iphone-friend-detail-390w.webp 390w, assets/img/slay/iphone-friend-detail-780w.webp 780w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 30vw, 30vw" width="390" height="845" loading="lazy" decoding="async" alt="A friend's detail view in Slay">
+                    </div>
+                    <div class="col-4 col-sm-4 col-lg-2 shot">
+                        <img src="assets/img/slay/iphone-bestie-alert-390w.webp" srcset="assets/img/slay/iphone-bestie-alert-390w.webp 390w, assets/img/slay/iphone-bestie-alert-780w.webp 780w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 30vw, 30vw" width="390" height="845" loading="lazy" decoding="async" alt="A push notification from Slay">
+                    </div>
+                    <div class="col-12">
+                        <p class="shot-caption">Screens from Slay's App Store listing.</p>
+                    </div>
+                </div>
+
+                <div class="prose mt-5">
+                    <h3 class="h4">What we built</h3>
+                    <p><strong>The app.</strong> A native iPhone app written in Swift and SwiftUI. Daily check-in, full history, charts that show how things have shifted over weeks and months, and a shareable summary a person can post if they want to.</p>
+                    <p><strong>On the wrist.</strong> A real Apple Watch app — not a mirror of the phone screen. You set your score with the Digital Crown and log it from the watch, and it appears on the phone a moment later. There is a watch-face complication showing your current score and streak, which opens the app when tapped.</p>
+                </div>
+
+                <!-- Apple Watch gallery -->
+                <div class="row justify-content-center g-3 mt-4">
+                    <div class="col-4 col-sm-3 col-lg-2 shot">
+                        <img src="assets/img/slay/watch-checkin-205w.webp" srcset="assets/img/slay/watch-checkin-205w.webp 205w, assets/img/slay/watch-checkin-410w.webp 410w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 22vw, 30vw" width="205" height="251" loading="lazy" decoding="async" alt="Slay's check-in screen on Apple Watch">
+                    </div>
+                    <div class="col-4 col-sm-3 col-lg-2 shot">
+                        <img src="assets/img/slay/watch-genderality-205w.webp" srcset="assets/img/slay/watch-genderality-205w.webp 205w, assets/img/slay/watch-genderality-410w.webp 410w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 22vw, 30vw" width="205" height="251" loading="lazy" decoding="async" alt="Setting a score with the Digital Crown on Apple Watch">
+                    </div>
+                    <div class="col-4 col-sm-3 col-lg-2 shot">
+                        <img src="assets/img/slay/watch-saved-205w.webp" srcset="assets/img/slay/watch-saved-205w.webp 205w, assets/img/slay/watch-saved-410w.webp 410w" sizes="(min-width: 992px) 16vw, (min-width: 576px) 22vw, 30vw" width="205" height="251" loading="lazy" decoding="async" alt="A saved entry confirmation on Apple Watch">
+                    </div>
+                    <div class="col-12">
+                        <p class="shot-caption">The Apple Watch app.</p>
+                    </div>
+                </div>
+
+                <div class="prose mt-5">
+                    <p><strong>On the Home Screen.</strong> Home-screen and lock-screen widgets showing the current score and streak, with a tap-to-log shortcut, refreshing the moment the underlying data changes.</p>
+                    <p><strong>In space.</strong> A dedicated Apple Vision Pro app, built as its own target so it can grow a genuinely spatial experience rather than being a stretched iPad app. It already has an immersive environment that shifts with the person's recent week.</p>
+                </div>
+
+                <!-- Apple Vision Pro -->
+                <div class="row justify-content-center mt-4">
+                    <div class="col-lg-10 shot">
+                        <img src="assets/img/slay/visionpro-today-960w.webp" srcset="assets/img/slay/visionpro-today-960w.webp 960w, assets/img/slay/visionpro-today-1920w.webp 1920w" sizes="(min-width: 992px) 900px, 92vw" width="960" height="540" loading="lazy" decoding="async" alt="Slay running on Apple Vision Pro">
+                        <p class="shot-caption">Slay on Apple Vision Pro.</p>
+                    </div>
+                </div>
+
+                <div class="prose mt-5">
+                    <p><strong>Syncing, properly.</strong> Entries move between a person's iPhone and their paired Watch automatically. The social side — the friends feature — syncs through Apple's own CloudKit under each person's Apple ID. Deletions stay deleted instead of reappearing, which is the hard part of sync and the part that is usually got wrong.</p>
+                    <p><strong>A social layer with the safety work done.</strong> Friends, friend codes, finding friends from your contacts without ever uploading your address book, reactions, and push notifications that fire the moment something happens. Messages between friends are cryptographically signed and sealed, so a notification cannot be forged.</p>
+                    <p><strong>Accessible.</strong> VoiceOver support, Reduce Motion honoured throughout, and every hidden interaction also reachable through a plain button so that someone using Switch Control or Voice Control is not locked out of it.</p>
+                    <p><strong>Tested and documented.</strong> Around 113 automated tests built with Apple's Swift Testing framework, split into a fast suite that runs on every build and a full suite that runs on every release, each driven by a one-command script. On top of that, a written manual test plan covering the multi-device flows no automated test can reach — two real users on two devices, the Watch, the Vision Pro headset, and the widgets.</p>
+                    <p><strong>Shipped.</strong> On the App Store, with the complete store package: app icon, six screenshots, store listing copy, keyword research, age rating, Apple's privacy disclosures filled in, and a published privacy policy.</p>
+                </div>
+
+                <!-- What it demonstrates -->
+                <div class="row justify-content-center mt-5">
+                    <div class="col-lg-10">
+                        <h3 class="h4">What it demonstrates</h3>
+                        <div class="table-responsive">
+                            <table class="table demonstrates">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">If you are asking…</th>
+                                        <th scope="col">Slay is the answer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Can you actually build native, or do you wrap a website?</td>
+                                        <td>Native Swift and SwiftUI throughout. Three separate app targets — iPhone, Apple Watch, Apple Vision Pro — out of one codebase.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Can you handle data syncing across devices?</td>
+                                        <td>Yes, including the hard case: deletions that stay deleted. Built on Apple's CloudKit, so there is no server to rent and no database for us to be a custodian of.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Can you build the Apple extras, or just the app itself?</td>
+                                        <td>Home-screen widgets, lock-screen widgets, a watch-face complication, push notifications, deep links, an immersive visionOS environment.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Do you take privacy and security seriously?</td>
+                                        <td>The design keeps personal entries on the user's own devices and in their own iCloud. Friend-to-friend messages are signed and sealed. The repository carries a written security policy.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Is it accessible?</td>
+                                        <td>VoiceOver, Reduce Motion and alternative routes to every gesture-only feature. This matters if you ever sell to a public body or a large company.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Do you test, or do you ship and hope?</td>
+                                        <td>~113 automated tests on two cadences, plus a written manual plan for what automation cannot cover.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Can you get it through Apple review?</td>
+                                        <td>It is on the App Store. The store assets, the privacy disclosures and the policy were all produced as part of the work.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>What do I own at the end?</td>
+                                        <td>Everything. Source code, assets, and the listing under your own developer account.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prose mt-4">
+                    <p>Slay is XFour's own product, so we chose the brief. That is worth knowing — but the app, the sync, the Watch, the widgets, the tests and the App Store submission are the same work we would do for yours.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================== The one call to action ====================== -->
+        <section class="clean-block" id="book">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Tell us what you want built</h2>
+                </div>
+                <div class="prose text-center">
+                    <p>Thirty minutes on a call. You describe what you need; we tell you which of the three packages fits, roughly what it costs, and roughly how long it takes. If it is not something we should build, we will say that too.</p>
+                    <p class="mt-4"><a class="btn btn-primary btn-lg" role="button" data-booking-link href="#book" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
+                    <!--
+                        TODO XFO-11: the hello@xfour.co.uk mailbox must exist before this page is
+                        deployed. If it does not, DELETE this single <p> — a dead address on a sales
+                        page is worse than no address. Do not substitute support@xfour.co.uk; Ben
+                        decides the address and that decision is tracked on XFO-11.
+                    -->
+                    <p>Or email <strong><a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a></strong> with a sentence about what you want to build.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer class="page-footer dark">
+        <div class="container">
+            <div class="row d-xl-flex justify-content-xl-center">
+                <div class="col-sm-3">
+                    <h5>About us</h5>
+                    <ul>
+                        <li><a href="services.html">Company Information</a></li>
+                        <li><a href="contact-us.html">Contact us</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>Legal</h5>
+                    <ul>
+                        <li><a href="legal/legal.html">Legal Center</a></li>
+                        <li><a href="legal/legal.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <p>© 2025 XFour IT Limited</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/bs-init.js?h=7563c52cc0a72a92d96ce0159b71241c"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
+    <script src="assets/js/vanilla-zoom.js?h=6a37ea9c996b05f763161c73127d66bc"></script>
+    <script src="assets/js/theme.js?h=a083aeb15550c5e1266c666e8a5846d9"></script>
+    <script>
+        // ===================================================================
+        // The Microsoft Bookings link for "Book a 30-minute build review".
+        // This is the ONLY place the booking URL appears on this page.
+        // TODO XFO-11: replace with the real Microsoft Bookings URL before deploy.
+        // ===================================================================
+        var BOOKING_URL = '[[BOOKINGS_URL]]';
+
+        (function () {
+            if (!BOOKING_URL || BOOKING_URL.charAt(0) === '[') return; // placeholder not yet replaced
+            var links = document.querySelectorAll('[data-booking-link]');
+            for (var i = 0; i < links.length; i++) links[i].setAttribute('href', BOOKING_URL);
+        })();
+    </script>
+</body>
+
+</html>
