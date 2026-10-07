@@ -212,13 +212,13 @@
                 <h1>We build the app. You get it on the App Store.</h1>
                 <p class="lead">XFour Labs builds native iOS apps and working prototypes for people who need something real in weeks, not a slide deck in months.</p>
                 <!--
-                    TODO XFO-11: replace with the real Microsoft Bookings URL before deploy.
-                    The URL lives in exactly ONE place on this page: the BOOKING_URL constant in the
-                    inline script at the bottom of this file. Both "Book a 30-minute build review"
-                    buttons are marked data-booking-link and get their href from that constant.
-                    Until it is set they fall back to the #book section, which carries the email address.
+                    The Microsoft Bookings link. It appears in two hrefs on this page: here and on
+                    the closing call to action in #book. Change both together.
+                    Keep ?anonymous — it is what lets a stranger book without a Microsoft sign-in.
+                    The three & are written &amp; because a bare & is invalid in an HTML attribute;
+                    the URL the browser requests is unchanged.
                 -->
-                <p><a class="btn btn-light btn-lg" role="button" data-booking-link href="#book" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
+                <p><a class="btn btn-light btn-lg" role="button" data-booking-link href="https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&amp;ismsaljsauthenabled&amp;ep=mcard" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
                 <p class="support">No charge, no obligation. Bring an idea or a half-finished project. You leave with a scope, a timeline and a price.</p>
             </div>
         </section>
@@ -479,13 +479,9 @@
                 </div>
                 <div class="prose text-center">
                     <p>Thirty minutes on a call. You describe what you need; we tell you which of the three packages fits, roughly what it costs, and roughly how long it takes. If it is not something we should build, we will say that too.</p>
-                    <p class="mt-4"><a class="btn btn-primary btn-lg" role="button" data-booking-link href="#book" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
-                    <!--
-                        TODO XFO-11: the hello@xfour.co.uk mailbox must exist before this page is
-                        deployed. If it does not, DELETE this single <p> — a dead address on a sales
-                        page is worse than no address. Do not substitute support@xfour.co.uk; Ben
-                        decides the address and that decision is tracked on XFO-11.
-                    -->
+                    <!-- Second of the two booking hrefs — see the comment in the hero. Change both together. -->
+                    <p class="mt-4"><a class="btn btn-primary btn-lg" role="button" data-booking-link href="https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&amp;ismsaljsauthenabled&amp;ep=mcard" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
+                    <!-- hello@xfour.co.uk must be receiving mail before this page is deployed (Ben, 7 Oct 2026). -->
                     <p>Or email <strong><a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a></strong> with a sentence about what you want to build.</p>
                 </div>
             </div>
@@ -520,20 +516,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
     <script src="assets/js/vanilla-zoom.js?h=6a37ea9c996b05f763161c73127d66bc"></script>
     <script src="assets/js/theme.js?h=a083aeb15550c5e1266c666e8a5846d9"></script>
-    <script>
-        // ===================================================================
-        // The Microsoft Bookings link for "Book a 30-minute build review".
-        // This is the ONLY place the booking URL appears on this page.
-        // TODO XFO-11: replace with the real Microsoft Bookings URL before deploy.
-        // ===================================================================
-        var BOOKING_URL = '[[BOOKINGS_URL]]';
-
-        (function () {
-            if (!BOOKING_URL || BOOKING_URL.charAt(0) === '[') return; // placeholder not yet replaced
-            var links = document.querySelectorAll('[data-booking-link]');
-            for (var i = 0; i < links.length; i++) links[i].setAttribute('href', BOOKING_URL);
-        })();
-    </script>
 </body>
 
 </html>
