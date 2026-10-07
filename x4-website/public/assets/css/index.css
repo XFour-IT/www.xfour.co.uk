@@ -1,7 +1,15 @@
 .xfour-hero {
-    color: rgba(58, 134, 255, 0.8);
-    background: url("../img/pexels-roberto-nickson-3082341.jpg"); 
-    background-size: cover;
+    /* `currentColor` is used by .clean-hero:before as the photo overlay. A dark
+       navy at this opacity keeps the brand feel but gives the white heading
+       enough contrast to pass WCAG AA over the photograph. */
+    color: rgba(8, 32, 68, 0.78);
+    background: url("../img/pexels-roberto-nickson-3082341.jpg") center / cover no-repeat;
+}
+.xfour-hero .text {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+.xfour-hero .btn + .btn {
+    margin-left: 0.5rem;
 }
 footer {
     bottom: 0;
