@@ -5,12 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Contact Us | XFour IT Support, Reading</title>
-    <meta name="description" content="Contact XFour. Call 0118 370 2920, email support@xfour.co.uk, or use the live chat on this page. IT support and Dynamics 365 help for Thames Valley businesses.">
+    <meta name="description" content="Contact XFour. Ask for a Dynamics 365 scoping call or a managed IT quote, call 0118 370 2920, or use the live chat on this page. IT support and Dynamics 365 help for Thames Valley businesses.">
     <link rel="canonical" href="https://www.xfour.co.uk/contact-us">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="XFour">
     <meta property="og:title" content="Contact Us | XFour IT Support, Reading">
-    <meta property="og:description" content="Contact XFour. Call 0118 370 2920, email support@xfour.co.uk, or use the live chat on this page. IT support and Dynamics 365 help for Thames Valley businesses.">
+    <meta property="og:description" content="Contact XFour. Ask for a Dynamics 365 scoping call or a managed IT quote, call 0118 370 2920, or use the live chat on this page. IT support and Dynamics 365 help for Thames Valley businesses.">
     <meta property="og:url" content="https://www.xfour.co.uk/contact-us">
     <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=5c13df78c26e51f31fd577e41c4f5937">
@@ -23,6 +23,55 @@
     <link rel="stylesheet" href="assets/css/vanilla-zoom.min.css?h=e737f76df021b46fa7180f48799a5d20">
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <!-- Page-scoped styles for the two enquiry forms. Kept in this file rather
+         than the shared stylesheets so a Bootstrap Studio regeneration of the
+         theme CSS cannot strip them silently. -->
+    <style>
+        .enquiry-card {
+            height: 100%;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, .1);
+            border-radius: 6px;
+            padding: 30px 28px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        .enquiry-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .enquiry-card .who {
+            color: #6c757d;
+            font-size: .95rem;
+        }
+
+        /* The honeypot must be reachable by a bot reading the markup and
+           invisible to a person. Moving it off-screen does both; display:none
+           is skipped by some form-filling bots. */
+        .honeypot {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .enquiry-state {
+            border-radius: 6px;
+            padding: 24px;
+        }
+
+        .enquiry-state.ok {
+            background-color: #e7f3ff;
+            border: 1px solid #b6daff;
+        }
+
+        .enquiry-state.bad {
+            background-color: #fdf0ef;
+            border: 1px solid #f5c6c3;
+        }
+    </style>
 </head>
 
 <body>
@@ -44,7 +93,8 @@
             <div class="container">
                 <div class="block-heading">
                     <h1 class="text-info">Contact Us</h1>
-                    <p>Get in touch with us today and learn more</p>
+                    <p>Tell us what you need and the right person will come back to you. Buying? Use one of the two
+                        forms below. Already a customer with something broken? Raise a ticket and we will pick it up.</p>
                 </div>
             </div>
             <div class="container">
@@ -53,14 +103,222 @@
                         <h2 class="h4" style="font-weight: bold;">Give us a ring</h2>
                         <p><a href="tel:+441183702920">0118 370 2920</a></p>
                     </div>
+                    <!-- support@ tells a buyer they are raising a ticket. Buyers get hello@;
+                         existing customers keep support@. Both addresses must be receiving
+                         mail before this page is deployed. -->
                     <div class="col-md-4" data-bss-hover-animate="pulse" style="text-align: center;"><i class="fas fa-envelope" style="font-size: 100px;padding: 1%;"></i>
                         <h2 class="h4" style="font-weight: bold;">Email Us</h2>
-                        <p><a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a></p>
+                        <p class="mb-1">New enquiry: <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a></p>
+                        <p>Already a customer: <a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a></p>
                     </div>
                     <div class="col-md-4" data-bss-hover-animate="pulse" style="text-align: center;"><i class="fas fa-map-marked-alt" style="font-size: 100px;padding: 1%;"></i>
                         <h2 class="h4" style="font-weight: bold;">Send us a letter</h2>
                         <p>4b Paddock Road<br>Reading<br>RG4 5BY</p>
                         <h5 style="font-style: italic;">Mail Only Please</h5>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--
+            Two enquiry forms, one per buying journey (XFO-46).
+
+            Both post to POST /api/enquiry, which creates a Lead in the XFour
+            Dynamics 365 tenant. The journey is carried in the hidden `journey`
+            field and decides the lead source and the owner. See
+            docs/lead-forms.md for the tenant configuration.
+
+            The forms need JavaScript, because Cloudflare Turnstile does. Each
+            one carries a <noscript> block with the phone number and email
+            address so nobody is ever stuck.
+        -->
+        <section class="clean-block clean-form" id="enquiry">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Tell us what you need</h2>
+                    <p>Two different conversations, so two different forms. Pick the one that sounds like you.</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-lg-6" id="dynamics-365">
+                        <div class="enquiry-card">
+                            <h3>Dynamics 365</h3>
+                            <p class="who">For anyone who already runs Dynamics 365, or is weighing it up, and wants
+                                to talk it through with somebody who does this every day.</p>
+                            <!--
+                                The quickest path is the live Microsoft Bookings link. This is the same
+                                meeting type as the one on /app-development — Ben, if you want the
+                                Dynamics scoping call to land in a separate Bookings calendar, create
+                                the meeting type and swap this href.
+                            -->
+                            <p><a class="btn btn-primary" role="button"
+                                    href="https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&amp;ismsaljsauthenabled&amp;ep=mcard"
+                                    target="_blank" rel="noopener">Book a 30-minute scoping call</a></p>
+                            <hr>
+                            <p class="who">Or tell us about it here and we will come back to you.</p>
+                            <form data-enquiry-form data-journey="dynamics" novalidate>
+                                <input type="hidden" name="journey" value="dynamics">
+                                <div class="honeypot" aria-hidden="true">
+                                    <label for="dyn-website">Website</label>
+                                    <input type="text" id="dyn-website" name="website" tabindex="-1"
+                                        autocomplete="off">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="dyn-name">Your name</label>
+                                    <input class="form-control" type="text" id="dyn-name" name="name" required
+                                        maxlength="100" autocomplete="name">
+                                    <div class="invalid-feedback d-block" data-error-for="name"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="dyn-company">Company</label>
+                                    <input class="form-control" type="text" id="dyn-company" name="company" required
+                                        maxlength="100" autocomplete="organization">
+                                    <div class="invalid-feedback d-block" data-error-for="company"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="dyn-email">Work email</label>
+                                    <input class="form-control" type="email" id="dyn-email" name="email" required
+                                        maxlength="120" autocomplete="email">
+                                    <div class="invalid-feedback d-block" data-error-for="email"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="dyn-stack">What do you run today?</label>
+                                    <textarea class="form-control" id="dyn-stack" name="current_stack" rows="3"
+                                        required maxlength="1000"
+                                        placeholder="Sales, Customer Service, Business Central, a spreadsheet — whatever it is."></textarea>
+                                    <div class="invalid-feedback d-block" data-error-for="current_stack"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="dyn-pain">What is not working?</label>
+                                    <textarea class="form-control" id="dyn-pain" name="pain" rows="3" required
+                                        maxlength="2000"
+                                        placeholder="The thing that made you look for help today."></textarea>
+                                    <div class="invalid-feedback d-block" data-error-for="pain"></div>
+                                </div>
+                                <div class="mb-3" data-turnstile></div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" value="yes" name="consent"
+                                        id="dyn-consent" required>
+                                    <label class="form-check-label" for="dyn-consent">I am happy for XFour to reply to
+                                        me about this enquiry. See our <a href="/legal/privacy">privacy policy</a>.</label>
+                                    <div class="invalid-feedback d-block" data-error-for="consent"></div>
+                                </div>
+                                <button class="btn btn-primary" type="submit">Send enquiry</button>
+                                <noscript>
+                                    <p class="mt-3 mb-0">This form needs JavaScript. Please call
+                                        <a href="tel:+441183702920">0118 370 2920</a> or email
+                                        <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a> instead.</p>
+                                </noscript>
+                            </form>
+                            <div class="enquiry-state ok" data-state="success" hidden>
+                                <h3 class="h5">Thank you — that is with us.</h3>
+                                <p class="mb-0">You will get an email confirming we have it, and one of us will come
+                                    back to you within one working day.</p>
+                            </div>
+                            <div class="enquiry-state bad" data-state="error" hidden>
+                                <p class="mb-0">Sorry — we could not send that. Please try again, or call
+                                    <a href="tel:+441183702920">0118 370 2920</a> or email
+                                    <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a>.</p>
+                            </div>
+                            <div class="enquiry-state bad" data-state="fallback" hidden>
+                                <p class="mb-0">This form is not available right now. Please call
+                                    <a href="tel:+441183702920">0118 370 2920</a> or email
+                                    <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" id="managed-it">
+                        <div class="enquiry-card">
+                            <h3>Managed IT</h3>
+                            <p class="who">For anyone who wants a price for looking after their people, their
+                                machines and their Microsoft 365.</p>
+                            <p class="who">Give us these five answers and we can usually come back with a number, not
+                                a meeting request.</p>
+                            <form data-enquiry-form data-journey="managed-it" novalidate>
+                                <input type="hidden" name="journey" value="managed-it">
+                                <div class="honeypot" aria-hidden="true">
+                                    <label for="mit-website">Website</label>
+                                    <input type="text" id="mit-website" name="website" tabindex="-1"
+                                        autocomplete="off">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="mit-name">Your name</label>
+                                    <input class="form-control" type="text" id="mit-name" name="name" required
+                                        maxlength="100" autocomplete="name">
+                                    <div class="invalid-feedback d-block" data-error-for="name"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="mit-company">Company</label>
+                                    <input class="form-control" type="text" id="mit-company" name="company" required
+                                        maxlength="100" autocomplete="organization">
+                                    <div class="invalid-feedback d-block" data-error-for="company"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="mit-email">Work email</label>
+                                    <input class="form-control" type="email" id="mit-email" name="email" required
+                                        maxlength="120" autocomplete="email">
+                                    <div class="invalid-feedback d-block" data-error-for="email"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label" for="mit-users">How many users?</label>
+                                        <input class="form-control" type="number" id="mit-users" name="users" required
+                                            min="1" max="10000" step="1" inputmode="numeric">
+                                        <div class="invalid-feedback d-block" data-error-for="users"></div>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label" for="mit-devices">How many devices?</label>
+                                        <input class="form-control" type="number" id="mit-devices" name="devices"
+                                            required min="1" max="20000" step="1" inputmode="numeric">
+                                        <div class="invalid-feedback d-block" data-error-for="devices"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="mit-provider">Who looks after it today?</label>
+                                    <input class="form-control" type="text" id="mit-provider" name="current_provider"
+                                        maxlength="100" placeholder="A provider, somebody in-house, or nobody yet.">
+                                    <div class="invalid-feedback d-block" data-error-for="current_provider"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="mit-cover">What cover do you need?</label>
+                                    <select class="form-select" id="mit-cover" name="cover" required>
+                                        <option value="">Please choose…</option>
+                                        <option value="Business hours">Business hours, Monday to Friday</option>
+                                        <option value="Extended hours">Extended hours, early and late</option>
+                                        <option value="24/7">24 hours, every day</option>
+                                        <option value="Not sure">Not sure — tell me what is normal</option>
+                                    </select>
+                                    <div class="invalid-feedback d-block" data-error-for="cover"></div>
+                                </div>
+                                <div class="mb-3" data-turnstile></div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" value="yes" name="consent"
+                                        id="mit-consent" required>
+                                    <label class="form-check-label" for="mit-consent">I am happy for XFour to reply to
+                                        me about this enquiry. See our <a href="/legal/privacy">privacy policy</a>.</label>
+                                    <div class="invalid-feedback d-block" data-error-for="consent"></div>
+                                </div>
+                                <button class="btn btn-primary" type="submit">Request a quote</button>
+                                <noscript>
+                                    <p class="mt-3 mb-0">This form needs JavaScript. Please call
+                                        <a href="tel:+441183702920">0118 370 2920</a> or email
+                                        <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a> instead.</p>
+                                </noscript>
+                            </form>
+                            <div class="enquiry-state ok" data-state="success" hidden>
+                                <h3 class="h5">Thank you — that is with us.</h3>
+                                <p class="mb-0">You will get an email confirming we have it, and one of us will come
+                                    back to you within one working day.</p>
+                            </div>
+                            <div class="enquiry-state bad" data-state="error" hidden>
+                                <p class="mb-0">Sorry — we could not send that. Please try again, or call
+                                    <a href="tel:+441183702920">0118 370 2920</a> or email
+                                    <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a>.</p>
+                            </div>
+                            <div class="enquiry-state bad" data-state="fallback" hidden>
+                                <p class="mb-0">This form is not available right now. Please call
+                                    <a href="tel:+441183702920">0118 370 2920</a> or email
+                                    <a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a>.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,6 +361,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
     <script src="assets/js/vanilla-zoom.js?h=6a37ea9c996b05f763161c73127d66bc"></script>
     <script src="assets/js/theme.js?h=a083aeb15550c5e1266c666e8a5846d9"></script>
+    <script src="assets/js/enquiry-form.js"></script>
     <script id="Microsoft_Omnichannel_LCWidget" src="https://oc-cdn-public-gbr.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js" onerror="(function(el){el.parentNode.removeChild(el);var s=document.createElement('script');s.src='https://ocprodpublicgbrgs.blob.core.windows.net/livechatwidget/scripts/LiveChatBootstrapper.js';s.setAttribute('id', 'Microsoft_Omnichannel_LCWidget');s.setAttribute('data-app-id', '30c2ba8d-2037-47e1-99c3-6b9c412ac9d1');s.setAttribute('data-lcw-version', 'prod');s.setAttribute('data-org-id', 'c38508aa-cd24-ef11-8407-0022481a27a4');s.setAttribute('data-org-url', 'https://m-c38508aa-cd24-ef11-8407-0022481a27a4.uk.omnichannelengagementhub.com');document.body.appendChild(s);})(this);" data-app-id="30c2ba8d-2037-47e1-99c3-6b9c412ac9d1" data-lcw-version="prod" data-org-id="c38508aa-cd24-ef11-8407-0022481a27a4" data-org-url="https://m-c38508aa-cd24-ef11-8407-0022481a27a4.uk.omnichannelengagementhub.com" async></script>
 </body>
 
