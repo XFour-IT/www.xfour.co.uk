@@ -121,3 +121,6 @@ $RECYCLE.BIN/
 sendgrid.env
 
 x4-website/.wrangler/tmp/
+
+# Worker secrets for local development (wrangler dev). Never commit these.
+x4-website/.dev.vars

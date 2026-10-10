@@ -6,45 +6,55 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "x4-website",
 	"compatibility_date": "2025-05-06",
+	"main": "./src/index.js",
 	"assets": {
 		"directory": "./public",
 		// Serve public/404.html on a miss. Without this, Workers returns its own
 		// bare 404 and the custom page is dead weight. (The old .htaccess tried
 		// to do this, but Workers does not read .htaccess.)
 		"not_found_handling": "404-page",
-		"html_handling": "auto-trailing-slash"
+		"html_handling": "auto-trailing-slash",
+		"binding": "ASSETS",
+		// Without this, a request that matches no asset is answered with 404.html
+		// and never reaches the Worker — so POST /api/enquiry would 404. With it,
+		// the Worker sees every request and hands all non-API paths straight back
+		// to the asset server, which keeps the two settings above working.
+		// (Newer Wrangler allows run_worker_first: ["/api/*"], which would be
+		// tighter. The pinned 4.14.2 only accepts the boolean.)
+		"run_worker_first": true
 	},
 	"observability": {
 		"enabled": true
+	},
+	/**
+	 * Enquiry form configuration — see docs/lead-forms.md.
+	 *
+	 * These are not secrets, so they live here in the repo. The two real secrets
+	 * (ENTRA_CLIENT_SECRET and TURNSTILE_SECRET_KEY) are set with
+	 * `wrangler secret put` and must never be written into this file.
+	 *
+	 * While DATAVERSE_URL, ENTRA_TENANT_ID, ENTRA_CLIENT_ID or the client secret
+	 * are blank, POST /api/enquiry answers 503 instead of silently losing a lead.
+	 */
+	"vars": {
+		// e.g. "https://xfour.crm11.dynamics.com" — no trailing slash.
+		"DATAVERSE_URL": "",
+		"ENTRA_TENANT_ID": "",
+		"ENTRA_CLIENT_ID": "",
+		// Turnstile site key. Public by design; the matching secret is a secret.
+		"TURNSTILE_SITE_KEY": "",
+		// Integer values of the two new Lead Source option set entries.
+		"LEAD_SOURCE_DYNAMICS": "",
+		"LEAD_SOURCE_MANAGED_IT": "",
+		// systemuser GUIDs. Separate owners so the pipelines report separately.
+		"LEAD_OWNER_DYNAMICS": "",
+		"LEAD_OWNER_MANAGED_IT": ""
 	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
 	// "placement": { "mode": "smart" },
-
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
 
 	/**
 	 * Service Bindings (communicate between multiple Workers)
