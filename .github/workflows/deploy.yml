@@ -1,0 +1,92 @@
+name: Deploy
+
+# A merge to main goes live. Nobody runs `wrangler deploy` by hand any more.
+# A pull request builds a preview version instead, and the preview URL is
+# posted back on the pull request. A preview never touches the live site.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: deploy-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://www.xfour.co.uk
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: x4-website/package-lock.json
+
+      - name: Install dependencies
+        working-directory: x4-website
+        run: npm ci
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: x4-website
+          command: deploy
+
+  preview:
+    name: Build preview
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: x4-website/package-lock.json
+
+      - name: Install dependencies
+        working-directory: x4-website
+        run: npm ci
+
+      - name: Upload preview version
+        id: preview
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: x4-website
+          command: versions upload
+
+      - name: Post the preview URL on the pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMAND_OUTPUT: ${{ steps.preview.outputs.command-output }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          url="$(printf '%s' "$COMMAND_OUTPUT" | grep -Eo 'https://[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev' | head -n 1 || true)"
+          if [ -z "$url" ]; then
+            echo "No preview URL found in the wrangler output."
+            exit 0
+          fi
+          printf 'Preview of this pull request: %s\n\nThis is a preview version. The live site is unchanged.\n' "$url" \
+            > preview-comment.md
+          gh pr comment "$PR_NUMBER" --body-file preview-comment.md
