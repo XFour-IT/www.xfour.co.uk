@@ -204,6 +204,39 @@ lands and start working the moment it does. No new tag manager is needed.
 
 ---
 
+## Previewing it
+
+**https://x4-website-preview.xfour.workers.dev/contact-us**
+
+The review address, put up on 11 Oct 2026 so both forms can be seen before
+anything reaches xfour.co.uk. It is the `x4-website-preview` Worker in the same
+Cloudflare account, and it is a throwaway — delete it once the forms are live.
+
+What is real on it:
+
+- `src/index.js` from this branch, byte for byte. Same handler, same validation,
+  same honeypot, same origin allowlist.
+- Both forms and `enquiry-form.js` from this branch.
+- Turnstile, against the live widget.
+
+What is different:
+
+- Static files come from the `xfour-preview-assets` KV namespace rather than the
+  Workers asset server, because this Worker was uploaded over the API and has no
+  asset bundle. Every page is served from that namespace, so the whole branch can
+  be clicked through, not only `/contact-us`.
+- `TURNSTILE_SECRET_KEY` is set on it. The Dataverse vars are not, so a
+  submission that passes Turnstile gets the same `503 not_configured` the live
+  site would give today, and the form shows its "call us instead" message. **A
+  preview submission cannot create a Lead.** That needs the four jobs above.
+- Every response carries `X-Robots-Tag: noindex, nofollow` and `robots.txt`
+  disallows everything, so the preview cannot show up in search results next to
+  the real site.
+
+To rebuild it after a change, or to tear it down, the Worker, the KV namespace
+and the Turnstile hostname entry are all in the XFour IT Limited Cloudflare
+account.
+
 ## Testing it
 
 Locally:
