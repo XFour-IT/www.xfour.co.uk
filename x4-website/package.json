@@ -7,7 +7,9 @@
 		"dev": "astro dev",
 		"start": "astro dev",
 		"preview": "astro build && wrangler dev",
-		"deploy": "wrangler deploy"
+		"deploy": "wrangler deploy",
+		"pretest": "astro build",
+		"test": "node --test 'test/*.test.mjs'"
 	},
 	"devDependencies": {
 		"astro": "^7.3.8",

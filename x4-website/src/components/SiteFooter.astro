@@ -17,8 +17,12 @@ const year = new Date().getFullYear();
 			<div class="col-sm-3">
 				<h5>Legal</h5>
 				<ul>
-					<li><a href="/legal/legal">Legal Center</a></li>
+					<li><a href="/legal/legal">Legal Centre</a></li>
 					<li><a href="/legal/privacy">Privacy Policy</a></li>
+					<li><a href="/legal/cookies">Cookie Policy</a></li>
+					<!-- Points at the cookie policy so it still works without JavaScript;
+					     consent.js upgrades it into a button that opens the panel in place. -->
+					<li><a href="/legal/cookies" data-x4-consent-open>Cookie choices</a></li>
 				</ul>
 			</div>
 		</div>

@@ -1,11 +1,13 @@
 ---
-// Microsoft Dynamics 365 Omnichannel live chat.
+// Microsoft Dynamics 365 Omnichannel live chat, gated by consent.
 //
-// Copied verbatim from the live pages. The `onerror` handler is the Microsoft
-// fallback: if the CDN script fails, it rebuilds the same tag against the blob
-// storage URL. Four of the seven pages do not load this today, so the layout
-// takes a `liveChat` prop rather than switching it on everywhere at once --
-// Phase 1 is a move, not a change.
+// This used to be the Microsoft script tag itself, which meant the widget
+// loaded on sight and wrote to the visitor's device before anyone was asked.
+// It is now only a marker. /assets/js/consent.js finds the marker and injects
+// the real widget, but only after the visitor allows chat. The widget's
+// organisation and application ids live in consent.js, in one place.
+//
+// Do not paste the Microsoft snippet back in. A test fails if anyone does.
 ---
 
-<script id="Microsoft_Omnichannel_LCWidget" src="https://oc-cdn-public-gbr.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js" onerror="(function(el){el.parentNode.removeChild(el);var s=document.createElement('script');s.src='https://ocprodpublicgbrgs.blob.core.windows.net/livechatwidget/scripts/LiveChatBootstrapper.js';s.setAttribute('id', 'Microsoft_Omnichannel_LCWidget');s.setAttribute('data-app-id', '30c2ba8d-2037-47e1-99c3-6b9c412ac9d1');s.setAttribute('data-lcw-version', 'prod');s.setAttribute('data-org-id', 'c38508aa-cd24-ef11-8407-0022481a27a4');s.setAttribute('data-org-url', 'https://m-c38508aa-cd24-ef11-8407-0022481a27a4.uk.omnichannelengagementhub.com');document.body.appendChild(s);})(this);" data-app-id="30c2ba8d-2037-47e1-99c3-6b9c412ac9d1" data-lcw-version="prod" data-org-id="c38508aa-cd24-ef11-8407-0022481a27a4" data-org-url="https://m-c38508aa-cd24-ef11-8407-0022481a27a4.uk.omnichannelengagementhub.com" async></script>
+<div data-x4-livechat hidden></div>

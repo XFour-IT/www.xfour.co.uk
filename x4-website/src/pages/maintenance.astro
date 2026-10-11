@@ -1,6 +1,7 @@
 ---
 // The "be right back" page, served by hand when the site is taken down.
 // StatusPage.io "sign" template, moved across unchanged.
+import LiveChat from '../components/LiveChat.astro';
 ---
 
 <!DOCTYPE html>
@@ -453,6 +454,10 @@
       box-shadow: 0 0 60px #000000;
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/consent.css">
+  <!-- consent.js before analytics.js: analytics.js asks it what the visitor
+       chose, so it has to be loaded first. -->
+  <script is:inline defer src="/assets/js/consent.js"></script>
   <script is:inline defer src="/assets/js/analytics.js"></script>
 </head>
 
@@ -489,7 +494,7 @@
       });
 
   </script>
-  <script is:inline id="Microsoft_Omnichannel_LCWidget" src="https://oc-cdn-public-gbr.azureedge.net/livechatwidget/scripts/LiveChatBootstrapper.js" onerror="(function(el){el.parentNode.removeChild(el);var s=document.createElement('script');s.src='https://ocprodpublicgbrgs.blob.core.windows.net/livechatwidget/scripts/LiveChatBootstrapper.js';s.setAttribute('id', 'Microsoft_Omnichannel_LCWidget');s.setAttribute('data-app-id', '30c2ba8d-2037-47e1-99c3-6b9c412ac9d1');s.setAttribute('data-lcw-version', 'prod');s.setAttribute('data-org-id', 'c38508aa-cd24-ef11-8407-0022481a27a4');s.setAttribute('data-org-url', 'https://m-c38508aa-cd24-ef11-8407-0022481a27a4.uk.omnichannelengagementhub.com');document.body.appendChild(s);})(this);" data-app-id="30c2ba8d-2037-47e1-99c3-6b9c412ac9d1" data-lcw-version="prod" data-org-id="c38508aa-cd24-ef11-8407-0022481a27a4" data-org-url="https://m-c38508aa-cd24-ef11-8407-0022481a27a4.uk.omnichannelengagementhub.com" async></script>
+  <LiveChat />
 
 
 </body>

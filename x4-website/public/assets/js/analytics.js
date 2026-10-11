@@ -1,9 +1,16 @@
 /*
  * Website measurement for www.xfour.co.uk — PostHog, EU region, cookieless.
  *
- * The site sets no cookie and writes nothing to localStorage, so this stays off
- * the consent-banner critical path. When the banner ships, switch
- * cookieless_mode to "on_reject" so visitors who accept get a stable id.
+ * This file sets no cookie and writes nothing to localStorage, so it stays off
+ * the consent-banner critical path and runs for visitors who have not chosen.
+ *
+ * The banner has now shipped (XFO-47) and we deliberately did NOT switch
+ * cookieless_mode to "on_reject". Doing so would give visitors who accept a
+ * stable cookie-based id and slightly truer unique-visitor counts, at the cost
+ * of a new cookie to declare, a second measurement mode to reason about, and
+ * two kinds of visitor in one funnel. On a five-page brochure site the question
+ * we actually ask is "which page produced this lead", and cookieless answers
+ * that. Revisit only if we need retention or returning-visitor reporting.
  *
  * Cookieless has two halves and needs both, or the numbers are wrong:
  *   1. cookieless_mode: "always" here, which sends the distinct id
@@ -28,6 +35,18 @@
     var LIVE_HOSTS = ['www.xfour.co.uk', 'xfour.co.uk'];
     var forced = window.location.search.indexOf('x4analytics=test') !== -1;
     if (!forced && LIVE_HOSTS.indexOf(window.location.hostname) === -1) {
+        return;
+    }
+
+    /* A visitor who pressed Reject, or who turned measurement off in the
+       preferences panel, is not measured at all — we do not even fetch the
+       PostHog loader. consent.js runs before this file and publishes the stored
+       choice on window.x4Consent, so this is a synchronous read with no race.
+       No stored choice means nobody has objected, and this file sets no cookie
+       and stores no identifier, so measurement runs. See the header of
+       consent.js for why that is the right default. */
+    var consent = window.x4Consent;
+    if (consent && consent.choice && consent.choice.analytics === false) {
         return;
     }
 

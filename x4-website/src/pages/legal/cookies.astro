@@ -1,0 +1,172 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+	title="Cookie Policy | XFour"
+	description="Every cookie and browser storage item used on xfour.co.uk: who sets it, what it is for, and how long it lasts."
+	liveChat={false}
+>
+    <section class="clean-block clean-info dark">
+        <div class="container">
+            <div class="block-heading">
+                <h1 class="text-info">Cookie Policy</h1>
+                <p>What this website stores on your device, who puts it there, and how to change your mind.</p>
+            </div>
+        </div>
+    </section>
+    <section class="clean-block">
+        <div class="container">
+            <article class="mx-auto" style="max-width: 50rem;">
+
+                <h2 class="h4">The short version</h2>
+                <p>This site works without cookies. Nothing that needs your permission is stored until you give it.</p>
+                <p>The one thing that needs your permission is our <strong>live chat</strong>. It is run for us by Microsoft, and
+                    it stores things in your browser as soon as it loads. So it stays switched off until you choose to allow it.
+                    If you do not allow it, the chat bubble does not appear and you can still reach us by phone or email.</p>
+                <p>We also count visits, but in a way that stores nothing on your device and does not identify you. That is
+                    explained under <a href="#measurement">Measurement that stores nothing</a>.</p>
+
+                <p>
+                    <a class="btn btn-primary" role="button" href="/legal/cookies" data-x4-consent-open>Change your cookie choices</a>
+                </p>
+
+                <h2 class="h4 mt-5">Cookies used on this site</h2>
+                <p>We last checked this list against the live site on <strong>11 October 2026</strong>. If you find something in
+                    your browser that is not described here, please tell us at
+                    <a href="mailto:gdpr@xfour.co.uk">gdpr@xfour.co.uk</a> and we will correct this page.</p>
+
+                <h3 class="h5 mt-4">Always on: strictly necessary</h3>
+                <p>These two do not need your permission, because the site cannot be secure or remember your choice without
+                    them. They hold no name, no email address and nothing that identifies you to us.</p>
+                <div class="x4-cookie-table-wrap">
+                    <table class="x4-cookie-table">
+                        <caption class="visually-hidden">Strictly necessary cookies</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Set by</th>
+                                <th scope="col">What it is for</th>
+                                <th scope="col">How long it lasts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>x4_consent</code></td>
+                                <td>XFour (this website)</td>
+                                <td>Remembers the cookie choice you made, so we do not ask you again on every page. It records
+                                    only your answer and the date you gave it.</td>
+                                <td>12 months</td>
+                            </tr>
+                            <tr>
+                                <td><code>cf_clearance</code></td>
+                                <td>Cloudflare, who host and protect this site</td>
+                                <td>Records that your browser has passed Cloudflare's security check, so you are not asked
+                                    again. You will only see it if Cloudflare decided to check your browser.</td>
+                                <td>Up to 1 year</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="h5 mt-4">Live chat: only if you allow it</h3>
+                <p>These are set by Microsoft, not by us, and they are set on Microsoft's own domains rather than ours. They
+                    appear when the chat loads and opens. We cannot delete them for you, because they are not ours — if you
+                    change your mind, clear them in your browser settings.</p>
+                <div class="x4-cookie-table-wrap">
+                    <table class="x4-cookie-table">
+                        <caption class="visually-hidden">Live chat cookies and browser storage</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Set by</th>
+                                <th scope="col">What it is for</th>
+                                <th scope="col">How long it lasts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>MC1</code></td>
+                                <td>Microsoft (<code>.microsoft.com</code>)</td>
+                                <td>Identifies your browser to the Microsoft service that runs our chat.</td>
+                                <td>Up to 1 year</td>
+                            </tr>
+                            <tr>
+                                <td><code>MS0</code></td>
+                                <td>Microsoft (<code>.microsoft.com</code>)</td>
+                                <td>Identifies a single session with the Microsoft service that runs our chat.</td>
+                                <td>About 30 minutes</td>
+                            </tr>
+                            <tr>
+                                <td><code>lcwDesignerDisabled-&hellip;</code>,
+                                    <code>customNotification-&hellip;</code>,
+                                    <code>customStartChatError-&hellip;</code></td>
+                                <td>Microsoft, in the chat widget's own storage</td>
+                                <td>Browser storage, not cookies. Holds how the chat window should look and behave, and the
+                                    wording of its messages, so it does not have to fetch them again.</td>
+                                <td>About 24 hours</td>
+                            </tr>
+                            <tr>
+                                <td>One item with a 32&#8209;character name</td>
+                                <td>Microsoft, in the chat widget's own storage</td>
+                                <td>Browser storage, not a cookie. Internal state for the chat widget. Microsoft does not
+                                    document what it holds, and we cannot read it.</td>
+                                <td>Until you clear your browser storage</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>If you start a conversation, what you type is also sent to our Dynamics 365 system so that we can answer
+                    you. That is covered in our <a href="/legal/privacy">privacy policy</a>.</p>
+
+                <h2 class="h4 mt-5" id="measurement">Measurement that stores nothing</h2>
+                <p>Two tools count visits to this site. Neither sets a cookie and neither writes anything to your device, so
+                    neither one needs your permission under the cookie rules. We list them anyway, because you should be able
+                    to find out who sees your visit.</p>
+                <ul>
+                    <li><strong>PostHog</strong>, hosted in the European Union, counts page views and clicks on our phone,
+                        email and booking links. It is set to its cookieless mode: instead of storing an identifier on your
+                        device, the server works one out from the day, your network address and your browser type. That value
+                        is rebuilt every day, so it cannot be used to follow you from one day to the next. Session recording
+                        and surveys are switched off.</li>
+                    <li><strong>Cloudflare Web Analytics</strong> reports how quickly pages loaded and which pages were
+                        visited. Cloudflare adds it at their end, so it is not in our website code. It uses no cookies.</li>
+                </ul>
+                <p>If you press <strong>Reject</strong> on our cookie banner, or turn off visit measurement in your cookie
+                    choices, we stop PostHog from collecting anything about you. Cloudflare Web Analytics is added by our
+                    hosting rather than by our pages, so we cannot switch it off per visitor; your browser's
+                    <em>Do Not Track</em> setting is honoured by PostHog.</p>
+
+                <h2 class="h4 mt-5">Other companies your browser contacts</h2>
+                <p>Some of the fonts, icons and code libraries this site uses are served by other companies. Your browser has
+                    to ask them for those files, so they can see your network address and which page you were on. They do not
+                    set cookies on our pages. They are:</p>
+                <ul>
+                    <li>Cloudflare — hosting, security and the font and code libraries served from
+                        <code>cdnjs.cloudflare.com</code></li>
+                    <li>Google — the Montserrat web font (<code>fonts.googleapis.com</code>)</li>
+                    <li>Fonticons — the Font Awesome icons (<code>use.fontawesome.com</code>)</li>
+                    <li>jsDelivr — the Bootstrap code library (<code>cdn.jsdelivr.net</code>)</li>
+                    <li>Microsoft — the live chat, but only once you have allowed it</li>
+                </ul>
+
+                <h2 class="h4 mt-5">How to change your mind</h2>
+                <p>Use the <strong>Cookie choices</strong> link in the footer of any page, or the button near the top of this
+                    page. Your choice is remembered for 12 months, after which we will ask again.</p>
+                <p>Turning the live chat off stops it loading the next time a page opens. It cannot remove cookies Microsoft
+                    has already set — to do that, clear cookies in your browser settings. Every major browser also lets you
+                    block or delete cookies for a whole site; if you block ours, the site still works, but we will have to ask
+                    you about cookies again on every page.</p>
+
+                <h2 class="h4 mt-5">Questions</h2>
+                <p>Email <a href="mailto:gdpr@xfour.co.uk">gdpr@xfour.co.uk</a>. The data controller is XFour IT Limited,
+                    company number 11776254, registered office 100 Berkshire Place, C/O KT Wells Ltd, Winnersh Triangle,
+                    Wokingham, RG41 5RD.</p>
+                <p>See also our <a href="/legal/privacy">privacy policy</a>, which explains what we do with personal
+                    information, and our <a href="/legal/legal">legal and company information</a>.</p>
+
+                <p class="text-muted mt-5"><small>Last updated 11 October 2026.</small></p>
+            </article>
+        </div>
+    </section>
+</BaseLayout>
