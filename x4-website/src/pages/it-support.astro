@@ -1,0 +1,499 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// XFO-67. The Journey B landing page: managed IT, for a small business in the
+// Thames Valley with 5 to 50 staff and nobody whose job is IT.
+//
+// The slug is /it-support and not /managed-it on purpose. Journey B is a local
+// offer and its search intent is local ("IT support Reading"), per plan section
+// 1.1a rule 6. The home page (XFO-63) sends its managed IT door to exactly this
+// path, so the slug is fixed and not a preference.
+//
+// Three things this buyer looks for, in this order: what is covered, how fast
+// somebody answers, and what it costs per user per month. They are the first
+// three sections of the page for that reason. This page is not a brochure for
+// XFour -- it is an answer to a price comparison the visitor is already part
+// way through.
+//
+// The call to action is a quote form, never a booking link. A stranger
+// comparing IT providers will not book a call before they know roughly what it
+// costs. The form itself is XFO-46; until it lands this page asks for the same
+// four facts in plain words, and a test keeps any booking link off the page.
+
+// ---------------------------------------------------------------------------
+// PROVISIONAL COMMERCIAL TERMS -- NOT YET APPROVED
+//
+// Ben has not published a managed IT price or a response-time commitment
+// anywhere: not in the website plan, not in the repository, not on the old
+// site, and not on any issue. The numbers below are a proposal, chosen so a
+// 15-user client lands inside the £500-£1,500 a month retainer the plan's
+// own ROI model assumes (section 5).
+//
+// They are in one object, used once each, so changing them is a one-line edit
+// and not a hunt through the markup.
+//
+// This pull request stays a draft until Ben confirms or replaces every value
+// here. These are public commercial promises, and a wrong one is a wrong
+// contract, not a typo.
+// ---------------------------------------------------------------------------
+const terms = {
+	/** Pounds per user per month, excluding VAT. */
+	pricePerUser: 45,
+	minimumUsers: 5,
+	/** One-off, per user, excluding VAT. */
+	setupPerUser: 45,
+	coverHours: '8am to 6pm, Monday to Friday',
+	coverExcludes: 'bank holidays',
+	noticePeriod: '30 days',
+	minimumTerm: 'three months',
+};
+
+/** £45, £675 -- so the worked example below cannot drift from the headline. */
+const gbp = (amount: number) => `£${amount.toLocaleString('en-GB')}`;
+
+/** The size of company the page is written for, used in the worked example. */
+const exampleUsers = 15;
+
+/** The response-time commitment. Written down because the buyer asked for it. */
+const responseTimes = [
+	{
+		priority: 'The business has stopped',
+		meaning: 'Nobody can work. Your email is down, your internet is down, or your main system is unreachable.',
+		response: '1 working hour',
+	},
+	{
+		priority: 'One person has stopped',
+		meaning: 'One member of staff cannot do their job. A dead laptop, a locked account, a printer nobody can reach.',
+		response: '4 working hours',
+	},
+	{
+		priority: 'Everything else',
+		meaning: 'It works, but it is wrong or slow. A new starter to set up, a licence to move, a question to answer.',
+		response: '1 working day',
+	},
+];
+
+/** What the per-user price covers. Grouped the way the buyer thinks about it. */
+const covered = [
+	{
+		icon: 'fas fa-headset',
+		title: 'Your people',
+		points: [
+			'Unlimited support requests by phone, email or chat',
+			'A named engineer who knows your business, not a queue',
+			'New starters set up, leavers shut off the same day',
+			'Password resets, account lockouts and licence changes',
+		],
+	},
+	{
+		icon: 'fas fa-laptop',
+		title: 'Your devices',
+		points: [
+			'Every Windows PC and Mac monitored and patched',
+			'Antivirus managed and watched, not just installed',
+			'Disk, battery and age tracked, so a failure is replaced and not survived',
+			'Phones and tablets enrolled, so a lost phone is wiped and not a breach',
+		],
+	},
+	{
+		icon: 'fab fa-microsoft',
+		title: 'Microsoft 365',
+		points: [
+			'Email, Teams, SharePoint and OneDrive administered',
+			'Licences bought, assigned and reviewed, so you stop paying for staff who left',
+			'Multi-factor authentication turned on and kept on',
+			'Spam and phishing filtering tuned to your mail',
+		],
+	},
+	{
+		icon: 'fas fa-shield-alt',
+		title: 'Keeping you safe',
+		points: [
+			'Backups of Microsoft 365 and your files, checked monthly by restoring one',
+			'Security patching inside 14 days of release, critical fixes faster',
+			'A written record of who has access to what',
+			'We tell you when something looks wrong, before you notice it',
+		],
+	},
+	{
+		icon: 'fas fa-network-wired',
+		title: 'Your office',
+		points: [
+			'Your broadband, firewall, switches and Wi-Fi looked after',
+			'On-site visits when a problem cannot be fixed remotely',
+			'Office moves and new desks planned with you',
+		],
+	},
+	{
+		icon: 'fas fa-phone-alt',
+		title: 'Your suppliers',
+		points: [
+			'We deal with your broadband provider, your software vendors and your landlord',
+			'One number to call, whoever is actually at fault',
+			'Renewals flagged before they roll over',
+		],
+	},
+];
+
+/** Named plainly, because every provider that hides this is asked about it anyway. */
+const notCovered = [
+	'Hardware itself. We specify it, buy it for you at cost and set it up; the laptop is yours to pay for.',
+	'Your Microsoft 365 licences. We administer them and can bill them, but the licence cost is yours and is quoted separately.',
+	'Out-of-hours and weekend cover. Available, priced on your quote, not inside the standard price.',
+	'Projects. A server replacement, an office move or a migration is scoped and priced on its own.',
+	'Line-of-business software nobody at XFour has seen. We will support it once we have had time to learn it, and we will say so first.',
+	'Dynamics 365 and Power Platform work. That is the other half of what we do, and it is quoted as consultancy.',
+];
+---
+
+<BaseLayout
+	title="IT Support for Small Businesses in Reading & the Thames Valley | XFour"
+	description="Managed IT support for Thames Valley businesses with 5 to 50 staff and no IT person. Response times in writing, one price per user per month. Get a quote."
+	ogTitle="Managed IT support in the Thames Valley | XFour"
+	liveChat={false}
+>
+	{/* The hero states where we are before it states what we do. Proximity is the
+	    thing that sells this offer, and a visitor searching "IT support Reading"
+	    is checking that first. */}
+	<section class="clean-block clean-hero it-hero">
+		<div class="text">
+			<h1 class="h2">Someone to run your IT, twenty minutes up the road</h1>
+			<p>
+				XFour looks after the IT for small businesses across Reading and the Thames Valley.
+				Response times in writing, cover {terms.coverHours}, and one price per user per month.
+			</p>
+			<p class="mb-0">
+				<a class="btn btn-primary btn-lg" role="button" href="#quote">Get a price</a>
+			</p>
+		</div>
+	</section>
+
+	{/* Qualify in and qualify out, in four lines. A visitor who is not this buyer
+	    should find that out here and not after a phone call. */}
+	<section class="clean-block py-4 it-qualify">
+		<div class="container">
+			<p class="mb-0 text-center">
+				<strong>This is for you if</strong> you have 5 to 50 staff, you are within about an hour
+				of Reading, and nobody at your company has IT in their job title — or somebody does, and
+				they are drowning.
+			</p>
+		</div>
+	</section>
+
+	<!-- ===================== What is covered ===================== -->
+	<section class="clean-block features" aria-labelledby="covered-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="covered-heading" class="text-info">What is covered</h2>
+				<p>
+					One price, and this is what is inside it. Nothing here is an upgrade or an add-on.
+				</p>
+			</div>
+			<div class="row justify-content-center g-4">
+				{covered.map((group) => (
+					<div class="col-md-6 col-lg-4">
+						<div class="covered-group h-100">
+							<i class:list={[group.icon, 'icon']} aria-hidden="true"></i>
+							<h3 class="h5">{group.title}</h3>
+							<ul>
+								{group.points.map((point) => <li>{point}</li>)}
+							</ul>
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== What is not covered ===================== -->
+	<section class="clean-block dark" aria-labelledby="excluded-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="excluded-heading" class="text-info">What is not covered</h2>
+				<p>
+					Every provider you are comparing has a list like this. Most of them make you ask for
+					it.
+				</p>
+			</div>
+			<div class="prose">
+				<ul class="not-covered">
+					{notCovered.map((item) => <li>{item}</li>)}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== Response times ===================== -->
+	<section class="clean-block" aria-labelledby="response-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="response-heading" class="text-info">How fast we answer</h2>
+				<p>
+					These are the times in the contract, not the times we hope for. If we miss one, it is
+					on the monthly report whether or not you noticed.
+				</p>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-lg-10">
+					<div class="table-responsive">
+						<table class="table response-times">
+							<thead>
+								<tr>
+									<th scope="col">What has happened</th>
+									<th scope="col">What that means</th>
+									<th scope="col">We respond within</th>
+								</tr>
+							</thead>
+							<tbody>
+								{responseTimes.map((row) => (
+									<tr>
+										<th scope="row">{row.priority}</th>
+										<td>{row.meaning}</td>
+										<td class="response-figure">{row.response}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					<p class="small-print">
+						<strong>Cover hours:</strong> {terms.coverHours}, excluding {terms.coverExcludes}.
+						Respond means a person who can help has started on it — not an automatic
+						acknowledgement from a ticket system. Out-of-hours and weekend cover is available
+						and is priced on your quote.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== The price ===================== -->
+	<section class="clean-block clean-pricing dark" aria-labelledby="price-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="price-heading" class="text-info">What it costs</h2>
+				<p>One price per user, per month. No tiers to decode and no cheapest option that is
+					missing the part you needed.</p>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-md-8 col-lg-6">
+					<div class="price-card text-center">
+						<p class="price-figure">{gbp(terms.pricePerUser)}</p>
+						<p class="price-unit">per user, per month, + VAT</p>
+						<hr>
+						<ul class="price-facts">
+							<li>Minimum {terms.minimumUsers} users</li>
+							<li>One-off set-up of {gbp(terms.setupPerUser)} per user, so we start from a
+								known state and not a guess</li>
+							<li>Rolling monthly after the first {terms.minimumTerm}, with
+								{' '}{terms.noticePeriod} of notice on either side</li>
+							<li>Everything in <a href="#covered-heading">what is covered</a>, at the
+								response times above</li>
+						</ul>
+						<p class="price-note mb-0">
+							A {exampleUsers}-person company pays{' '}
+							{gbp(terms.pricePerUser * exampleUsers)} a month, + VAT, for the whole of its
+							IT department.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	{/* Proximity is the whole argument for this journey, so it gets its own band
+	    rather than a line in the hero. The address is the real one from
+	    /contact-us; it is mail-only, which the copy has to say or a visitor
+	    turns up at it. */}
+	<section class="clean-block" aria-labelledby="local-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="local-heading" class="text-info">We are actually local</h2>
+			</div>
+			<div class="prose">
+				<p>
+					XFour is in Reading. When a problem cannot be fixed down the wire, somebody drives to
+					you — Reading, Wokingham, Bracknell, Newbury, Basingstoke, Maidenhead, Slough, High
+					Wycombe, Oxford. If you are further out, say where you are and we will tell you
+					honestly whether we can get to you.
+				</p>
+				<p>
+					You get the same engineer, and they learn your business. That is the part a national
+					help desk cannot sell you at any price.
+				</p>
+				<p class="mb-0">
+					<a href="/contact-us">Our address and phone number</a>. The office is mail only —
+					ring first, do not turn up.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== The call to action ===================== -->
+	<!--
+		The one call to action on this page, and it is a quote and not a booking.
+		Rule 3 of plan section 1.1a: a stranger comparing IT providers will not
+		give up half an hour before they know roughly what it costs.
+
+		XFO-46 builds the form itself. Its managed IT journey asks for exactly
+		four facts beyond name, company and email -- users, devices, current
+		provider and cover needed -- which is why those four are what this section
+		asks for in words today. When XFO-46 lands, the <div class="quote-ask">
+		below is replaced by its <form data-enquiry-form> with journey
+		"managed-it", and nothing else on this page changes.
+	-->
+	<section class="clean-block clean-form" id="quote" aria-labelledby="quote-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="quote-heading" class="text-info">Get a price for your business</h2>
+				<p>You get a figure, not a sales process. If we are not the right fit we will say so.</p>
+			</div>
+			<div class="prose">
+				<div class="quote-ask">
+					<p>Send us these four things and we will come back with a monthly price:</p>
+					<ol>
+						<li>How many people need support</li>
+						<li>How many computers, laptops and servers you have</li>
+						<li>Who looks after your IT today, if anyone</li>
+						<li>The hours you need covered</li>
+					</ol>
+					<p class="mb-0">
+						Email <a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a> or call
+						<a href="tel:+441183702920">0118 370 2920</a> and ask for a managed IT quote.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	/* Flat brand navy, matching the home page hero. .clean-block.clean-hero:before
+	   paints currentColor over the band, so both properties are set to the same
+	   value and the hero costs no image request. */
+	.it-hero {
+		color: #082044;
+		background-color: #082044;
+	}
+
+	.it-hero .text {
+		max-width: 44rem;
+	}
+
+	/* The theme caps .block-heading p at 420px, which is too narrow for these
+	   intros. Scoped, so it only affects this page. */
+	.block-heading p {
+		max-width: 680px;
+	}
+
+	.prose {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.prose p,
+	.prose li {
+		line-height: 1.7;
+	}
+
+	.it-qualify {
+		border-bottom: 1px solid rgba(8, 32, 68, 0.12);
+	}
+
+	/* The theme's .features .feature-box centres its text and hides overflow,
+	   which a list of covered items cannot live with. This is its own card. */
+	.covered-group {
+		background-color: #fff;
+		border: 1px solid rgba(8, 32, 68, 0.12);
+		border-radius: 6px;
+		padding: 28px 26px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		text-align: left;
+	}
+
+	.covered-group .icon {
+		font-size: 2rem;
+		/* 7.2:1 on white. */
+		color: #15479c;
+		margin-bottom: 0.75rem;
+		display: block;
+	}
+
+	.covered-group ul {
+		margin-bottom: 0;
+		padding-left: 1.1rem;
+		font-size: 0.94rem;
+	}
+
+	.covered-group li {
+		margin-bottom: 0.45rem;
+	}
+
+	.not-covered li {
+		margin-bottom: 0.6rem;
+	}
+
+	.response-times th[scope='col'] {
+		white-space: nowrap;
+	}
+
+	.response-times th[scope='row'] {
+		font-weight: 600;
+		width: 22%;
+	}
+
+	.response-figure {
+		font-weight: 700;
+		white-space: nowrap;
+		color: #15479c;
+	}
+
+	.small-print {
+		font-size: 0.92rem;
+		opacity: 0.85;
+		margin-top: 1.25rem;
+	}
+
+	.price-card {
+		background-color: #fff;
+		border: 2px solid #15479c;
+		border-radius: 6px;
+		padding: 34px 30px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+	}
+
+	.price-figure {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		margin-bottom: 0.25rem;
+		color: #15479c;
+	}
+
+	.price-unit {
+		font-weight: 600;
+		margin-bottom: 0;
+	}
+
+	.price-facts {
+		text-align: left;
+		padding-left: 1.1rem;
+		margin-bottom: 1.25rem;
+	}
+
+	.price-facts li {
+		margin-bottom: 0.5rem;
+	}
+
+	.price-note {
+		font-size: 0.92rem;
+		opacity: 0.85;
+	}
+
+	.quote-ask ol {
+		padding-left: 1.3rem;
+	}
+
+	.quote-ask li {
+		margin-bottom: 0.4rem;
+	}
+</style>
