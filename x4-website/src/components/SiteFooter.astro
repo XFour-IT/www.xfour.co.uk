@@ -1,0 +1,29 @@
+---
+// The site footer, written once. The year comes from the build date, so it
+// cannot go stale on a page nobody remembers to edit.
+const year = new Date().getFullYear();
+---
+
+<footer class="page-footer dark">
+	<div class="container">
+		<div class="row d-xl-flex justify-content-xl-center">
+			<div class="col-sm-3">
+				<h5>About us</h5>
+				<ul>
+					<li><a href="/about-us">Company Information</a></li>
+					<li><a href="/contact-us">Contact us</a></li>
+				</ul>
+			</div>
+			<div class="col-sm-3">
+				<h5>Legal</h5>
+				<ul>
+					<li><a href="/legal/legal">Legal Center</a></li>
+					<li><a href="/legal/privacy">Privacy Policy</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="footer-copyright">
+		<p>© {year} XFour IT Limited</p>
+	</div>
+</footer>

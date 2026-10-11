@@ -1,0 +1,13 @@
+---
+import ErrorLayout from '../layouts/ErrorLayout.astro';
+---
+
+<ErrorLayout title="Service unavailable | XFour" code="503">
+	<Fragment slot="subheader">
+		Looks like we're having <br>
+		some server issues.
+	</Fragment>
+	<Fragment slot="context">
+		<p>We are working on it. Please try again shortly, or report a problem if you think we are unaware of the issue.</p>
+	</Fragment>
+</ErrorLayout>
