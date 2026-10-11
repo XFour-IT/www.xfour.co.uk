@@ -31,6 +31,13 @@
         return;
     }
 
+    /* Our own hostnames, so a link from www.xfour.co.uk to xfour.co.uk is not
+       counted as a lead leaving the site. The current host is included too, so
+       forced test runs on a preview URL behave the same way. */
+    function isOwnHost(hostname) {
+        return LIVE_HOSTS.indexOf(hostname) !== -1 || hostname === window.location.hostname;
+    }
+
     /* Which part of the funnel this page belongs to. Registered on every event
        so a lead can be traced back to the journey that produced it. */
     function journeyFor(path) {
@@ -114,7 +121,10 @@
             }
 
             // Any other link off the site — App Store badge, partner links.
-            if (/^https?:\/\//.test(href) && link.hostname && link.hostname !== window.location.hostname) {
+            // Both of our own hostnames count as this site, not as outbound: the
+            // 404 page links to xfour.co.uk while the visitor is on www, and that
+            // is navigation, not a lead leaving.
+            if (/^https?:\/\//.test(href) && link.hostname && !isOwnHost(link.hostname)) {
                 capture(posthog, 'outbound_click', {
                     target_host: link.hostname,
                     target_url: href,
