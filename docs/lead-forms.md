@@ -194,13 +194,26 @@ history on the lead.
 
 ## Analytics
 
-`enquiry-form.js` fires one event per successful submit:
+XFO-44 has landed, so this is live now rather than waiting.
 
-- `posthog.capture('enquiry_submitted', { journey })`
-- and a `dataLayer.push({ event: 'enquiry_submitted', journey })`
+Two events per enquiry, which is deliberate:
 
-Both calls are guarded, so they are harmless before the analytics work (XFO-44)
-lands and start working the moment it does. No new tag manager is needed.
+| Event | Fired by | When |
+|---|---|---|
+| `form_submit` | `analytics.js` | Every submit **attempt** |
+| `enquiry_submitted` | `enquiry-form.js` | Only a **successful** submit |
+
+Attempts minus successes is the drop-off, which is the number worth watching.
+Both carry the journey. Both forms carry a `data-form-name`
+(`enquiry-dynamics`, `enquiry-managed-it`), which is what `analytics.js` reads,
+so neither reports as `unnamed`.
+
+`enquiry-form.js` also does a guarded `dataLayer.push`, which does nothing today
+and means no code change if a tag manager is ever added.
+
+Note that `analytics.js` only reports from `www.xfour.co.uk` and `xfour.co.uk`,
+so preview submissions stay out of the numbers. Add `?x4analytics=test` to a
+preview URL to force reporting on.
 
 ---
 
@@ -236,6 +249,24 @@ What is different:
 To rebuild it after a change, or to tear it down, the Worker, the KV namespace
 and the Turnstile hostname entry are all in the XFour IT Limited Cloudflare
 account.
+
+### Why not the Workers Builds preview URL
+
+The README is right that every branch push uploads a Worker version with its own
+preview URL, and that is the usual way to review a change here. It is not enough
+on its own for these forms, for two reasons:
+
+- **The hostname changes on every push.** Workers Builds names a stable alias
+  after the branch, but `feature/enquiry-forms` has a slash in it and gets none,
+  so the only address is `<version-prefix>-x4-website.xfour.workers.dev`, which
+  is a new link after every commit.
+- **Turnstile only answers on a hostname that is on the widget.** The stable
+  preview address is on it. A per-version hostname is not, so the widget refuses
+  to render there and neither form can be submitted.
+
+Both preview kinds now pass the origin check: the Worker allows any host under
+`.xfour.workers.dev` rather than a fixed list, because nobody outside this
+account can create one.
 
 ## Testing it
 

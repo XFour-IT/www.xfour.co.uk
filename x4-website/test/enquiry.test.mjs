@@ -56,7 +56,7 @@ const VALID_MANAGED_IT = {
  * Worker asked for. `turnstile` and `dataverse` choose the stubbed outcomes.
  */
 async function post(fields, env = CONFIGURED_ENV, options = {}) {
-	const { turnstile = true, dataverse = { status: 204 } } = options;
+	const { turnstile = true, dataverse = { status: 204 }, origin = 'https://www.xfour.co.uk' } = options;
 	const calls = [];
 	const realFetch = globalThis.fetch;
 
@@ -84,7 +84,7 @@ async function post(fields, env = CONFIGURED_ENV, options = {}) {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
-				Origin: 'https://www.xfour.co.uk',
+				Origin: origin,
 				'CF-Connecting-IP': '203.0.113.7',
 			},
 			body: new URLSearchParams(fields),
@@ -267,6 +267,41 @@ test('a cross-site post is refused', async () => {
 		const request = new Request('https://www.xfour.co.uk/api/enquiry', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: 'https://evil.example' },
+			body: new URLSearchParams(VALID_DYNAMICS),
+		});
+		const response = await worker.fetch(request, CONFIGURED_ENV, {});
+		assert.equal(response.status, 403);
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('a post from a Worker preview URL is accepted', async () => {
+	// Workers Builds uploads a version per branch push, each on its own
+	// <prefix>-x4-website.xfour.workers.dev host. The prefix changes every time,
+	// so the suffix has to be allowed or no preview can ever be tested.
+	const { status, calls } = await post(VALID_DYNAMICS, CONFIGURED_ENV, {
+		origin: 'https://f0c50bb8-x4-website.xfour.workers.dev',
+	});
+	assert.equal(status, 200);
+	assert.ok(
+		calls.some((c) => c.url.includes('/api/data/v9.2/leads')),
+		'expected the preview post to reach Dataverse',
+	);
+});
+
+test('a host that only looks like our preview subdomain is refused', async () => {
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = async () => {
+		throw new Error('no outbound call expected');
+	};
+	try {
+		const request = new Request('https://www.xfour.co.uk/api/enquiry', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				Origin: 'https://notxfour.workers.dev',
+			},
 			body: new URLSearchParams(VALID_DYNAMICS),
 		});
 		const response = await worker.fetch(request, CONFIGURED_ENV, {});

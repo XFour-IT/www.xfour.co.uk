@@ -72,6 +72,7 @@
             border: 1px solid #f5c6c3;
         }
     </style>
+    <script defer src="/assets/js/analytics.js"></script>
 </head>
 
 <body>
@@ -154,7 +155,7 @@
                                     target="_blank" rel="noopener">Book a 30-minute scoping call</a></p>
                             <hr>
                             <p class="who">Or tell us about it here and we will come back to you.</p>
-                            <form data-enquiry-form data-journey="dynamics" novalidate>
+                            <form data-enquiry-form data-journey="dynamics" data-form-name="enquiry-dynamics" novalidate>
                                 <input type="hidden" name="journey" value="dynamics">
                                 <div class="honeypot" aria-hidden="true">
                                     <label for="dyn-website">Website</label>
@@ -232,7 +233,7 @@
                                 machines and their Microsoft 365.</p>
                             <p class="who">Give us these five answers and we can usually come back with a number, not
                                 a meeting request.</p>
-                            <form data-enquiry-form data-journey="managed-it" novalidate>
+                            <form data-enquiry-form data-journey="managed-it" data-form-name="enquiry-managed-it" novalidate>
                                 <input type="hidden" name="journey" value="managed-it">
                                 <div class="honeypot" aria-hidden="true">
                                     <label for="mit-website">Website</label>

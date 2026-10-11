@@ -47,16 +47,16 @@ const COMMON_FIELDS = [
 ];
 
 /** Origins allowed to post to the endpoint. Anything else is a cross-site post. */
-const ALLOWED_ORIGIN_HOSTS = [
-	'www.xfour.co.uk',
-	'xfour.co.uk',
-	// The account's workers.dev subdomain is `xfour`, so the Worker answers on
-	// <script>.xfour.workers.dev. `x4-website.workers.dev` is not a real host.
-	'x4-website.xfour.workers.dev',
-	'x4-website-preview.xfour.workers.dev',
-	'localhost',
-	'127.0.0.1',
-];
+const ALLOWED_ORIGIN_HOSTS = ['www.xfour.co.uk', 'xfour.co.uk', 'localhost', '127.0.0.1'];
+
+/**
+ * Every preview of this Worker is served from the account's own workers.dev
+ * subdomain, which is `xfour`. Workers Builds uploads a version for each push
+ * to a branch, and each version gets its own hostname there with a prefix that
+ * changes every time, so the suffix is matched instead of listing hostnames.
+ * Nobody else can create a host under it, because the subdomain is ours.
+ */
+const ALLOWED_ORIGIN_SUFFIX = '.xfour.workers.dev';
 
 export default {
 	async fetch(request, env, ctx) {
@@ -157,7 +157,8 @@ function originAllowed(request) {
 	// rather than blocking a legitimate submission.
 	if (!origin) return true;
 	try {
-		return ALLOWED_ORIGIN_HOSTS.includes(new URL(origin).hostname);
+		const host = new URL(origin).hostname;
+		return ALLOWED_ORIGIN_HOSTS.includes(host) || host.endsWith(ALLOWED_ORIGIN_SUFFIX);
 	} catch {
 		return false;
 	}
