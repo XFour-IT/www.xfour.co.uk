@@ -6,6 +6,19 @@ The code is finished and merged behind configuration. **The endpoint answers
 `503 not_configured` until the steps in "Tenant configuration" are done**, which
 is deliberate: a form that silently drops a lead is worse than no form.
 
+### Decided 11 October 2026
+
+| Question | Answer |
+|---|---|
+| Customer Insights – Journeys licence? | No. Keep the Worker. |
+| Lead owner | Ben owns both journeys for now |
+| Dataverse environment | `https://xfour.crm11.dynamics.com` |
+| Turnstile widget | Made — see step 5, nothing left to do |
+| Review before go-live | On a preview address first — see "Previewing it" |
+
+So of the five tenant jobs below, **1, 2, 3 and the GUID in 4 are all that is
+left**, and all four need tenant admin.
+
 ---
 
 ## What was built
@@ -90,21 +103,36 @@ and the journey is still in the subject line and the description. But without
 them the two pipelines cannot be reported separately, which was the whole point
 of building two forms.
 
-### 4. Decide the two owners
+### 4. Decide the two owners — decided, GUID still needed
 
-The plan is deliberate that the journeys have separate owners so the pipelines
-report separately. Get the **systemuser GUID** for each owner (open the user
-record in Dynamics and read `id=` out of the URL) and put them in
-`wrangler.jsonc`.
+**Ben owns both journeys for now** (11 Oct 2026). There are still two vars, so a
+second owner can be dropped in later without touching code; until then the same
+GUID goes in both.
 
-### 5. Create the Turnstile widget
+Get the **systemuser GUID**: Dynamics → Settings → Users → open Ben's record and
+read `id=` out of the browser address bar. Put it in `LEAD_OWNER_DYNAMICS` and
+`LEAD_OWNER_MANAGED_IT`.
 
-1. Cloudflare dashboard → Turnstile → Add widget.
-   - Name: `xfour.co.uk enquiry forms`
-   - Hostnames: `www.xfour.co.uk` and `xfour.co.uk`
-   - Widget mode: Managed
-2. Copy the **site key** into `wrangler.jsonc` and keep the **secret key** for
-   the next section.
+### 5. Create the Turnstile widget — done
+
+Made on 11 Oct 2026 in the XFour IT Limited Cloudflare account.
+
+- Name: `xfour.co.uk enquiry forms`
+- Mode: Managed
+- Hostnames: `xfour.co.uk`, `www.xfour.co.uk`, `x4-website.xfour.workers.dev`,
+  `x4-website-preview.xfour.workers.dev`
+- Site key: `0x4AAAAAAFT_mDl3N3uC7M63` — already in `wrangler.jsonc`, public by
+  design
+
+The **secret key** is only in the Cloudflare dashboard (Turnstile → the widget →
+Settings). Set it on the production Worker when you first deploy:
+
+```bash
+cd x4-website
+npx wrangler secret put TURNSTILE_SECRET_KEY
+```
+
+It is already set on the preview Worker.
 
 ---
 
@@ -115,14 +143,14 @@ committed:
 
 ```jsonc
 "vars": {
-  "DATAVERSE_URL": "https://<org>.crm11.dynamics.com",
-  "ENTRA_TENANT_ID": "...",
-  "ENTRA_CLIENT_ID": "...",
-  "TURNSTILE_SITE_KEY": "0x...",
-  "LEAD_SOURCE_DYNAMICS": "...",
-  "LEAD_SOURCE_MANAGED_IT": "...",
-  "LEAD_OWNER_DYNAMICS": "...",
-  "LEAD_OWNER_MANAGED_IT": "..."
+  "DATAVERSE_URL": "https://xfour.crm11.dynamics.com",   // done
+  "ENTRA_TENANT_ID": "...",                              // step 1
+  "ENTRA_CLIENT_ID": "...",                              // step 1
+  "TURNSTILE_SITE_KEY": "0x4AAAAAAFT_mDl3N3uC7M63",      // done
+  "LEAD_SOURCE_DYNAMICS": "...",                         // step 3
+  "LEAD_SOURCE_MANAGED_IT": "...",                       // step 3
+  "LEAD_OWNER_DYNAMICS": "...",                          // step 4, Ben's GUID
+  "LEAD_OWNER_MANAGED_IT": "..."                         // step 4, Ben's GUID
 }
 ```
 

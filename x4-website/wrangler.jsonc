@@ -37,16 +37,18 @@
 	 * are blank, POST /api/enquiry answers 503 instead of silently losing a lead.
 	 */
 	"vars": {
-		// e.g. "https://xfour.crm11.dynamics.com" — no trailing slash.
-		"DATAVERSE_URL": "",
+		// The XFour production environment. No trailing slash.
+		"DATAVERSE_URL": "https://xfour.crm11.dynamics.com",
 		"ENTRA_TENANT_ID": "",
 		"ENTRA_CLIENT_ID": "",
-		// Turnstile site key. Public by design; the matching secret is a secret.
-		"TURNSTILE_SITE_KEY": "",
+		// Site key of the "xfour.co.uk enquiry forms" Turnstile widget. Public by
+		// design; the matching secret key is a Worker secret.
+		"TURNSTILE_SITE_KEY": "0x4AAAAAAFT_mDl3N3uC7M63",
 		// Integer values of the two new Lead Source option set entries.
 		"LEAD_SOURCE_DYNAMICS": "",
 		"LEAD_SOURCE_MANAGED_IT": "",
-		// systemuser GUIDs. Separate owners so the pipelines report separately.
+		// systemuser GUIDs. Two vars so the journeys can be split later; for now
+		// Ben owns both, so the same GUID goes in both (decided 11 Oct 2026).
 		"LEAD_OWNER_DYNAMICS": "",
 		"LEAD_OWNER_MANAGED_IT": ""
 	}

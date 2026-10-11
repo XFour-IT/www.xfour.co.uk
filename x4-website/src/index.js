@@ -50,7 +50,10 @@ const COMMON_FIELDS = [
 const ALLOWED_ORIGIN_HOSTS = [
 	'www.xfour.co.uk',
 	'xfour.co.uk',
-	'x4-website.workers.dev',
+	// The account's workers.dev subdomain is `xfour`, so the Worker answers on
+	// <script>.xfour.workers.dev. `x4-website.workers.dev` is not a real host.
+	'x4-website.xfour.workers.dev',
+	'x4-website-preview.xfour.workers.dev',
 	'localhost',
 	'127.0.0.1',
 ];
