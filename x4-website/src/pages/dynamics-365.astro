@@ -1,0 +1,348 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// XFO-64. The Journey A landing page: the Dynamics 365 and Power Platform
+// buyer.
+//
+// Three things this page has to say, and nothing else (plan section 1.3,
+// "Journey landing page — who it is for, what XFour does, what it costs to
+// start"):
+//
+//   1. who the page is for,
+//   2. what XFour does,
+//   3. what it costs to start.
+//
+// The language is this journey's own language -- licences, migration,
+// automation, reporting -- and it never switches to Journey B's language of
+// response times, cover hours and price per user (plan rule 2). There is one
+// call to action on the page and it is a booking, not a form (plan rule 3),
+// because this buyer is sold to by a conversation and is national: no town is
+// named anywhere on this page, and no local-search copy belongs on it
+// (plan rule 6).
+//
+// The home page (XFO-63) sends its Dynamics door to /dynamics-365, so this
+// file's name is fixed: rename it and the home page 404s.
+//
+// The Microsoft Bookings link. It is the one already live on /app-development,
+// which is what XFO-64 asks for. It appears in three hrefs on this page: the
+// hero, the price box and the closing call to action -- so it is written once,
+// here, and used three times. Keep ?anonymous: it is what lets a stranger book
+// without a Microsoft sign-in. The three & stay bare in this string; Astro
+// escapes them when it writes the attribute.
+//
+// It books the same 30-minute slot the app-development page books. That is a
+// real 30-minute scoping call today, so the page is honest, but a separate
+// Bookings meeting type for Dynamics scoping would tell the two journeys apart
+// in the diary. That is Ben's call and is flagged on the pull request.
+const BOOKING_URL =
+	'https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&ismsaljsauthenabled&ep=mcard';
+
+// What XFour does, in this journey's four words. The order is the order the
+// work happens in, not an order of importance.
+const work = [
+	{
+		title: 'Licences and set-up',
+		body: 'Which Dynamics 365 and Power Platform licences you actually need, and an environment layout that lets more than one person work at once. Most of the trouble we are called in to fix started here.',
+	},
+	{
+		title: 'Migration',
+		body: 'Moving off the spreadsheets, the database nobody owns, or the system a third party holds the keys to — with the data checked, and with the business still running while it happens.',
+	},
+	{
+		title: 'Automation',
+		body: 'The repeated work taken out by hand and put into Power Automate and Dataverse, built so it is parameterised and version-controlled rather than wired to one person’s account.',
+	},
+	{
+		title: 'Reporting',
+		body: 'Numbers you can act on, from one source instead of four. If two reports disagree today, that is a data problem before it is a reporting problem, and we start there.',
+	},
+];
+
+// Proof. Only what is cleared for publication (XFO-43): Allseas Shipping Co,
+// VisiMedia as the delivery partner, and Selwood Housing are named, with their
+// permission. The travel loyalty business is never named. The 91% booking-time
+// figure is Ben's own estimate, not a figure from Allseas, so it is not on this
+// page as a client result.
+const proof = [
+	{
+		client: 'Allseas Shipping Co',
+		note: 'delivered with VisiMedia',
+		before: 'Their booking process ran on a legacy system an overseas partner owned outright. Every change needed someone else’s agreement, on someone else’s timetable, in another time zone.',
+		after: 'We implemented Dynamics 365 with source control from day one: five environments, three developers, Azure DevOps. Allseas now own the system their business books work on, and booking takes a fraction of the time it used to.',
+	},
+	{
+		client: 'Selwood Housing',
+		note: null,
+		before: 'Ten developers shared three environments. Nothing was in source control, customisations were unmanaged — including in production — and the org copy feature was doing the job of a deployment pipeline.',
+		after: 'Three environments became thirteen, everything went under source control, and the apps and the code came into one repository with a build. Failed releases stopped, and several workstreams now run at the same time without standing on each other.',
+	},
+	{
+		client: 'A UK travel loyalty business',
+		note: null,
+		before: 'They are opening the Power Platform to their own staff, so people can improve their own day-to-day work. A hundred makers with no guardrails is a predictable mess.',
+		after: 'We are putting the guardrails in before they start building, not after.',
+	},
+];
+---
+
+<BaseLayout
+	title="Dynamics 365 and Power Platform Consultancy | XFour"
+	description="XFour is a Microsoft Partner. Dynamics 365 and Power Platform licences, migration, automation and reporting for businesses anywhere in the UK. Start with a 30-minute scoping call, or a fixed-price three-day readiness check."
+	navCurrent="/dynamics-365"
+	mainClass="page journey-a"
+>
+
+	<!-- =========================== Hero =========================== -->
+	<section class="clean-block clean-hero journey-hero">
+		<div class="text">
+			<h1 class="h2">Make Dynamics 365 do what you were promised</h1>
+			<p>
+				XFour is a Microsoft Partner. We implement Dynamics 365 and the Power Platform,
+				migrate what you run today, automate the work nobody should be doing by hand, and
+				give you reporting you can trust. We work with businesses anywhere in the UK.
+			</p>
+			<p class="mb-0">
+				<a class="btn btn-primary btn-lg" role="button" data-booking-link href={BOOKING_URL} target="_blank" rel="noopener">
+					Book a 30-minute scoping call
+				</a>
+			</p>
+		</div>
+	</section>
+
+	<!-- ==================== 1. Who this is for ==================== -->
+	<section class="clean-block" aria-labelledby="who-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="who-heading" class="text-info">Who this page is for</h2>
+				<p>Two businesses come to us. They arrive with different sentences and they need different first steps.</p>
+			</div>
+			<div class="row g-4 justify-content-center">
+				<div class="col-lg-6">
+					<div class="who-card h-100">
+						<h3 class="h5">“We have outgrown spreadsheets”</h3>
+						<p class="mb-0">
+							The business runs on workbooks, a mailbox and somebody’s memory. It worked at
+							ten people and it does not work now: two versions of the truth, work that falls
+							between people, and no number anyone believes. You need a system of record, and
+							you need the move onto it to not break trading while it happens.
+						</p>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="who-card h-100">
+						<h3 class="h5">“We are on Microsoft and it does not work”</h3>
+						<p class="mb-0">
+							You already pay for Dynamics 365 or the Power Platform. Someone implemented it,
+							people work around it, changes are risky, and the reports disagree with each
+							other. You do not need to start again. You need the licences, the environments
+							and the release process put right, in an order that does not stop the business.
+						</p>
+					</div>
+				</div>
+			</div>
+			<p class="text-center mt-4 mb-0 geography">
+				Nobody chooses a Dynamics partner by postcode, so we do not ask you to. This work is
+				done remotely, for clients across the UK.
+			</p>
+		</div>
+	</section>
+
+	<!-- ===================== 2. What we do ===================== -->
+	<section class="clean-block dark" aria-labelledby="work-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="work-heading" class="text-info">What XFour does</h2>
+				<p>Four kinds of work. Most engagements are two or three of them, in this order.</p>
+			</div>
+			<div class="row g-4">
+				{work.map((item) => (
+					<div class="col-md-6">
+						<h3 class="h5">{item.title}</h3>
+						<p class="mb-0">{item.body}</p>
+					</div>
+				))}
+			</div>
+			<p class="mt-4 mb-0 aside">
+				We also build native iOS apps and working prototypes — the same project work, for the
+				same kind of buyer. <a href="/app-development">See what we build, and what it costs →</a>
+			</p>
+		</div>
+	</section>
+
+	<!-- ================ 3. What it costs to start ================ -->
+	<section class="clean-block" id="cost" aria-labelledby="cost-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="cost-heading" class="text-info">What it costs to start</h2>
+				<p>
+					Two ways in, and both end with a price in writing before any delivery work begins.
+					All prices exclude VAT.
+				</p>
+			</div>
+			<div class="row g-4 justify-content-center">
+
+				<!-- Way in 1 -- the free call. First, because it is the one every
+				     visitor can take today and it is the page's one call to action. -->
+				<div class="col-md-6 col-lg-5">
+					<div class="price-card h-100">
+						<h3 class="h5">A 30-minute scoping call</h3>
+						<p class="price">No charge</p>
+						<p>
+							You describe where you are. We tell you what we would do first, roughly what it
+							costs and roughly how long it takes. If what you need is not Dynamics, we will say
+							so — that answer is cheaper for both of us now than in three months.
+						</p>
+						<p class="mb-0">
+							<a class="btn btn-primary" role="button" data-booking-link href={BOOKING_URL} target="_blank" rel="noopener">
+								Book a 30-minute scoping call
+							</a>
+						</p>
+					</div>
+				</div>
+
+				<!-- Way in 2 -- the fixed-price check, for an estate that already
+				     exists. £1,950 + VAT is the price Ben set on 10 October 2026. -->
+				<div class="col-md-6 col-lg-5">
+					<div class="price-card h-100">
+						<h3 class="h5">A readiness check, if you already run Dynamics</h3>
+						<p class="price">£1,950 + VAT</p>
+						<p>
+							Three days, fixed price, fully remote. We score your Dataverse estate against the
+							fourteen things that separate a governed environment from a failed deployment
+							waiting to happen — source control, environments, release pipelines, configuration
+							data, recovery, flow monitoring — and you get the scores in writing with a 90-day
+							plan in the order the work should be done.
+						</p>
+						<p class="mb-0">
+							You keep the report either way. If it comes back mostly green, the report says so
+							and that is the end of it.
+						</p>
+					</div>
+				</div>
+			</div>
+			<p class="text-center mt-4 mb-0 aside">
+				Delivery work after either of these is quoted as a fixed price against a written
+				scope. We do not start on a day rate and tell you the total later.
+			</p>
+		</div>
+	</section>
+
+	<!-- ========================= Proof ========================= -->
+	<section class="clean-block dark" aria-labelledby="proof-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="proof-heading" class="text-info">Dataverse estates we have actually worked on</h2>
+				<p>Named with permission. The third is a real client who has asked not to be named.</p>
+			</div>
+			<div class="row g-4">
+				{proof.map((item) => (
+					<div class="col-lg-4">
+						<article class="proof-card h-100">
+							<h3 class="h5 mb-1">{item.client}</h3>
+							{item.note && <p class="proof-note">{item.note}</p>}
+							<p class="proof-label">Before</p>
+							<p>{item.before}</p>
+							<p class="proof-label">What we did</p>
+							<p class="mb-0">{item.after}</p>
+						</article>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<!-- ==================== Call to action ==================== -->
+	<section class="clean-block" id="book" aria-labelledby="book-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="book-heading" class="text-info">Start with the call</h2>
+			</div>
+			<div class="closing text-center">
+				<p>
+					Thirty minutes. Bring the thing that is not working — the licence bill, the migration
+					nobody will sign off, the report two people disagree about. You leave knowing what we
+					would do first and what it would cost.
+				</p>
+				<p class="mt-4">
+					<a class="btn btn-primary btn-lg" role="button" data-booking-link href={BOOKING_URL} target="_blank" rel="noopener">
+						Book a 30-minute scoping call
+					</a>
+				</p>
+				<p class="mb-0">
+					Or email <strong><a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a></strong>, or
+					call <strong><a href="tel:01183702920">0118 370 2920</a></strong>.
+				</p>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	/* .clean-block.clean-hero:before paints currentColor across the whole hero,
+	   so setting the colour here gives a flat brand navy band and costs no image
+	   request. Same navy, and the same reasoning, as the home page hero. */
+	.journey-hero {
+		color: #082044;
+		background-color: #082044;
+	}
+
+	.journey-hero .text {
+		max-width: 46rem;
+	}
+
+	/* The theme caps .block-heading p at 420px, which is too narrow for these
+	   intros. */
+	.journey-a .block-heading p {
+		max-width: 680px;
+	}
+
+	.who-card,
+	.price-card,
+	.proof-card {
+		background-color: #fff;
+		border: 1px solid rgba(8, 32, 68, 0.12);
+		border-radius: 6px;
+		padding: 28px 26px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+	}
+
+	.price {
+		font-size: 1.6rem;
+		font-weight: 700;
+		color: #1e6add;
+		margin-bottom: 0.75rem;
+	}
+
+	.proof-note {
+		font-size: 0.9rem;
+		opacity: 0.75;
+	}
+
+	.proof-label {
+		margin-bottom: 0.15rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		/* 7.2:1 on white. */
+		color: #15479c;
+	}
+
+	.geography,
+	.aside {
+		max-width: 680px;
+		margin-left: auto;
+		margin-right: auto;
+		font-size: 0.95rem;
+		opacity: 0.85;
+	}
+
+	.closing {
+		max-width: 720px;
+		margin: 0 auto;
+	}
+
+	.closing p {
+		line-height: 1.7;
+	}
+</style>

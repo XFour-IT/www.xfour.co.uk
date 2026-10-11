@@ -13,6 +13,9 @@ const { current } = Astro.props;
 const links = [
 	{ href: '/', label: 'Home' },
 	{ href: '/about-us', label: 'About Us' },
+	// XFO-64: the Journey A landing page. The home page routes to it, but a
+	// visitor who lands anywhere else needs a way into the journey too.
+	{ href: '/dynamics-365', label: 'Dynamics 365' },
 	{ href: '/services', label: 'Services' },
 	{ href: '/app-development', label: 'App Development' },
 	{ href: '/contact-us', label: 'Contact Us' },
