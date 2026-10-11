@@ -1,20 +1,29 @@
 /*
- * Whole-site checks on the HTML itself.
+ * Whole-site checks on the HTML the visitor actually receives.
  *
- * The site is eleven hand-maintained pages with no templating, so the real
- * risk is not broken logic — it is one page drifting out of step with the
- * other ten. That is how the journey tag ended up wrong in XFO-44: the code
- * was right and one page was not. These tests read every page and fail if any
- * of them disagrees with the rest.
+ * These read ./dist, the output of `astro build`, not the .astro sources. One
+ * shared layout makes drift between pages much less likely than it was, but it
+ * does not make these checks pointless: a page can still opt out of the layout
+ * (maintenance.astro does), pass the wrong prop, or be added by hand. Reading
+ * the built HTML also tests the layout itself — if the consent script is
+ * dropped from BaseLayout, every page here fails at once, which is what we
+ * want.
+ *
+ * `npm test` builds first (see the pretest script), so dist is never stale.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
+const DIST = join(here, '../dist');
 const PUBLIC = join(here, '../public');
+
+if (!existsSync(DIST)) {
+    throw new Error('dist/ is missing. Run `npm run build` first, or use `npm test`, which builds for you.');
+}
 
 function htmlFiles(dir) {
     return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -24,8 +33,8 @@ function htmlFiles(dir) {
     });
 }
 
-const pages = htmlFiles(PUBLIC).map((path) => ({
-    name: relative(PUBLIC, path),
+const pages = htmlFiles(DIST).map((path) => ({
+    name: relative(DIST, path).split('\\').join('/'),
     html: readFileSync(path, 'utf8')
 }));
 
@@ -34,13 +43,22 @@ test('every page is found', () => {
 });
 
 test('no page loads the Microsoft chat widget directly', () => {
-    /* The widget sets cookies the moment it loads, so it may only ever be
-       injected by consent.js after the visitor agrees. If this fails, someone
-       has pasted the Microsoft snippet back into a page. */
+    /* The widget writes to the visitor's device as soon as it loads, so it may
+       only ever be injected by consent.js after the visitor agrees. If this
+       fails, someone has pasted the Microsoft snippet back into a page or into
+       LiveChat.astro. */
     const offenders = pages
         .filter((p) => /<script[^>]*Microsoft_Omnichannel_LCWidget/.test(p.html))
         .map((p) => p.name);
     assert.deepEqual(offenders, [], 'these pages load the chat without consent');
+});
+
+test('the pages that offer chat still offer it', () => {
+    /* The layout decides which pages carry the chat slot. This fails if the
+       slot disappears from the pages that are meant to have it, which would
+       make the gating look like it worked by removing the feature. */
+    const withChat = pages.filter((p) => p.html.includes('data-x4-livechat')).map((p) => p.name);
+    assert.ok(withChat.length >= 6, `expected the chat slot on the main pages, found ${withChat.length}`);
 });
 
 test('every page that offers chat has the consent script to gate it', () => {
@@ -59,6 +77,15 @@ test('consent.js loads before analytics.js on every page that has both', () => {
         .filter((p) => p.html.indexOf('/assets/js/consent.js') > p.html.indexOf('/assets/js/analytics.js'))
         .map((p) => p.name);
     assert.deepEqual(offenders, [], 'these pages load analytics before consent');
+});
+
+test('every page that loads analytics.js also loads consent.js', () => {
+    /* The other half of the order check: a page that measures without the
+       consent script present can never be switched off by the visitor. */
+    const offenders = pages
+        .filter((p) => p.html.includes('/assets/js/analytics.js') && !p.html.includes('/assets/js/consent.js'))
+        .map((p) => p.name);
+    assert.deepEqual(offenders, [], 'these pages measure with no way to object');
 });
 
 test('every page that loads consent.js also loads its stylesheet', () => {
@@ -86,7 +113,7 @@ test('the footer legal links point at pages that exist', () => {
         '/legal/privacy': 'legal/privacy.html',
         '/legal/cookies': 'legal/cookies.html'
     };
-    const names = new Set(pages.map((p) => p.name.split('\\').join('/')));
+    const names = new Set(pages.map((p) => p.name));
     for (const [href, file] of Object.entries(targets)) {
         assert.ok(names.has(file), `${href} is linked but ${file} does not exist`);
     }
@@ -101,23 +128,41 @@ test('the footer legal links point at pages that exist', () => {
 test('the privacy policy no longer claims we run no analytics', () => {
     /* It said exactly that while PostHog was live. Keep the claim from coming
        back if the page is ever edited by hand. */
-    const privacy = pages.find((p) => p.name.endsWith('privacy.html')).html;
+    const privacy = pages.find((p) => p.name === 'legal/privacy.html').html;
     assert.doesNotMatch(privacy, /do not run any website analytics/i);
     assert.match(privacy, /cookieless/i, 'the policy should describe how measurement works');
 });
 
+test('the privacy policy states the retention periods the business confirmed', () => {
+    /* Confirmed on 11 October 2026 (XFO-47). These numbers also appear in the
+       data protection addendum customers are given; if one is changed without
+       the other, the two documents contradict each other. */
+    const privacy = pages.find((p) => p.name === 'legal/privacy.html').html;
+    assert.match(privacy, /24 months from your last contact/i, 'the enquiry retention period is missing');
+    assert.match(privacy, /then 6 years/i, 'the customer retention period is missing');
+});
+
 test('the cookie policy names every cookie the site can set', () => {
-    const cookies = pages.find((p) => p.name.endsWith('cookies.html')).html;
+    const cookies = pages.find((p) => p.name === 'legal/cookies.html').html;
     for (const name of ['x4_consent', 'cf_clearance', 'MC1', 'MS0']) {
         assert.match(cookies, new RegExp(name), `${name} is not named in the cookie policy`);
     }
+});
+
+test('the cookie policy declares both analytics tools', () => {
+    /* Cloudflare Web Analytics is injected by Cloudflare after our HTML leaves
+       the Worker, so it is invisible in this repository and easy to forget. The
+       business chose to keep it, so it has to stay declared. */
+    const cookies = pages.find((p) => p.name === 'legal/cookies.html').html;
+    assert.match(cookies, /PostHog/, 'PostHog is not declared');
+    assert.match(cookies, /Cloudflare Web Analytics/, 'Cloudflare Web Analytics is not declared');
 });
 
 test('the cookie name in the policy matches the one the code sets', () => {
     const consentJs = readFileSync(join(PUBLIC, 'assets/js/consent.js'), 'utf8');
     const match = consentJs.match(/COOKIE_NAME\s*=\s*'([^']+)'/);
     assert.ok(match, 'could not find the cookie name in consent.js');
-    const cookies = pages.find((p) => p.name.endsWith('cookies.html')).html;
+    const cookies = pages.find((p) => p.name === 'legal/cookies.html').html;
     assert.match(cookies, new RegExp(match[1]), 'the policy names a different cookie than the code sets');
 });
 

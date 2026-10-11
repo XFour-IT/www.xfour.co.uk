@@ -1,20 +1,26 @@
+---
+// The "be right back" page, served by hand when the site is taken down.
+// StatusPage.io "sign" template, moved across unchanged.
+import LiveChat from '../components/LiveChat.astro';
+---
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+  <script is:inline src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script is:inline src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" media="screen" rel="stylesheet" />
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" media="screen"
     rel="stylesheet" />
-  <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
-  <script src="https://cdn.statuspage.io/moment-timezone-with-data.js"></script>
-  <script src="https://cdn.statuspage.io/jstz.js"></script>
-  <script src="https://cdn.statuspage.io/localtimes.js"></script>
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+  <script is:inline src="https://cdn.statuspage.io/moment-timezone-with-data.js"></script>
+  <script is:inline src="https://cdn.statuspage.io/jstz.js"></script>
+  <script is:inline src="https://cdn.statuspage.io/localtimes.js"></script>
 
-  <style>
+  <style is:inline>
     * {
       -moz-box-sizing: border-box;
       -webkit-box-sizing: border-box;
@@ -148,7 +154,7 @@
       clear: both
     }
   </style>
-  <style>
+  <style is:inline>
     .sign.error-page-wrapper {
       font-family: 'Source Sans Pro', sans-serif;
       background-color: #179eca;
@@ -408,7 +414,7 @@
       }
     }
   </style>
-  <style>
+  <style is:inline>
     .background-color {
       background-color: #179ECA !important;
     }
@@ -449,8 +455,10 @@
     }
   </style>
   <link rel="stylesheet" href="/assets/css/consent.css">
-  <script defer src="/assets/js/consent.js"></script>
-  <script defer src="/assets/js/analytics.js"></script>
+  <!-- consent.js before analytics.js: analytics.js asks it what the visitor
+       chose, so it has to be loaded first. -->
+  <script is:inline defer src="/assets/js/consent.js"></script>
+  <script is:inline defer src="/assets/js/analytics.js"></script>
 </head>
 
 <body class="sign error-page-wrapper background-color background-image">
@@ -475,7 +483,7 @@
     </div>
   </div>
 
-  <script>
+  <script is:inline>
     function ErrorPage(e, t, n) { this.$container = $(e), this.$contentContainer = this.$container.find(n == "sign" ? ".sign-container" : ".content-container"), this.pageType = t, this.templateName = n } ErrorPage.prototype.centerContent = function () { var e = this.$container.outerHeight(), t = this.$contentContainer.outerHeight(), n = (e - t) / 2, r = this.templateName == "sign" ? -100 : 0; this.$contentContainer.css("top", n + r) }, ErrorPage.prototype.initialize = function () { var e = this; this.centerContent(), this.$container.on("resize", function (t) { t.preventDefault(), t.stopPropagation(), e.centerContent() }), this.templateName == "plain" && window.setTimeout(function () { e.$contentContainer.addClass("in") }, 500), this.templateName == "sign" && $(".sign-container").animate({ textIndent: 0 }, { step: function (e) { $(this).css({ transform: "rotate(" + e + "deg)", "transform-origin": "top center" }) }, duration: 1e3, easing: "easeOutBounce" }) }, ErrorPage.prototype.createTimeRangeTag = function (e, t) { return "<time utime=" + e + ' simple_format="MMM DD, YYYY HH:mm">' + e + "</time> - <time utime=" + t + ' simple_format="MMM DD, YYYY HH:mm">' + t + "</time>." }, ErrorPage.prototype.handleStatusFetchSuccess = function (e, t) { if (e == "503") $("#replace-with-fetched-data").html(t.status.description); else if (!t.scheduled_maintenances.length) $("#replace-with-fetched-data").html("<em>(there are no active scheduled maintenances)</em>"); else { var n = t.scheduled_maintenances[0]; $("#replace-with-fetched-data").html(this.createTimeRangeTag(n.scheduled_for, n.scheduled_until)), $.fn.localizeTime() } }, ErrorPage.prototype.handleStatusFetchFail = function (e) { $("#replace-with-fetched-data").html("<em>(enter a valid StatusPage.io url)</em>") }, ErrorPage.prototype.fetchStatus = function (e, t) { if (!e || !t || t == "404") return; var n = "", r = this; t == "503" ? n = e + "/api/v2/status.json" : n = e + "/api/v2/scheduled-maintenances/active.json", $.ajax({ type: "GET", url: n }).success(function (e, n) { r.handleStatusFetchSuccess(t, e) }).fail(function (e, n) { r.handleStatusFetchFail(t) }) };
     var ep = new ErrorPage('body', "maintenance", "sign");
     ep.initialize();
@@ -486,12 +494,7 @@
       });
 
   </script>
-    <!-- Live chat, gated by consent. assets/js/consent.js injects the Microsoft
-         Dynamics 365 Omnichannel widget here, but only once the visitor has allowed
-         chat cookies. The widget used to be a script tag on this page; it is not any
-         more, because it set cookies before anyone was asked. Delete this marker to
-         take chat off this page; do not paste the Microsoft script back in. -->
-    <div data-x4-livechat hidden></div>
+  <LiveChat />
 
 
 </body>

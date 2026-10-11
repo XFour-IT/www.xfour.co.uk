@@ -1,0 +1,103 @@
+---
+// The one layout for the public pages of www.xfour.co.uk.
+//
+// Before this file, every page carried its own copy of the head tags, the
+// navigation, the footer and the script list. Eleven copies drifted apart. A
+// change here now happens once, on every page.
+import SiteNav from '../components/SiteNav.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import LiveChat from '../components/LiveChat.astro';
+
+interface Props {
+	/** <title> and, unless ogTitle is given, og:title. */
+	title: string;
+	/** meta description and, unless ogDescription is given, og:description. */
+	description: string;
+	ogTitle?: string;
+	ogDescription?: string;
+	/** Class on <main>. Kept per page because the old pages set it per page. */
+	mainClass?: string;
+	/** href of this page's nav link, so that link gets Bootstrap's `active`. */
+	navCurrent?: string;
+	/**
+	 * Microsoft Omnichannel live chat. Three pages load it today and four do
+	 * not. The default matches the pages that do; the four pass false so that
+	 * this change moves the pages without altering them.
+	 */
+	liveChat?: boolean;
+}
+
+const {
+	title,
+	description,
+	ogTitle = title,
+	ogDescription = description,
+	mainClass = 'page',
+	navCurrent,
+	liveChat = true,
+} = Astro.props;
+
+// Built from the page's own URL, so a page cannot be given the canonical tag of
+// another page -- which is the kind of copy-and-paste mistake this layout
+// exists to prevent.
+//
+// The build writes about-us.html, but the URL people and search engines use is
+// /about-us, so the .html and the index are taken off the end. The home page
+// keeps its single trailing slash; no other page has one. This matches the URLs
+// the Worker serves today exactly.
+const path = Astro.url.pathname
+	.replace(/\.html$/, '')
+	.replace(/\/index$/, '/')
+	.replace(/(.)\/+$/, '$1');
+const canonical = new URL(path, Astro.site).href;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<title>{title}</title>
+	<meta name="description" content={description}>
+	<link rel="canonical" href={canonical}>
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="XFour">
+	<meta property="og:title" content={ogTitle}>
+	<meta property="og:description" content={ogDescription}>
+	<meta property="og:url" content={canonical}>
+	<meta name="twitter:card" content="summary">
+	<link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
+	<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css?h=5c13df78c26e51f31fd577e41c4f5937">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+	<link rel="stylesheet" href="/assets/css/Highlight-Blue.css?h=91a04f2b18410bc09760f3473788176a">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css">
+	<link rel="stylesheet" href="/assets/css/vanilla-zoom.min.css?h=e737f76df021b46fa7180f48799a5d20">
+	<link rel="stylesheet" href="/assets/css/index.css">
+	<link rel="stylesheet" href="/assets/css/consent.css">
+	<!-- consent.js before analytics.js: analytics.js asks it what the visitor
+	     chose, so it has to be loaded first. A test checks the order. -->
+	<script is:inline defer src="/assets/js/consent.js"></script>
+	<script is:inline defer src="/assets/js/analytics.js"></script>
+	<!-- Page-scoped head content, for the one page that has any. -->
+	<slot name="head" />
+</head>
+
+<body>
+	<SiteNav current={navCurrent} />
+	<main class={mainClass}>
+		<slot />
+	</main>
+	<SiteFooter />
+	<script is:inline src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script is:inline src="/assets/js/bs-init.js?h=7563c52cc0a72a92d96ce0159b71241c"></script>
+	<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
+	<script is:inline src="/assets/js/vanilla-zoom.js?h=6a37ea9c996b05f763161c73127d66bc"></script>
+	<script is:inline src="/assets/js/theme.js?h=a083aeb15550c5e1266c666e8a5846d9"></script>
+	{liveChat && <LiveChat />}
+</body>
+
+</html>
