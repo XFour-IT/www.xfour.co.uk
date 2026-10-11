@@ -7,7 +7,12 @@
 	"name": "x4-website",
 	"compatibility_date": "2025-05-06",
 	"assets": {
-		"directory": "./public"
+		"directory": "./public",
+		// Serve public/404.html on a miss. Without this, Workers returns its own
+		// bare 404 and the custom page is dead weight. (The old .htaccess tried
+		// to do this, but Workers does not read .htaccess.)
+		"not_found_handling": "404-page",
+		"html_handling": "auto-trailing-slash"
 	},
 	"observability": {
 		"enabled": true
