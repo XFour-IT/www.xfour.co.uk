@@ -41,13 +41,18 @@
     /* Which part of the funnel this page belongs to. Registered on every event
        so a lead can be traced back to the journey that produced it. */
     function journeyFor(path) {
-        var page = path.replace(/\/+$/, '').split('/').pop() || 'index.html';
-        if (page === 'index.html') return 'home';
-        if (page === 'app-development.html') return 'app-development';
-        if (page === 'services.html') return 'services';
-        if (page === 'contact-us.html') return 'contact';
-        if (page === 'about-us.html') return 'about';
         if (path.indexOf('/legal/') !== -1) return 'legal';
+
+        /* The live site serves extensionless URLs (/app-development), while the
+           files on disk and local previews are .html. Match on the name with any
+           trailing slash and .html removed, so both forms give the same journey.
+           Matching only .html sent every page except the homepage to "other". */
+        var page = path.replace(/\/+$/, '').split('/').pop().replace(/\.html$/, '');
+        if (!page || page === 'index') return 'home';
+        if (page === 'app-development') return 'app-development';
+        if (page === 'services') return 'services';
+        if (page === 'contact-us') return 'contact';
+        if (page === 'about-us') return 'about';
         return 'other';
     }
 
@@ -61,6 +66,12 @@
             cookieless_mode: 'always',
             persistence: 'memory',
             respect_dnt: true,
+            /* Off on purpose. The conversion events below are the measurement
+               we actually designed, and are what the install was approved to
+               collect. Autocapture recorded a second $autocapture event on
+               every click on top of them: more collection than we described,
+               and more event volume for nothing. */
+            autocapture: false,
             person_profiles: 'identified_only',
             capture_pageview: true,
             capture_pageleave: true,
