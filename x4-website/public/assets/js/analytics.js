@@ -1,10 +1,17 @@
 /*
  * Website measurement for www.xfour.co.uk — PostHog, EU region, cookieless.
  *
- * The site sets no cookie and writes nothing to localStorage: persistence is
- * "memory" and the visitor id comes from PostHog's stateless server-side hash.
- * That keeps us off the consent-banner critical path. When the banner ships,
- * switch persistence to "localStorage+cookie" for visitors who accept.
+ * The site sets no cookie and writes nothing to localStorage, so this stays off
+ * the consent-banner critical path. When the banner ships, switch
+ * cookieless_mode to "on_reject" so visitors who accept get a stable id.
+ *
+ * Cookieless has two halves and needs both, or the numbers are wrong:
+ *   1. cookieless_mode: "always" here, which sends the distinct id
+ *      "$posthog_cookieless" instead of a stored one.
+ *   2. "Cookieless server hash mode" enabled on the PostHog project, which
+ *      turns that sentinel into a daily hash of day + user agent + IP + host.
+ * Without half 2 the events are discarded. Without half 1 the server never
+ * hashes anything and every page load counts as a new visitor.
  *
  * Conversion events live at the bottom of this file. Add new ones there rather
  * than inline in the pages, so all 11 pages keep sharing one script.
@@ -44,6 +51,7 @@
         posthog.init(PROJECT_KEY, {
             api_host: API_HOST,
             defaults: '2025-05-24',
+            cookieless_mode: 'always',
             persistence: 'memory',
             respect_dnt: true,
             person_profiles: 'identified_only',
