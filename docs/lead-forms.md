@@ -15,9 +15,45 @@ is deliberate: a form that silently drops a lead is worse than no form.
 | Dataverse environment | `https://xfour.crm11.dynamics.com` |
 | Turnstile widget | Made — see step 5, nothing left to do |
 | Review before go-live | On a preview address first — see "Previewing it" |
+| Both forms, seen on the preview address | Approved by Ben, 11 Oct 2026 |
+| Who does the four tenant jobs | Ben, then sends the values back |
 
 So of the five tenant jobs below, **1, 2, 3 and the GUID in 4 are all that is
 left**, and all four need tenant admin.
+
+---
+
+## What to send back, and what never to send
+
+Five values come back. **None of them is a secret**, so the task thread is a
+fine place for them:
+
+| # | Value | Where it comes from | Goes into |
+|---|---|---|---|
+| 1 | Directory (tenant) ID | Entra app registration, Overview | `ENTRA_TENANT_ID` |
+| 2 | Application (client) ID | Entra app registration, Overview | `ENTRA_CLIENT_ID` |
+| 3 | Integer value of `Web — Dynamics 365` | Lead Source choice, step 3 | `LEAD_SOURCE_DYNAMICS` |
+| 4 | Integer value of `Web — Managed IT` | Lead Source choice, step 3 | `LEAD_SOURCE_MANAGED_IT` |
+| 5 | Ben's systemuser GUID | Dynamics user record, step 4 | both `LEAD_OWNER_*` |
+
+The **client secret is the one thing that must not come back.** Do not put it in
+the task thread, in an email, or in the repo. Ben puts it straight into
+Cloudflare himself, where the Worker reads it and nobody else can:
+
+1. Cloudflare dashboard → Workers & Pages → **x4-website** → Settings.
+2. Variables and Secrets → Add → type **Secret**.
+3. Name `ENTRA_CLIENT_SECRET`, value the secret from the app registration. Save.
+
+A Worker secret is encrypted, is never shown again in the dashboard, and
+survives later deploys, because it is not in `wrangler.jsonc`. The CLI
+equivalent is `npx wrangler secret put ENTRA_CLIENT_SECRET`; either is fine.
+
+Order does not matter. `POST /api/enquiry` needs `DATAVERSE_URL`,
+`ENTRA_TENANT_ID`, `ENTRA_CLIENT_ID` and `ENTRA_CLIENT_SECRET` all present, and
+answers `503 not_configured` while any one of them is blank — so a half-finished
+configuration shows the "call us instead" message rather than losing a lead.
+Values 3, 4 and 5 are not part of that check: without them the Lead is still
+created, it just has no source and the default owner.
 
 ---
 
@@ -70,7 +106,9 @@ administrator role, which is why they were not in PR #23.
    - Single tenant. No redirect URI — this is a daemon, not a sign-in.
 2. Note the **Application (client) ID** and the **Directory (tenant) ID**.
 3. Certificates & secrets → New client secret. Copy the value once; it is never
-   shown again. Put a diary note in for the expiry date.
+   shown again. Put it straight into Cloudflare as described in "What to send
+   back" — not into the task thread. Put a diary note in for the expiry date,
+   because the forms stop working the day it expires.
 
 No API permissions are needed here. Dataverse access comes from the application
 user in step 2, not from a delegated or application permission grant.
