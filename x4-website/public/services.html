@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="assets/css/vanilla-zoom.min.css?h=e737f76df021b46fa7180f48799a5d20">
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="stylesheet" href="/assets/css/consent.css">
+    <script defer src="/assets/js/consent.js"></script>
     <script defer src="/assets/js/analytics.js"></script>
 </head>
 
@@ -88,8 +90,12 @@
                 <div class="col-sm-3">
                     <h5>Legal</h5>
                     <ul>
-                        <li><a href="/legal/legal">Legal Center</a></li>
+                        <li><a href="/legal/legal">Legal Centre</a></li>
                         <li><a href="/legal/privacy">Privacy Policy</a></li>
+                        <li><a href="/legal/cookies">Cookie Policy</a></li>
+                        <!-- Points at the cookie policy so it still works without JavaScript;
+                             consent.js upgrades it into a button that opens the panel in place. -->
+                        <li><a href="/legal/cookies" data-x4-consent-open>Cookie choices</a></li>
                     </ul>
                 </div>
             </div>
