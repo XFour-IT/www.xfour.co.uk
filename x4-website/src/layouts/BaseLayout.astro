@@ -19,12 +19,6 @@ interface Props {
 	mainClass?: string;
 	/** href of this page's nav link, so that link gets Bootstrap's `active`. */
 	navCurrent?: string;
-	/**
-	 * Microsoft Omnichannel live chat. Three pages load it today and four do
-	 * not. The default matches the pages that do; the four pass false so that
-	 * this change moves the pages without altering them.
-	 */
-	liveChat?: boolean;
 }
 
 const {
@@ -34,7 +28,6 @@ const {
 	ogDescription = description,
 	mainClass = 'page',
 	navCurrent,
-	liveChat = true,
 } = Astro.props;
 
 // Built from the page's own URL, so a page cannot be given the canonical tag of
@@ -97,7 +90,7 @@ const canonical = new URL(path, Astro.site).href;
 	<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.js"></script>
 	<script is:inline src="/assets/js/vanilla-zoom.js?h=6a37ea9c996b05f763161c73127d66bc"></script>
 	<script is:inline src="/assets/js/theme.js?h=a083aeb15550c5e1266c666e8a5846d9"></script>
-	{liveChat && <LiveChat />}
+	<LiveChat />
 </body>
 
 </html>
