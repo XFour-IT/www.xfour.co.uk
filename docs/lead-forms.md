@@ -22,16 +22,20 @@ is deliberate: a form that silently drops a lead is worse than no form.
 | Both runtime secrets, Assign on Lead | Done by Ben, 12 Oct 2026 |
 | Acknowledgement + task flow | A solution file Ben imports — see below |
 
-State on 12 Oct 2026, 22:30:
+| Read and Write on Lead, flow imported and on | Done by Ben, 12 Oct 2026 |
+
+State on 12 Oct 2026, 22:40:
 
 - Both forms are **live on www.xfour.co.uk**, deployed from this branch by
   accident on 12 Oct (a dashboard Deploy picked up the branch's latest upload).
   Ben decided to keep them live. The next deploy of `main` removes them again
   until this branch is merged.
-- A test submission on the live Managed IT form was **refused by Dataverse**:
-  `missing prvReadLead privilege`. The role needs Read and Write on Lead at User
-  scope as well (step 2).
-- The flow is in `dynamics/website-enquiries/`, not yet imported.
+- One test submission on each live form was **refused by Dataverse** at 22:36:
+  `does not have CreateAccess right(s) … Consider assigning a role with the
+  level BusinessUnitLevel`. Create and Assign on Lead must be Business Unit
+  scope (step 2). Read and Write stay at User.
+- Ben may merge this branch once a test Lead lands with the right source and
+  owner.
 
 ---
 
@@ -147,13 +151,21 @@ user in step 2, not from a delegated or application permission grant.
    - create a role named `Website enquiry form` with **Create**, **Read**,
      **Write** and **Assign** on the Lead entity, and nothing else.
 
-   Set Read and Write to **User** scope (the smallest circle). Create and
-   Assign can be User scope too.
+   Set Read and Write to **User** scope (the smallest circle). Set Create and
+   Assign to **Business Unit** scope.
 
 Why Assign: the Worker creates each Lead already owned by Ben (the
 `LEAD_OWNER_*` vars). Creating a record owned by somebody else counts as
 assigning it, and Dataverse refuses the whole create without the Assign
 privilege.
+
+Why Create and Assign at Business Unit: at User scope the application user may
+only create Leads that it owns itself. A Lead owned by Ben is outside that
+circle, so on 12 Oct 2026 the live forms were refused with `does not have
+CreateAccess right(s) … Consider assigning a role with the level
+BusinessUnitLevel`. Business Unit scope lets it create Leads owned by anybody in
+XFour's business unit. Neither privilege lets it see a Lead: Create makes new
+ones, and Assign needs the ID of a Lead, which it has no way to list.
 
 Why Read and Write, when the Worker never reads a Lead back: Dataverse checks
 them itself during that assignment. On 12 Oct 2026 the live form was refused
@@ -161,10 +173,10 @@ with `missing prvReadLead privilege` with Create and Assign alone. Write is
 there because assigning is a change to the record, so it is the next check in
 line.
 
-Why User scope is still safe: at User scope the application user can only read
-or change Leads it owns, and it owns none — every Lead is handed to Ben as it
-is created. So if the client secret ever leaked, the worst an attacker could do
-is still create junk leads. If a submission is still refused at User scope,
+Why that is still safe: Read and Write stay at User scope, so the application
+user can only read or change Leads it owns, and it owns none — every Lead is
+handed to Ben as it is created. So if the client secret ever leaked, the worst
+an attacker could do is still create junk leads. If a submission is refused,
 read the `enquiry_dataverse_failed` line in the Worker log before widening
 anything: Read at Business Unit or Organisation would let a leaked secret read
 every Lead in the CRM. Widen one privilege, one step, only if the log names it.
