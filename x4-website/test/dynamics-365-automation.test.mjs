@@ -13,7 +13,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -21,7 +21,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 const DIST = join(here, '../dist');
 const PUBLIC = join(here, '../public');
 
-const PAGE = 'dynamics-365-automation-integration.html';
+const PAGE = 'dynamics-365/automation-and-integration.html';
+const PATH = '/dynamics-365/automation-and-integration';
+const OLD_PATH = '/dynamics-365-automation-integration';
 
 if (!existsSync(DIST)) {
     throw new Error('dist/ is missing. Run `npm run build` first, or use `npm test`, which builds for you.');
@@ -40,7 +42,7 @@ const words = main
     .filter((w) => /\w/.test(w));
 
 test('the page is built', () => {
-    assert.ok(readdirSync(DIST).includes(PAGE), `${PAGE} is missing`);
+    assert.ok(existsSync(join(DIST, PAGE)), `${PAGE} is missing`);
 });
 
 test('it is at least 600 words', () => {
@@ -108,19 +110,26 @@ test('the price matches the landing page', () => {
 
 test('it is linked from the landing page, and is in the sitemap', () => {
     const landing = readFileSync(join(DIST, 'dynamics-365.html'), 'utf8');
-    assert.match(landing, /href="\/dynamics-365-automation-integration"/, '/dynamics-365 does not link here');
+    assert.match(landing, new RegExp(`href="${PATH}"`), '/dynamics-365 does not link here');
+    assert.doesNotMatch(landing, new RegExp(`href="${OLD_PATH}"`), '/dynamics-365 still links to the old address');
     assert.match(main, /href="\/dynamics-365"/, 'this page does not link back to the landing page');
     const sitemap = readFileSync(join(PUBLIC, 'sitemap.xml'), 'utf8');
-    assert.match(sitemap, /dynamics-365-automation-integration/, 'the page is not in the sitemap');
+    assert.match(sitemap, new RegExp(`<loc>https://www\\.xfour\\.co\\.uk${PATH}</loc>`), 'the page is not in the sitemap');
+    assert.doesNotMatch(sitemap, new RegExp(OLD_PATH), 'the sitemap still lists the old address');
+});
+
+test('the old flat address redirects here', () => {
+    /* The page went live at /dynamics-365-automation-integration first, so
+       links and search results may still point there. */
+    const redirects = readFileSync(join(PUBLIC, '_redirects'), 'utf8');
+    assert.match(redirects, new RegExp(`^${OLD_PATH}\\s+${PATH}\\s+301$`, 'm'));
+    assert.ok(!existsSync(join(DIST, 'dynamics-365-automation-integration.html')), 'the old page is still built');
 });
 
 test('analytics counts this page as Journey A', () => {
+    /* Every page under /dynamics-365/ is Journey A; see analytics.js. */
     const analytics = readFileSync(join(PUBLIC, 'assets/js/analytics.js'), 'utf8');
-    assert.match(
-        analytics,
-        /page === 'dynamics-365-automation-integration'\) return 'dynamics-365'/,
-        'this page falls back to the "other" journey'
-    );
+    assert.match(analytics, /'\/dynamics-365\/'\) !== -1\) return 'dynamics-365'/, 'pages under /dynamics-365 fall back to "other"');
 });
 
 test('the page source carries no internal note', () => {
