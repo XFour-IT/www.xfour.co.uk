@@ -17,9 +17,17 @@ is deliberate: a form that silently drops a lead is worse than no form.
 | Review before go-live | On a preview address first — see "Previewing it" |
 | Both forms, seen on the preview address | Approved by Ben, 11 Oct 2026 |
 | Who does the four tenant jobs | Ben, then sends the values back |
+| The five values | Received 12 Oct 2026 and set in `wrangler.jsonc` |
 
-So of the five tenant jobs below, **1, 2, 3 and the GUID in 4 are all that is
-left**, and all four need tenant admin.
+What is left, checked against the Cloudflare API on 12 Oct 2026, when the
+`x4-website` Worker had **no runtime secrets at all**:
+
+- `ENTRA_CLIENT_SECRET` has to be a **runtime** secret on the Worker (see
+  below — it went into the Build settings by mistake).
+- `TURNSTILE_SECRET_KEY` has to be added to the same place (step 5). Until now
+  it was only on the preview Worker.
+- The application user's role needs **Assign** on Lead as well as Create
+  (step 2).
 
 ---
 
@@ -41,8 +49,18 @@ the task thread, in an email, or in the repo. Ben puts it straight into
 Cloudflare himself, where the Worker reads it and nobody else can:
 
 1. Cloudflare dashboard → Workers & Pages → **x4-website** → Settings.
-2. Variables and Secrets → Add → type **Secret**.
-3. Name `ENTRA_CLIENT_SECRET`, value the secret from the app registration. Save.
+2. The **Variables and Secrets** section near the top of the page → Add → type
+   **Secret**.
+3. Name `ENTRA_CLIENT_SECRET`, value the secret from the app registration.
+   Click **Deploy**.
+
+**Not** the "Variables and secrets" box inside the **Build** section further
+down the same page. That one is only handed to `npm ci` / `wrangler` while a
+push is being built; the running Worker never sees it, so the form keeps
+answering 503. The two boxes have the same name, which is an easy trap.
+
+To check it landed: after saving, the top Variables and Secrets list shows
+`ENTRA_CLIENT_SECRET` with type Secret and a hidden value.
 
 A Worker secret is encrypted, is never shown again in the dashboard, and
 survives later deploys, because it is not in `wrangler.jsonc`. The CLI
@@ -120,9 +138,15 @@ user in step 2, not from a delegated or application permission grant.
 2. Pick the app registration from step 1.
 3. Give it a security role that can **create Lead only**. Do not give it System
    Administrator. Either:
-   - copy `Salesperson` and strip everything except Create + Append on Lead, or
-   - create a role named `Website enquiry form` with Create and Append To on the
-     Lead entity at organisation scope and nothing else.
+   - copy `Salesperson` and strip everything except Create, Append and Assign
+     on Lead, or
+   - create a role named `Website enquiry form` with **Create** and **Assign**
+     on the Lead entity, at user scope or wider, and nothing else.
+
+Why Assign: the Worker creates each Lead already owned by Ben (the
+`LEAD_OWNER_*` vars). Creating a record owned by somebody else counts as
+assigning it, and Dataverse refuses the whole create without the Assign
+privilege. Read is **not** needed — the Worker never reads a Lead back.
 
 The point of the narrow role: if the client secret ever leaked, the worst an
 attacker could do is create junk leads.
@@ -163,12 +187,17 @@ Made on 11 Oct 2026 in the XFour IT Limited Cloudflare account.
   design
 
 The **secret key** is only in the Cloudflare dashboard (Turnstile → the widget →
-Settings). Set it on the production Worker when you first deploy:
+Settings). Set it on the production Worker the same way as
+`ENTRA_CLIENT_SECRET` — the top **Variables and Secrets** box, type Secret, name
+`TURNSTILE_SECRET_KEY` — or from the CLI:
 
 ```bash
 cd x4-website
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
+
+Without it both forms answer 503 and show "call us instead", even with every
+Dynamics value in place.
 
 It is already set on the preview Worker.
 

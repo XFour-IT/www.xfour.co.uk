@@ -393,7 +393,10 @@ async function createLead(config, lead, env) {
 			Accept: 'application/json',
 			'OData-MaxVersion': '4.0',
 			'OData-Version': '4.0',
-			Prefer: 'return=representation',
+			// No `Prefer: return=representation`. That makes Dataverse read the
+			// record back, which needs Read on Lead, and the application user is
+			// deliberately limited to creating. The new id comes back in the
+			// OData-EntityId header of the 204 instead.
 		},
 		body: JSON.stringify(lead),
 	});
@@ -406,8 +409,10 @@ async function createLead(config, lead, env) {
 		return { ok: false, status: response.status, detail: detail.slice(0, 1000) };
 	}
 
-	const created = await response.json().catch(() => ({}));
-	return { ok: true, leadid: created.leadid };
+	// e.g. https://xfour.crm11.dynamics.com/api/data/v9.2/leads(00000000-0000-0000-0000-000000000000)
+	const entityId = response.headers.get('OData-EntityId') || '';
+	const match = entityId.match(/\(([0-9a-f-]{36})\)\s*$/i);
+	return { ok: true, leadid: match ? match[1] : undefined };
 }
 
 /* -------------------------------------------------------------------------- */

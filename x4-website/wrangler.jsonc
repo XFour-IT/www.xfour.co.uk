@@ -39,18 +39,20 @@
 	"vars": {
 		// The XFour production environment. No trailing slash.
 		"DATAVERSE_URL": "https://xfour.crm11.dynamics.com",
-		"ENTRA_TENANT_ID": "",
-		"ENTRA_CLIENT_ID": "",
+		"ENTRA_TENANT_ID": "86492a79-a8af-44ee-a575-462f841e0ad5",
+		// App registration "XFour website enquiry forms".
+		"ENTRA_CLIENT_ID": "f100b65e-b13e-4e54-9749-bdc34a629d83",
 		// Site key of the "xfour.co.uk enquiry forms" Turnstile widget. Public by
 		// design; the matching secret key is a Worker secret.
 		"TURNSTILE_SITE_KEY": "0x4AAAAAAFT_mDl3N3uC7M63",
 		// Integer values of the two new Lead Source option set entries.
-		"LEAD_SOURCE_DYNAMICS": "",
-		"LEAD_SOURCE_MANAGED_IT": "",
+		// "Web — Dynamics 365" and "Web — Managed IT".
+		"LEAD_SOURCE_DYNAMICS": "828640001",
+		"LEAD_SOURCE_MANAGED_IT": "828640002",
 		// systemuser GUIDs. Two vars so the journeys can be split later; for now
 		// Ben owns both, so the same GUID goes in both (decided 11 Oct 2026).
-		"LEAD_OWNER_DYNAMICS": "",
-		"LEAD_OWNER_MANAGED_IT": ""
+		"LEAD_OWNER_DYNAMICS": "bd166bb6-921f-ef11-840b-002248425de8",
+		"LEAD_OWNER_MANAGED_IT": "bd166bb6-921f-ef11-840b-002248425de8"
 	}
 	/**
 	 * Smart Placement

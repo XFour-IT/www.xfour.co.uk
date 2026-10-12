@@ -74,7 +74,11 @@ async function post(fields, env = CONFIGURED_ENV, options = {}) {
 			if (dataverse.status >= 400) {
 				return new Response('dataverse said no', { status: dataverse.status });
 			}
-			return Response.json({ leadid: 'lead-guid' });
+			// What Dataverse really sends for a create without return=representation.
+			return new Response(null, {
+				status: 204,
+				headers: { 'OData-EntityId': `${url}(33333333-3333-3333-3333-333333333333)` },
+			});
 		}
 		throw new Error(`unexpected outbound call to ${url}`);
 	};
@@ -121,6 +125,16 @@ test('Dynamics journey creates a lead with the right source, owner and answers',
 	assert.match(lead.description, /What is not working: Nobody trusts the forecast/);
 	// Number of employees belongs to the Managed IT journey only.
 	assert.equal(lead.numberofemployees, undefined);
+});
+
+test('the lead create never asks Dataverse to read the record back', async () => {
+	// return=representation needs Read on Lead, which the create-only
+	// application user does not have, so the create would be refused.
+	const { status, calls } = await post(VALID_DYNAMICS);
+
+	assert.equal(status, 200);
+	const call = calls.find((c) => c.url.includes('/api/data/v9.2/leads'));
+	assert.equal(call.init.headers.Prefer, undefined);
 });
 
 test('Managed IT journey creates a lead with the other source, owner and the user count', async () => {
