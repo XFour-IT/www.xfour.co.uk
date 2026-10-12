@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { BOOKING_URL } from '../data/booking';
 
 // XFO-64. The Journey A landing page: the Dynamics 365 and Power Platform
 // buyer.
@@ -23,19 +24,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 // The home page (XFO-63) sends its Dynamics door to /dynamics-365, so this
 // file's name is fixed: rename it and the home page 404s.
 //
-// The Microsoft Bookings link. It is the one already live on /app-development,
-// which is what XFO-64 asks for. It appears in three hrefs on this page: the
-// hero, the price box and the closing call to action -- so it is written once,
-// here, and used three times. Keep ?anonymous: it is what lets a stranger book
-// without a Microsoft sign-in. The three & stay bare in this string; Astro
-// escapes them when it writes the attribute.
-//
-// It books the same 30-minute slot the app-development page books. That is a
-// real 30-minute scoping call today, so the page is honest, but a separate
-// Bookings meeting type for Dynamics scoping would tell the two journeys apart
-// in the diary. That is Ben's call and is flagged on the pull request.
-const BOOKING_URL =
-	'https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&ismsaljsauthenabled&ep=mcard';
+// The Microsoft Bookings link is in src/data/booking.ts, shared with the
+// other Journey A pages. It appears in three hrefs on this page: the hero, the
+// price box and the closing call to action.
 
 // What XFour does, in this journey's four words. The order is the order the
 // work happens in, not an order of importance.
@@ -168,7 +159,10 @@ const proof = [
 					</div>
 				))}
 			</div>
-			<p class="mt-4 mb-0 aside">
+			<p class="mt-4 aside">
+				<a href="/dynamics-365/implementation-and-migration">How an implementation or a migration runs, from first call to go-live →</a>
+			</p>
+			<p class="mb-0 aside">
 				We also build native iOS apps and working prototypes — the same project work, for the
 				same kind of buyer. <a href="/app-development">See what we build, and what it costs →</a>
 			</p>
