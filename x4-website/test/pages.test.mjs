@@ -53,12 +53,21 @@ test('no page loads the Microsoft chat widget directly', () => {
     assert.deepEqual(offenders, [], 'these pages load the chat without consent');
 });
 
-test('the pages that offer chat still offer it', () => {
-    /* The layout decides which pages carry the chat slot. This fails if the
-       slot disappears from the pages that are meant to have it, which would
-       make the gating look like it worked by removing the feature. */
-    const withChat = pages.filter((p) => p.html.includes('data-x4-livechat')).map((p) => p.name);
-    assert.ok(withChat.length >= 6, `expected the chat slot on the main pages, found ${withChat.length}`);
+/* The one page with no chat slot. It is the Slay app's privacy policy: Apple
+   requires that URL, it is read inside the app, and it carries no navigation,
+   no footer and no analytics on purpose. */
+const NO_CHAT = ['legal/slay.html'];
+
+test('every page offers chat, except the Slay policy', () => {
+    /* Four pages used to miss the chat because eleven hand-edited HTML files
+       drifted. Ben asked for it everywhere, so the layout gives it to every
+       page it builds. This fails if a page loses the slot again, and also if
+       the Slay policy gains site chrome its own text says is not there. */
+    const withoutChat = pages
+        .filter((p) => !p.html.includes('data-x4-livechat'))
+        .map((p) => p.name)
+        .sort();
+    assert.deepEqual(withoutChat, NO_CHAT, 'these pages have no way to reach the chat');
 });
 
 test('every page that offers chat has the consent script to gate it', () => {
