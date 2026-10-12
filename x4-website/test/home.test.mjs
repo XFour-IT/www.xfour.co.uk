@@ -11,7 +11,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -34,6 +34,14 @@ test('one door leads to each journey', () => {
 	for (const journey of JOURNEYS) {
 		const links = main.match(new RegExp(`href="${journey}"`, 'g')) ?? [];
 		assert.equal(links.length, 1, `expected one link to ${journey}, found ${links.length}`);
+	}
+});
+
+test('each door opens onto a page that exists', () => {
+	/* A door to a 404 is worse than no door: the visitor has already chosen. */
+	for (const journey of JOURNEYS) {
+		const page = join(here, '../dist', `${journey.slice(1)}.html`);
+		assert.ok(existsSync(page), `${journey} is not built`);
 	}
 });
 
