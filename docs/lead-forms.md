@@ -90,7 +90,7 @@ Files:
 
 - `x4-website/src/index.js` — the Worker. `POST /api/enquiry` and `GET /api/form-config`.
 - `x4-website/public/assets/js/enquiry-form.js` — client side.
-- `x4-website/public/contact-us.html` — both forms.
+- `x4-website/src/pages/contact-us.astro` — both forms.
 - `x4-website/wrangler.jsonc` — the non-secret configuration.
 
 Spam defence is a honeypot field plus Cloudflare Turnstile, with validation
@@ -370,10 +370,6 @@ Worker logs are in the Cloudflare dashboard (observability is on). Useful lines:
 - **A failed Dataverse write loses the enquiry.** The visitor is told to call or
   email, and the failure is logged, but nothing holds the submission for a retry.
   A Queue or a KV write before the Dataverse call would fix this. Not Phase 0.
-- **`run_worker_first` is `true`,** so the Worker runs on every request and hands
-  non-API paths back to the asset server. Wrangler 4.20+ accepts
-  `run_worker_first: ["/api/*"]`, which is tighter. Worth doing next time
-  Wrangler is bumped.
 - **No rate limit beyond Turnstile.** If junk ever gets through, add a Cloudflare
   rate limiting rule on `/api/enquiry` rather than writing counting code.
 - **The Bookings link is shared** with `/app-development`, so a Dynamics scoping

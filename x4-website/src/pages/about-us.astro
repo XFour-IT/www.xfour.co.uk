@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { team, photoAltFor } from '../data/team';
+---
+
+<BaseLayout
+	title="About XFour | IT Support in Reading & the Thames Valley"
+	description="XFour IT Limited is a Reading-based Microsoft Partner providing Microsoft Dynamics 365 consultancy and managed IT support to small businesses across the Thames Valley."
+	navCurrent="/about-us"
+>
+<section class="clean-block clean-info dark">
+    <div class="container">
+        <div class="block-heading">
+            <h1 class="text-info">About XFour</h1>
+            <p>Microsoft Dynamics 365 consultancy and managed IT support for small businesses in Reading and across the Thames Valley.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="h4 text-info">What we do</h2>
+                <p>XFour works with small businesses in two ways.</p>
+                <p><strong>Microsoft Dynamics 365.</strong> We help you choose, set up and run Dynamics 365 so that your customer records, your sales process and your support conversations live in one place instead of several spreadsheets.</p>
+                <p><strong>Managed IT.</strong> We look after the day-to-day: user accounts, devices, email, backups and security, so that your team can get on with its work and you have someone to call when something breaks.</p>
+                <p>We also take on project management and web design work for the clients we support.</p>
+                <h2 class="h4 text-info">Who we are</h2>
+                <p>XFour IT Limited trades as XFour. We are registered in England and Wales, company number 11776254, VAT number GB396767915. Full company details are on our <a href="/legal/legal">Legal page</a>.</p>
+                <h2 class="h4 text-info">Microsoft Partner</h2>
+                <p>XFour IT Limited is a <strong>Microsoft Partner</strong>. We work inside the Microsoft stack every day &mdash; Dynamics 365, Microsoft 365 and Azure &mdash; and the partnership is how we get licences, support and product guidance for the businesses we look after.</p>
+                <p>It also means our advice on Dynamics 365 comes from working with the product, not from reading about it.</p>
+                <h2 class="h4 text-info">Talk to us</h2>
+                <p>Call <a href="tel:+441183702920">0118 370 2920</a>, email <a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a>, or start a live chat using the button on this page.</p>
+                <p><a class="btn btn-primary btn-lg" role="button" href="/contact-us">Contact us</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+{/*
+  The people. This section renders only when src/data/team.ts has somebody in
+  it, so the page never shows an empty grid or a stand-in face. Add a person
+  to that file and they appear here; the page itself needs no edit.
+*/}
+{team.length > 0 && (
+<section class="clean-block clean-team light">
+    <div class="container">
+        <div class="block-heading">
+            <h2 class="text-info">The people behind XFour</h2>
+            <p>When you call XFour, these are the people who answer.</p>
+        </div>
+        <div class="row justify-content-center">
+            {team.map((member) => (
+            <div class="col-md-6 col-lg-4 d-flex">
+                <div class="card border-0 bg-transparent text-center w-100 mb-4">
+                    <img
+                        class="team-photo rounded-circle mx-auto"
+                        src={member.photo}
+                        alt={photoAltFor(member)}
+                        width="600"
+                        height="600"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                    <div class="card-body">
+                        <h3 class="h5 mb-1">{member.name}</h3>
+                        <p class="text-info mb-2">{member.role}</p>
+                        <p>{member.bio}</p>
+                        {member.linkedin && (
+                        <p class="mb-0">
+                            <a href={member.linkedin} rel="noopener">
+                                <i class="fab fa-linkedin" aria-hidden="true"></i>
+                                <span class="visually-hidden">{member.name} on LinkedIn</span>
+                                LinkedIn
+                            </a>
+                        </p>
+                        )}
+                    </div>
+                </div>
+            </div>
+            ))}
+        </div>
+    </div>
+</section>
+)}
+</BaseLayout>
+
+<style>
+	/* Square photographs, shown as circles at one size on every card, so a
+	   mixed set of phone photographs still looks like one set. */
+	.team-photo {
+		width: 180px;
+		height: 180px;
+		max-width: 100%;
+		object-fit: cover;
+		object-position: center top;
+	}
+</style>

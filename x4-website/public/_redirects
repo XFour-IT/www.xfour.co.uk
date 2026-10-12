@@ -1,0 +1,6 @@
+# Cloudflare Workers static-asset redirects. Read before any file is served.
+
+# The automation and integration page moved under /dynamics-365, next to the
+# implementation page. Old links and search results keep working.
+/dynamics-365-automation-integration       /dynamics-365/automation-and-integration 301
+/dynamics-365-automation-integration.html  /dynamics-365/automation-and-integration 301

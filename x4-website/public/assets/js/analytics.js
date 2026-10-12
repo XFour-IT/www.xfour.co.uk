@@ -1,9 +1,16 @@
 /*
  * Website measurement for www.xfour.co.uk — PostHog, EU region, cookieless.
  *
- * The site sets no cookie and writes nothing to localStorage, so this stays off
- * the consent-banner critical path. When the banner ships, switch
- * cookieless_mode to "on_reject" so visitors who accept get a stable id.
+ * This file sets no cookie and writes nothing to localStorage, so it stays off
+ * the consent-banner critical path and runs for visitors who have not chosen.
+ *
+ * The banner has now shipped (XFO-47) and we deliberately did NOT switch
+ * cookieless_mode to "on_reject". Doing so would give visitors who accept a
+ * stable cookie-based id and slightly truer unique-visitor counts, at the cost
+ * of a new cookie to declare, a second measurement mode to reason about, and
+ * two kinds of visitor in one funnel. On a five-page brochure site the question
+ * we actually ask is "which page produced this lead", and cookieless answers
+ * that. Revisit only if we need retention or returning-visitor reporting.
  *
  * Cookieless has two halves and needs both, or the numbers are wrong:
  *   1. cookieless_mode: "always" here, which sends the distinct id
@@ -31,6 +38,18 @@
         return;
     }
 
+    /* A visitor who pressed Reject, or who turned measurement off in the
+       preferences panel, is not measured at all — we do not even fetch the
+       PostHog loader. consent.js runs before this file and publishes the stored
+       choice on window.x4Consent, so this is a synchronous read with no race.
+       No stored choice means nobody has objected, and this file sets no cookie
+       and stores no identifier, so measurement runs. See the header of
+       consent.js for why that is the right default. */
+    var consent = window.x4Consent;
+    if (consent && consent.choice && consent.choice.analytics === false) {
+        return;
+    }
+
     /* Our own hostnames, so a link from www.xfour.co.uk to xfour.co.uk is not
        counted as a lead leaving the site. The current host is included too, so
        forced test runs on a preview URL behave the same way. */
@@ -41,13 +60,26 @@
     /* Which part of the funnel this page belongs to. Registered on every event
        so a lead can be traced back to the journey that produced it. */
     function journeyFor(path) {
-        var page = path.replace(/\/+$/, '').split('/').pop() || 'index.html';
-        if (page === 'index.html') return 'home';
-        if (page === 'app-development.html') return 'app-development';
-        if (page === 'services.html') return 'services';
-        if (page === 'contact-us.html') return 'contact';
-        if (page === 'about-us.html') return 'about';
         if (path.indexOf('/legal/') !== -1) return 'legal';
+        /* The pages under the Journey A landing page (XFO-65 onwards). Same
+           journey as the landing page, so every Journey A booking is counted
+           together; the page itself is on each event as $pathname. */
+        if (path.indexOf('/dynamics-365/') !== -1) return 'dynamics-365';
+
+        /* The live site serves extensionless URLs (/app-development), while the
+           files on disk and local previews are .html. Match on the name with any
+           trailing slash and .html removed, so both forms give the same journey.
+           Matching only .html sent every page except the homepage to "other". */
+        var page = path.replace(/\/+$/, '').split('/').pop().replace(/\.html$/, '');
+        if (!page || page === 'index') return 'home';
+        /* The Journey A landing page (XFO-64). Tagged as its own journey, not
+           as 'other', so bookings taken from it can be told apart from every
+           other booking on the site. */
+        if (page === 'dynamics-365') return 'dynamics-365';
+        if (page === 'app-development') return 'app-development';
+        if (page === 'services') return 'services';
+        if (page === 'contact-us') return 'contact';
+        if (page === 'about-us') return 'about';
         return 'other';
     }
 
@@ -61,6 +93,12 @@
             cookieless_mode: 'always',
             persistence: 'memory',
             respect_dnt: true,
+            /* Off on purpose. The conversion events below are the measurement
+               we actually designed, and are what the install was approved to
+               collect. Autocapture recorded a second $autocapture event on
+               every click on top of them: more collection than we described,
+               and more event volume for nothing. */
+            autocapture: false,
             person_profiles: 'identified_only',
             capture_pageview: true,
             capture_pageleave: true,

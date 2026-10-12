@@ -6,9 +6,17 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "x4-website",
 	"compatibility_date": "2025-05-06",
+	// The enquiry form endpoint (/api/*). Everything else is static.
 	"main": "./src/index.js",
+	// Astro writes the site to ./dist. `wrangler deploy` runs the build itself
+	// (see "build" below), so the Cloudflare Workers Builds command does not
+	// have to change: `npm ci` then `npx wrangler deploy` still does the whole
+	// job.
+	"build": {
+		"command": "npm run build"
+	},
 	"assets": {
-		"directory": "./public",
+		"directory": "./dist",
 		// Serve public/404.html on a miss. Without this, Workers returns its own
 		// bare 404 and the custom page is dead weight. (The old .htaccess tried
 		// to do this, but Workers does not read .htaccess.)
@@ -16,12 +24,10 @@
 		"html_handling": "auto-trailing-slash",
 		"binding": "ASSETS",
 		// Without this, a request that matches no asset is answered with 404.html
-		// and never reaches the Worker — so POST /api/enquiry would 404. With it,
-		// the Worker sees every request and hands all non-API paths straight back
-		// to the asset server, which keeps the two settings above working.
-		// (Newer Wrangler allows run_worker_first: ["/api/*"], which would be
-		// tighter. The pinned 4.14.2 only accepts the boolean.)
-		"run_worker_first": true
+		// and never reaches the Worker — so POST /api/enquiry would 404. Only
+		// /api/* goes to the Worker; every page and asset is served straight from
+		// the asset server, as before.
+		"run_worker_first": ["/api/*"]
 	},
 	"observability": {
 		"enabled": true

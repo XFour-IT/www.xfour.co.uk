@@ -1,0 +1,35 @@
+---
+// The site navigation. It was written out by hand in all eleven pages before
+// this file existed, which is how the pages drifted apart. It is now here once.
+//
+// `current` is the href of the page being rendered, so the right link gets
+// Bootstrap's `active` class.
+interface Props {
+	current?: string;
+}
+
+const { current } = Astro.props;
+
+const links = [
+	{ href: '/', label: 'Home' },
+	{ href: '/about-us', label: 'About Us' },
+	// XFO-64: the Journey A landing page. The home page routes to it, but a
+	// visitor who lands anywhere else needs a way into the journey too.
+	{ href: '/dynamics-365', label: 'Dynamics 365' },
+	{ href: '/services', label: 'Services' },
+	{ href: '/app-development', label: 'App Development' },
+	{ href: '/contact-us', label: 'Contact Us' },
+];
+---
+
+<nav class="navbar navbar-light navbar-expand-lg sticky-top bg-white clean-navbar">
+	<div class="container"><a class="navbar-brand logo" href="/"><img src="/assets/img/Blue.png?h=6b8329759fd4c709e86de7d2d2736107" style="max-height: 5vh;" alt="XFour"></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+		<div class="collapse navbar-collapse" id="navcol-1">
+			<ul class="navbar-nav ms-auto">
+				{links.map((link) => (
+					<li class="nav-item"><a class:list={['nav-link', { active: link.href === current }]} href={link.href}>{link.label}</a></li>
+				))}
+			</ul>
+		</div>
+	</div>
+</nav>

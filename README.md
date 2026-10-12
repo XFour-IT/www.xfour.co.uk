@@ -1,10 +1,35 @@
 # XFour Website
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/contains-cat-gifs.svg)](https://forthebadge.com)
 
-The XFour corporate website. 
+The XFour corporate website.
 
-Built with [BootStrap Studio](https://bootstrapstudio.io/).
+Built with [Astro](https://astro.build/). The look is Bootstrap 5, originally
+from [BootStrap Studio](https://bootstrapstudio.io/).
 View at [www.xfour.co.uk](https://www.xfour.co.uk).
+
+## How the site is put together
+
+Everything lives in the `x4-website` directory.
+
+| Path | What is in it |
+| --- | --- |
+| `src/pages` | One file per page. The file name is the URL: `src/pages/about-us.astro` is served at `/about-us`. |
+| `src/layouts` | `BaseLayout.astro` holds the head tags, navigation and footer for the public pages. `ErrorLayout.astro` is the 404 and 503 shell. |
+| `src/components` | The navigation, the footer and the live chat tag. |
+| `public` | Images, CSS, JavaScript, `robots.txt`, `sitemap.xml`, `_headers`. Copied into the build as they are, so every asset URL stays where it is. |
+| `dist` | The built site. Not in git — it is made on every deploy. |
+
+**Change the navigation, the footer or a head tag in one place only.** Before
+Astro, each of the eleven pages carried its own copy of all three, and they
+drifted apart. That is what this structure exists to prevent.
+
+Two things worth knowing:
+
+* A new page needs no routing. Add the file to `src/pages` and the URL exists.
+  It only needs a navigation edit if it belongs in the menu.
+* The `title`, `description` and Open Graph tags come from the two props a page
+  passes to `BaseLayout`. The canonical URL is worked out from the page's own
+  address, so it cannot be copied from another page by mistake.
 
 ## Deploying
 
@@ -21,15 +46,20 @@ Cloudflare watches the repository and builds it:
 
 Both run in the `x4-website` directory.
 
+Wrangler runs the Astro build itself before it uploads anything — `wrangler.jsonc`
+sets `build.command` to `npm run build`. So the two commands above are the whole
+pipeline, and the Cloudflare build settings did not have to change when the site
+moved to Astro.
+
 So: open a pull request, wait for the **Workers Builds: x4-website** check,
 follow it for the preview URL, look at the site in a browser, then merge. What
 is on `main` is what is live.
 
 ### Why not by hand
 
-`wrangler deploy` uploads whatever is in your local `x4-website/public` folder
-at that moment. It does not read git, does not check which branch you are on,
-and does not care whether your files are committed. A hand deploy can put
+`wrangler deploy` builds whatever is in your local working copy and uploads
+that. It does not read git, does not check which branch you are on, and does
+not care whether your files are committed. A hand deploy can put
 uncommitted work live with no record of what went out, and the next merge to
 `main` silently undoes it.
 
@@ -55,17 +85,25 @@ does not go through the zone, so it serves exactly what was uploaded:
 
 ```sh
 # Worker → Deployments → the live version → Preview URL
-curl -sL https://<version-prefix>-x4-website.xfour.workers.dev/about-us.html \
-  | diff - x4-website/public/about-us.html
+cd x4-website && npm ci && npm run build
+curl -sL https://<version-prefix>-x4-website.xfour.workers.dev/about-us \
+  | diff - dist/about-us.html
 ```
 
-### Local preview
+### Working on it locally
 
 ```sh
 cd x4-website
 npm ci
-npm run dev    # wrangler dev, serves the site locally
+npm run dev        # Astro dev server, reloads as you edit
+npm run build      # writes dist/
+npm run preview    # builds, then serves dist/ through the real Worker runtime
 ```
+
+`npm run dev` is the one to use while writing a page. Use `npm run preview`
+before opening a pull request, because it is the only one that applies the
+Worker's own rules: the extensionless URLs, the `_headers` file and the custom
+404.
 
 ### Where the build settings live
 

@@ -1,0 +1,16 @@
+---
+import ErrorLayout from '../layouts/ErrorLayout.astro';
+---
+
+<ErrorLayout title="Page not found | XFour" code="404">
+	<Fragment slot="subheader">
+		Oops, the page you're <br>
+		looking for does not exist.
+	</Fragment>
+	<Fragment slot="context">
+		<p>
+			You may want to head back to the homepage.<br />
+			If you think something is broken, report a problem.
+		</p>
+	</Fragment>
+</ErrorLayout>

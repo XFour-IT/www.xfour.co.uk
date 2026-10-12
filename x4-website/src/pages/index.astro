@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// XFO-63. The home page routes the visitor. It does not sell.
+//
+// Plan section 1.1a rule 1: one sentence on who XFour is, then two equal doors,
+// then one band of proof. The rule exists because this site has two different
+// buyers, and the one way the design fails is a grid of service cards -- both
+// buyers then see a list, and neither buyer sees themself. So there is no
+// service grid here, and there is no third door: /app-development is project
+// work sold to the Dynamics buyer, so it sits inside Journey A (rule 8).
+//
+// The two doors are built from one array and one block of markup on purpose.
+// Equal weight is not a matter of good intentions: same size, same colour, same
+// shape of words, because the data and the template are shared.
+const doors = [
+	{
+		href: '/dynamics-365',
+		kicker: 'Dynamics 365 and Power Platform',
+		heading: 'I need Dynamics 365 to work',
+		lede: 'You have outgrown spreadsheets, or you are already on Microsoft and it does not do what you were promised.',
+		points: [
+			'Licences and set-up',
+			'Migration from what you run today',
+			'Automation across the business',
+			'Reporting you can trust',
+		],
+		cta: 'Dynamics 365 consultancy',
+	},
+	{
+		href: '/it-support',
+		kicker: 'Managed IT',
+		heading: 'I need someone to run our IT',
+		lede: 'You have 5 to 50 staff in the Thames Valley, and nobody whose job is IT.',
+		points: [
+			'Response times in writing',
+			'Cover hours that fit your day',
+			'Every device looked after',
+			'One price per user, per month',
+		],
+		cta: 'Managed IT support',
+	},
+];
+---
+
+<BaseLayout
+	title="Dynamics 365 Consultancy and Managed IT Support | XFour"
+	description="XFour is a Microsoft Partner in Reading. Dynamics 365 and Power Platform consultancy across the UK, and managed IT support for small businesses in the Thames Valley. Call 0118 370 2920."
+	navCurrent="/"
+	mainClass="page landing-page"
+>
+	{/* One sentence. No photograph: the hero is the largest paint on the page, and
+	    a text hero keeps LCP under the 2.0s mobile target in plan 1.4 without
+	    spending 257 KB of the 500 KB page budget on a stock image. */}
+	<section class="clean-block clean-hero home-hero">
+		<div class="text">
+			<h1 class="h2">Dynamics 365, and managed IT</h1>
+			<p class="mb-0">
+				XFour is a Microsoft Partner in Reading. We do two things: we make Dynamics 365 and the
+				Power Platform work for businesses anywhere in the UK, and we run the IT for small
+				businesses across the Thames Valley.
+			</p>
+		</div>
+	</section>
+
+	<section class="clean-block" aria-labelledby="doors-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="doors-heading" class="h3">Which one are you here for?</h2>
+				<p>Two different jobs, two different pages. Pick yours.</p>
+			</div>
+			<div class="row g-4 justify-content-center">
+				{doors.map((door) => (
+					<div class="col-lg-6">
+						<article class="card h-100 door">
+							<div class="card-body d-flex flex-column p-4">
+								<p class="door-kicker">{door.kicker}</p>
+								<h3 class="h4">{door.heading}</h3>
+								<p>{door.lede}</p>
+								<ul class="door-points">
+									{door.points.map((point) => <li>{point}</li>)}
+								</ul>
+								<a class="btn btn-primary btn-lg mt-auto stretched-link" href={door.href}>
+									{door.cta}
+								</a>
+							</div>
+						</article>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	{/* One band of proof, and only one. Case studies are Phase 2 and are not
+	    written yet, so this band carries only what is true and cleared today:
+	    the Partner status, the engagements whose names Ben cleared on XFO-43,
+	    and Slay. IAG Loyalty is not cleared, so it appears here anonymised, as
+	    that task requires. No figures: the only numbers anyone has counted
+	    belong in the case studies, not on a routing page. */}
+	<section class="clean-block dark proof-band" aria-labelledby="proof-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="proof-heading" class="h3">Why trust either page</h2>
+			</div>
+			<div class="row g-4">
+				<div class="col-md-4">
+					<h3 class="h6 text-uppercase proof-label">Microsoft Partner</h3>
+					<p class="mb-0">XFour holds Microsoft Partner status.</p>
+				</div>
+				<div class="col-md-4">
+					<h3 class="h6 text-uppercase proof-label">Delivered, not proposed</h3>
+					<p class="mb-0">
+						Dynamics 365 and Power Platform work for Allseas Shipping Co, VisiMedia, Selwood
+						Housing and a UK travel loyalty business.
+					</p>
+				</div>
+				<div class="col-md-4">
+					<h3 class="h6 text-uppercase proof-label">We build our own</h3>
+					<p class="mb-0">
+						Slay is our own native iOS app, on the App Store.
+						<a href="/app-development">See what we build</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	/* .clean-block.clean-hero:before paints currentColor over the whole hero, so
+	   setting the colour here gives a flat brand navy band and no image request.
+	   It is the same navy that .xfour-hero used over its photograph. */
+	.home-hero {
+		color: #082044;
+		background-color: #082044;
+	}
+
+	.home-hero .text {
+		max-width: 44rem;
+	}
+
+	.door {
+		border: 1px solid rgba(8, 32, 68, 0.12);
+		transition: box-shadow 0.2s ease, transform 0.2s ease;
+	}
+
+	/* The whole card is the click target, through .stretched-link on the button.
+	   The hover and focus states have to live on the card, or only the button
+	   looks alive. :focus-within carries the keyboard state. */
+	.door:hover,
+	.door:focus-within {
+		box-shadow: 0 0.5rem 1.5rem rgba(8, 32, 68, 0.15);
+		transform: translateY(-2px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.door {
+			transition: none;
+		}
+
+		.door:hover,
+		.door:focus-within {
+			transform: none;
+		}
+	}
+
+	.door-kicker {
+		margin-bottom: 0.5rem;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		/* 7.2:1 on white. */
+		color: #15479c;
+	}
+
+	.door-points {
+		margin-bottom: 1.75rem;
+		padding-left: 1.1rem;
+	}
+
+	.door-points li {
+		margin-bottom: 0.35rem;
+	}
+
+	.proof-label {
+		letter-spacing: 0.06em;
+		color: #15479c;
+	}
+
+	.proof-band .block-heading {
+		margin-bottom: 1.75rem;
+	}
+</style>

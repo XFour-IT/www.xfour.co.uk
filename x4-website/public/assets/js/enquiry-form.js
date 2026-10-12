@@ -155,7 +155,7 @@
 
 	/**
 	 * One event per submit, tagged by journey. Guarded so this works whether or
-	 * not analytics is installed on the page yet (see XFO-44).
+	 * not analytics is installed on the page yet.
 	 */
 	function track(journey) {
 		try {

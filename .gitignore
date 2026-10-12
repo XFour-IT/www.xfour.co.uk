@@ -120,7 +120,13 @@ $RECYCLE.BIN/
 \.idea/
 sendgrid.env
 
-x4-website/.wrangler/tmp/
+# Local wrangler dev state (miniflare caches, local KV/R2/D1).
+x4-website/.wrangler/
+
+# Astro build output and generated types. The site is built on deploy, so the
+# built HTML is not committed.
+x4-website/dist/
+x4-website/.astro/
 
 # Worker secrets for local development (wrangler dev). Never commit these.
 x4-website/.dev.vars
