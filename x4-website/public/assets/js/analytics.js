@@ -68,6 +68,10 @@
            Matching only .html sent every page except the homepage to "other". */
         var page = path.replace(/\/+$/, '').split('/').pop().replace(/\.html$/, '');
         if (!page || page === 'index') return 'home';
+        /* The Journey A landing page (XFO-64). Tagged as its own journey, not
+           as 'other', so bookings taken from it can be told apart from every
+           other booking on the site. */
+        if (page === 'dynamics-365') return 'dynamics-365';
         if (page === 'app-development') return 'app-development';
         if (page === 'services') return 'services';
         if (page === 'contact-us') return 'contact';
