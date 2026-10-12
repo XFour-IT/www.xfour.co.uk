@@ -54,6 +54,34 @@
         }
       },
       "actions": {
+        "Owner_for_this_journey": {
+          "runAfter": {},
+          "type": "Compose",
+          "description": "systemuser GUID of the owner for each journey. Ben owns both for now (decided 11 Oct 2026); to split the journeys, change one GUID. The website does not set the owner: naming another owner on create would need the website's app user to have Read on every Lead.",
+          "inputs": "@if(equals(triggerOutputs()?['body/leadsourcecode'], 828640001), 'bd166bb6-921f-ef11-840b-002248425de8', 'bd166bb6-921f-ef11-840b-002248425de8')"
+        },
+        "Give_the_Lead_to_its_owner": {
+          "runAfter": {
+            "Owner_for_this_journey": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "description": "The website creates the Lead owned by its own app user. This hands it to the journey's owner, so it shows in their My Leads and the app user can no longer read it.",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "operationId": "UpdateRecord"
+            },
+            "parameters": {
+              "entityName": "leads",
+              "recordId": "@triggerOutputs()?['body/leadid']",
+              "item/ownerid@odata.bind": "/systemusers(@{outputs('Owner_for_this_journey')})"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
         "Due_one_working_day_later": {
           "runAfter": {},
           "type": "Compose",
@@ -63,6 +91,9 @@
         "Create_the_follow-up_task": {
           "runAfter": {
             "Due_one_working_day_later": [
+              "Succeeded"
+            ],
+            "Owner_for_this_journey": [
               "Succeeded"
             ]
           },
@@ -80,7 +111,7 @@
               "item/scheduledend": "@outputs('Due_one_working_day_later')",
               "item/prioritycode": 2,
               "item/regardingobjectid_lead_task@odata.bind": "/leads(@{triggerOutputs()?['body/leadid']})",
-              "item/ownerid_task@odata.bind": "/@{triggerOutputs()?['body/_ownerid_type']}(@{triggerOutputs()?['body/_ownerid_value']})"
+              "item/ownerid@odata.bind": "/systemusers(@{outputs('Owner_for_this_journey')})"
             },
             "authentication": "@parameters('$authentication')"
           }
@@ -170,6 +201,33 @@
             "runError": {
               "code": "FollowUpTaskNotCreated",
               "message": "The follow-up task for the new web Lead was not created. Create it by hand."
+            }
+          }
+        },
+        "Mark_the_run_as_failed_if_not_assigned": {
+          "runAfter": {
+            "Give_the_Lead_to_its_owner": [
+              "Failed",
+              "TimedOut"
+            ],
+            "Send_the_acknowledgement": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ],
+            "Create_the_follow-up_task": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "Terminate",
+          "description": "Waits for the email and the task, because Terminate would cancel them. The Lead is still in Dynamics, owned by the website's app user; assign it by hand.",
+          "inputs": {
+            "runStatus": "Failed",
+            "runError": {
+              "code": "LeadNotAssigned",
+              "message": "The new web Lead could not be given to its owner. It is in Dynamics under the website's app user. Assign it by hand."
             }
           }
         }

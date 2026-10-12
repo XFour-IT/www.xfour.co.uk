@@ -24,16 +24,24 @@ is deliberate: a form that silently drops a lead is worse than no form.
 
 | Read and Write on Lead, flow imported and on | Done by Ben, 12 Oct 2026 |
 
-State on 12 Oct 2026, 22:40:
+| Create and Assign on Lead at Business Unit | Done by Ben, 12 Oct 2026 |
+
+State on 12 Oct 2026, 23:00:
 
 - Both forms are **live on www.xfour.co.uk**, deployed from this branch by
   accident on 12 Oct (a dashboard Deploy picked up the branch's latest upload).
   Ben decided to keep them live. The next deploy of `main` removes them again
   until this branch is merged.
-- One test submission on each live form was **refused by Dataverse** at 22:36:
-  `does not have CreateAccess right(s) … Consider assigning a role with the
-  level BusinessUnitLevel`. Create and Assign on Lead must be Business Unit
-  scope (step 2). Read and Write stay at User.
+- The test submissions at 22:45 and 22:46 got past Create and were then
+  **refused by Dataverse** with `does not have ReadAccess right(s) for record
+  … of entity Lead. Consider assigning a role with the level BusinessUnitLevel`.
+  A create that names another owner makes Dataverse assign the new Lead, and
+  the assign checks Read on it at Ben's scope. Read at Business Unit would let
+  a leaked secret read every Lead, so the design changed instead: the Worker no
+  longer sets the owner, and the flow (version 1.0.0.1) hands each Lead to its
+  owner. See step 2 and "Acknowledgement email and the follow-up task".
+- To finish: Ben imports `XFourWebsiteEnquiries_1_0_0_1.zip` over the existing
+  solution, this branch is deployed, then one test submission on each form.
 - Ben may merge this branch once a test Lead lands with the right source and
   owner.
 
@@ -50,7 +58,7 @@ fine place for them:
 | 2 | Application (client) ID | Entra app registration, Overview | `ENTRA_CLIENT_ID` |
 | 3 | Integer value of `Web — Dynamics 365` | Lead Source choice, step 3 | `LEAD_SOURCE_DYNAMICS` |
 | 4 | Integer value of `Web — Managed IT` | Lead Source choice, step 3 | `LEAD_SOURCE_MANAGED_IT` |
-| 5 | Ben's systemuser GUID | Dynamics user record, step 4 | both `LEAD_OWNER_*` |
+| 5 | Ben's systemuser GUID | Dynamics user record, step 4 | the flow's `Owner for this journey` step |
 
 The **client secret is the one thing that must not come back.** Do not put it in
 the task thread, in an email, or in the repo. Ben puts it straight into
@@ -92,7 +100,7 @@ created, it just has no source and the default owner.
 | `journey` value posted | `dynamics` | `managed-it` |
 | Lead subject | `Dynamics 365 enquiry — {company}` | `Managed IT quote — {company}` |
 | Lead source | `LEAD_SOURCE_DYNAMICS` | `LEAD_SOURCE_MANAGED_IT` |
-| Lead owner | `LEAD_OWNER_DYNAMICS` | `LEAD_OWNER_MANAGED_IT` |
+| Lead owner | Set by the flow, `Owner for this journey` | Set by the flow, `Owner for this journey` |
 
 Files:
 
@@ -145,41 +153,34 @@ user in step 2, not from a delegated or application permission grant.
    environment → Settings → Users + permissions → Application users → New.
 2. Pick the app registration from step 1.
 3. Give it a security role that can **create Lead only**. Do not give it System
-   Administrator. Either:
-   - copy `Salesperson` and strip everything except Create, Read, Write and
-     Assign on Lead, or
-   - create a role named `Website enquiry form` with **Create**, **Read**,
-     **Write** and **Assign** on the Lead entity, and nothing else.
+   Administrator. Create a role named `Website enquiry form` with **Create**,
+   **Read** and **Write** on the Lead entity, all at **User** scope (the
+   smallest circle), and nothing else.
 
-   Set Read and Write to **User** scope (the smallest circle). Set Create and
-   Assign to **Business Unit** scope.
+Why the Worker does not set the owner: a create that names another owner makes
+Dataverse assign the new Lead to them, and that assignment checks the app
+user's Read and Write on the Lead at the new owner's scope. On 12 Oct 2026 the
+live forms were refused, one privilege at a time: first `missing prvReadLead`,
+then `CreateAccess … BusinessUnitLevel`, then `ReadAccess … BusinessUnitLevel`.
+Read at Business Unit would let a leaked secret read every Lead in the CRM. So
+the Worker creates the Lead owned by its own app user, and the flow hands it to
+the journey's owner straight after.
 
-Why Assign: the Worker creates each Lead already owned by Ben (the
-`LEAD_OWNER_*` vars). Creating a record owned by somebody else counts as
-assigning it, and Dataverse refuses the whole create without the Assign
-privilege.
+Why Read and Write at all, when the Worker never reads a Lead back: Dataverse
+checks them on the record during a create. At User scope they cover only Leads
+the app user owns, and it owns each Lead only for the seconds before the flow
+hands it on.
 
-Why Create and Assign at Business Unit: at User scope the application user may
-only create Leads that it owns itself. A Lead owned by Ben is outside that
-circle, so on 12 Oct 2026 the live forms were refused with `does not have
-CreateAccess right(s) … Consider assigning a role with the level
-BusinessUnitLevel`. Business Unit scope lets it create Leads owned by anybody in
-XFour's business unit. Neither privilege lets it see a Lead: Create makes new
-ones, and Assign needs the ID of a Lead, which it has no way to list.
+Why that is still safe: if the client secret ever leaked, the worst an attacker
+could do is create junk leads. They could not list or read any real Lead.
 
-Why Read and Write, when the Worker never reads a Lead back: Dataverse checks
-them itself during that assignment. On 12 Oct 2026 the live form was refused
-with `missing prvReadLead privilege` with Create and Assign alone. Write is
-there because assigning is a change to the record, so it is the next check in
-line.
+Create and Assign were set to **Business Unit** on 12 Oct 2026, before this
+change. That is harmless: Create only makes new Leads, and Assign needs Read on
+the Lead, which stays at User. They can be put back to User (and Assign
+removed) at any time; nothing needs them now.
 
-Why that is still safe: Read and Write stay at User scope, so the application
-user can only read or change Leads it owns, and it owns none — every Lead is
-handed to Ben as it is created. So if the client secret ever leaked, the worst
-an attacker could do is still create junk leads. If a submission is refused,
-read the `enquiry_dataverse_failed` line in the Worker log before widening
-anything: Read at Business Unit or Organisation would let a leaked secret read
-every Lead in the CRM. Widen one privilege, one step, only if the log names it.
+If a submission is refused, read the `enquiry_dataverse_failed` line in the
+Worker log before widening anything.
 
 ### 3. Add the two Lead Source option set values
 
@@ -195,15 +196,12 @@ and the journey is still in the subject line and the description. But without
 them the two pipelines cannot be reported separately, which was the whole point
 of building two forms.
 
-### 4. Decide the two owners — decided, GUID still needed
+### 4. Decide the two owners — done
 
-**Ben owns both journeys for now** (11 Oct 2026). There are still two vars, so a
-second owner can be dropped in later without touching code; until then the same
-GUID goes in both.
-
-Get the **systemuser GUID**: Dynamics → Settings → Users → open Ben's record and
-read `id=` out of the browser address bar. Put it in `LEAD_OWNER_DYNAMICS` and
-`LEAD_OWNER_MANAGED_IT`.
+**Ben owns both journeys for now** (11 Oct 2026). His systemuser GUID
+(Dynamics → Settings → Users → his record → `id=` in the address bar) is in the
+flow's **Owner for this journey** step, once per journey. To give a journey to
+somebody else, change that GUID in the flow; the Worker does not change.
 
 ### 5. Create the Turnstile widget — done
 
@@ -245,9 +243,7 @@ committed:
   "ENTRA_CLIENT_ID": "...",                              // step 1
   "TURNSTILE_SITE_KEY": "0x4AAAAAAFT_mDl3N3uC7M63",      // done
   "LEAD_SOURCE_DYNAMICS": "...",                         // step 3
-  "LEAD_SOURCE_MANAGED_IT": "...",                       // step 3
-  "LEAD_OWNER_DYNAMICS": "...",                          // step 4, Ben's GUID
-  "LEAD_OWNER_MANAGED_IT": "..."                         // step 4, Ben's GUID
+  "LEAD_SOURCE_MANAGED_IT": "..."                        // step 3
 }
 ```
 
@@ -287,11 +283,15 @@ Trigger: a Lead is **created** with Lead Source `Web — Dynamics 365` or
 
 Then, side by side:
 
-1. **Create the follow-up task.** A Task regarding the Lead, owned by the
-   Lead's owner, high priority, due **one working day** after the Lead was
+1. **Give the Lead to its owner.** The website creates each Lead owned by its
+   own app user (see step 2 for why). The **Owner for this journey** step picks
+   the owner by Lead Source, and the Lead is assigned to them. Ben owns both
+   for now.
+2. **Create the follow-up task.** A Task regarding the Lead, owned by the
+   journey's owner, high priority, due **one working day** after the Lead was
    created: Friday +3 days, Saturday +2, any other day +1, on UK time. Bank
    holidays are not skipped. The description repeats the form answers.
-2. **Send the acknowledgement** from the `hello@xfour.co.uk` shared mailbox to
+3. **Send the acknowledgement** from the `hello@xfour.co.uk` shared mailbox to
    the Lead's email address. The text is fixed and **contains nothing the
    visitor typed** — not even their name. Otherwise anyone could put somebody
    else's address in the form and use it to send that person a message of
@@ -299,8 +299,13 @@ Then, side by side:
 
 If the email fails, the task subject is changed to start
 `NO ACKNOWLEDGEMENT SENT - reply by hand`, and the run is marked failed. If
-the task cannot be created, the run is marked failed. Power Automate emails the
-flow owner about failed runs, so neither failure is silent.
+the task cannot be created, or the Lead cannot be given to its owner, the run
+is marked failed. Power Automate emails the flow owner about failed runs, so no
+failure is silent. A Lead that was not handed on is still in Dynamics, under
+the app user `# XFour website enquiry forms`; assign it by hand.
+
+If the flow is off, Leads still arrive, but they stay with the app user and
+nobody gets a task. Ben sees them under **All Leads**, not **My Leads**.
 
 The SLA in the task (one working day) is the promise made by the success
 message in `contact-us.astro`. If one changes, change both.
@@ -314,7 +319,7 @@ node dynamics/website-enquiries/pack.mjs
 That checks the parts agree — in particular that the trigger filter names the
 same Lead Source values as `LEAD_SOURCE_*` in `wrangler.jsonc`, because a
 mismatch imports cleanly and then never fires — and writes
-`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_0.zip`.
+`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_1.zip`.
 
 Before importing, the account that will own the flow needs **Send As** on the
 `hello@xfour.co.uk` mailbox: Exchange admin centre → Recipients → Mailboxes →
@@ -330,6 +335,10 @@ work.
    Outlook connection, signed in as the account that has Send As on hello@.
 4. When the import finishes, open the solution → the flow → **Turn on**. It is
    imported switched off on purpose.
+
+To update it (for example 1.0.0.0 → 1.0.0.1), import the new zip the same way.
+Power Apps sees the higher version and offers **Upgrade**; keep the default. It
+reuses the existing connections. Check the flow is still **On** afterwards.
 
 It is an unmanaged solution, so the flow can be edited in the designer
 afterwards. If you change it there, export the solution and unpack it over

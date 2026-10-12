@@ -22,8 +22,6 @@ const CONFIGURED_ENV = {
 	TURNSTILE_SITE_KEY: '0xSITEKEY',
 	LEAD_SOURCE_DYNAMICS: '100000001',
 	LEAD_SOURCE_MANAGED_IT: '100000002',
-	LEAD_OWNER_DYNAMICS: '11111111-1111-1111-1111-111111111111',
-	LEAD_OWNER_MANAGED_IT: '22222222-2222-2222-2222-222222222222',
 	ASSETS: { fetch: async () => new Response('asset', { status: 200 }) },
 };
 
@@ -107,7 +105,7 @@ function leadFrom(calls) {
 	return JSON.parse(call.init.body);
 }
 
-test('Dynamics journey creates a lead with the right source, owner and answers', async () => {
+test('Dynamics journey creates a lead with the right source and answers', async () => {
 	const { status, body, calls } = await post(VALID_DYNAMICS);
 
 	assert.equal(status, 200);
@@ -120,7 +118,6 @@ test('Dynamics journey creates a lead with the right source, owner and answers',
 	assert.equal(lead.companyname, 'Analytical Engines Ltd');
 	assert.equal(lead.emailaddress1, 'ada@example.com');
 	assert.equal(lead.leadsourcecode, 100000001);
-	assert.equal(lead['ownerid@odata.bind'], '/systemusers(11111111-1111-1111-1111-111111111111)');
 	assert.match(lead.description, /What they run today: Sales and a lot of spreadsheets/);
 	assert.match(lead.description, /What is not working: Nobody trusts the forecast/);
 	// Number of employees belongs to the Managed IT journey only.
@@ -128,8 +125,8 @@ test('Dynamics journey creates a lead with the right source, owner and answers',
 });
 
 test('the lead create never asks Dataverse to read the record back', async () => {
-	// return=representation would need Read on every Lead the application
-	// user creates and hands to Ben. Its role only has Read at user scope.
+	// return=representation would need Read on the Lead after the flow has
+	// handed it to Ben. The app user's role only has Read at user scope.
 	const { status, calls } = await post(VALID_DYNAMICS);
 
 	assert.equal(status, 200);
@@ -137,7 +134,22 @@ test('the lead create never asks Dataverse to read the record back', async () =>
 	assert.equal(call.init.headers.Prefer, undefined);
 });
 
-test('Managed IT journey creates a lead with the other source, owner and the user count', async () => {
+test('the lead create never names an owner', async () => {
+	// Naming another owner makes Dataverse assign the new Lead, and the assign
+	// checks Read on it across the business unit. That failed in production on
+	// 12 Oct 2026. The flow gives the Lead to its owner instead.
+	for (const form of [VALID_DYNAMICS, VALID_MANAGED_IT]) {
+		const { status, calls } = await post(form);
+		assert.equal(status, 200);
+		const lead = leadFrom(calls);
+		assert.deepEqual(
+			Object.keys(lead).filter((key) => key.toLowerCase().startsWith('ownerid')),
+			[],
+		);
+	}
+});
+
+test('Managed IT journey creates a lead with the other source and the user count', async () => {
 	const { status, body, calls } = await post(VALID_MANAGED_IT);
 
 	assert.equal(status, 200);
@@ -146,7 +158,6 @@ test('Managed IT journey creates a lead with the other source, owner and the use
 	const lead = leadFrom(calls);
 	assert.equal(lead.subject, 'Managed IT quote — Harvard Computation');
 	assert.equal(lead.leadsourcecode, 100000002);
-	assert.equal(lead['ownerid@odata.bind'], '/systemusers(22222222-2222-2222-2222-222222222222)');
 	assert.equal(lead.numberofemployees, 42);
 	assert.match(lead.description, /Number of users: 42/);
 	assert.match(lead.description, /Number of devices: 55/);
@@ -232,18 +243,16 @@ test('a single-word name goes into lastname, which is the required field on Lead
 	assert.equal(lead.lastname, 'Prince');
 });
 
-test('lead source and owner are left off when the tenant values are not set yet', async () => {
+test('lead source is left off when the tenant value is not set yet', async () => {
 	const env = {
 		...CONFIGURED_ENV,
 		LEAD_SOURCE_DYNAMICS: '',
-		LEAD_OWNER_DYNAMICS: '',
 	};
 	const { status, calls } = await post(VALID_DYNAMICS, env);
 	const lead = leadFrom(calls);
 
 	assert.equal(status, 200);
 	assert.equal(lead.leadsourcecode, undefined);
-	assert.equal(lead['ownerid@odata.bind'], undefined);
 	// The journey is still recoverable from the subject and the description.
 	assert.match(lead.subject, /^Dynamics 365 enquiry/);
 	assert.match(lead.description, /Journey: Dynamics 365 \(dynamics\)/);

@@ -18,7 +18,6 @@ const JOURNEYS = {
 	dynamics: {
 		label: 'Dynamics 365',
 		leadSourceVar: 'LEAD_SOURCE_DYNAMICS',
-		ownerVar: 'LEAD_OWNER_DYNAMICS',
 		subject: (company) => `Dynamics 365 enquiry — ${company}`,
 		fields: [
 			{ name: 'current_stack', label: 'What they run today', required: true, max: 1000 },
@@ -28,7 +27,6 @@ const JOURNEYS = {
 	'managed-it': {
 		label: 'Managed IT',
 		leadSourceVar: 'LEAD_SOURCE_MANAGED_IT',
-		ownerVar: 'LEAD_OWNER_MANAGED_IT',
 		subject: (company) => `Managed IT quote — ${company}`,
 		fields: [
 			{ name: 'users', label: 'Number of users', required: true, integer: true, min: 1, max: 10000 },
@@ -350,17 +348,21 @@ function buildLead(journeyKey, journey, values, env) {
 		lead.numberofemployees = values.users;
 	}
 
-	// Lead source and owner are tenant-specific. Both are optional here so the
-	// endpoint still works before the option set values exist; the journey is
-	// always in the subject and the description either way.
+	// Lead source is tenant-specific. It is optional here so the endpoint still
+	// works before the option set values exist; the journey is always in the
+	// subject and the description either way.
 	const leadSource = Number(str(env[journey.leadSourceVar]));
 	if (Number.isInteger(leadSource) && leadSource > 0) {
 		lead.leadsourcecode = leadSource;
 	}
-	const owner = str(env[journey.ownerVar]);
-	if (owner) {
-		lead['ownerid@odata.bind'] = `/systemusers(${owner})`;
-	}
+
+	// No ownerid on purpose. A create that names another owner makes Dataverse
+	// assign the new record, and the assign checks Read on it at the new owner's
+	// scope, so the app user would need Read on Lead across the business unit
+	// (seen in production on 12 Oct 2026). With that, a leaked secret could read
+	// every Lead in the CRM. Instead the Lead is created owned by the app user,
+	// and the Power Automate flow gives it to the journey's owner straight after.
+	// See docs/lead-forms.md and dynamics/website-enquiries.
 
 	return lead;
 }
@@ -395,9 +397,6 @@ async function createLead(config, lead, env) {
 			'OData-Version': '4.0',
 			// No `Prefer: return=representation`: the new id comes back in the
 			// OData-EntityId header of the 204, so nothing here reads the record.
-			// The role still needs Read (and Write) on Lead at user scope, because
-			// Dataverse checks them itself when the create sets ownerid — seen in
-			// production on 12 Oct 2026. See docs/lead-forms.md, step 2.
 		},
 		body: JSON.stringify(lead),
 	});

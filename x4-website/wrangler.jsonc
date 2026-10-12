@@ -54,11 +54,10 @@
 		// Integer values of the two new Lead Source option set entries.
 		// "Web — Dynamics 365" and "Web — Managed IT".
 		"LEAD_SOURCE_DYNAMICS": "828640001",
-		"LEAD_SOURCE_MANAGED_IT": "828640002",
-		// systemuser GUIDs. Two vars so the journeys can be split later; for now
-		// Ben owns both, so the same GUID goes in both (decided 11 Oct 2026).
-		"LEAD_OWNER_DYNAMICS": "bd166bb6-921f-ef11-840b-002248425de8",
-		"LEAD_OWNER_MANAGED_IT": "bd166bb6-921f-ef11-840b-002248425de8"
+		"LEAD_SOURCE_MANAGED_IT": "828640002"
+		// No owner here. The Power Automate flow in dynamics/website-enquiries
+		// gives each Lead to its journey's owner, so the app user never needs
+		// Read on Leads it does not own. See docs/lead-forms.md.
 	}
 	/**
 	 * Smart Placement
