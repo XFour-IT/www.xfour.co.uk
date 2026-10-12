@@ -1,5 +1,20 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// Internal notes for whoever edits this file next live here, in the
+// frontmatter, because frontmatter never reaches the browser. An HTML comment
+// ships in the page source, where any visitor can read it (XFO-96).
+//
+// How long we keep it. The periods for our own systems were confirmed by the
+// business on 11 October 2026 (XFO-47): 24 months from last contact for
+// non-customer enquiries and chats, 6 years after the work ends for customer
+// records. If either changes, the data protection addendum given to customers
+// has to change with it, or the two documents contradict each other.
+//
+// Website measurement is stated as a criterion rather than a number on
+// purpose. A fixed period would be a promise about a PostHog retention setting
+// we have not verified we can control on our plan, and a policy that names a
+// period we do not enforce is worse than one that names a criterion we do.
 ---
 
 <BaseLayout
@@ -154,13 +169,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     together with the supplier's own technical safeguards.</p>
 
                 <h2 class="h4 mt-5">How long we keep it</h2>
-                <!--
-                    The periods below for our own systems were confirmed by the business on
-                    11 October 2026 (XFO-47): 24 months from last contact for non-customer
-                    enquiries and chats, 6 years after the work ends for customer records.
-                    If either changes, the data protection addendum given to customers has to
-                    change with it, or the two documents contradict each other.
-                -->
                 <div class="x4-cookie-table-wrap">
                     <table class="x4-cookie-table">
                         <caption class="visually-hidden">How long XFour keeps each kind of information</caption>
@@ -186,13 +194,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                             </tr>
                             <tr>
                                 <td>Website measurement</td>
-                                <!--
-                                    Stated as a criterion rather than a number on purpose. A fixed
-                                    period here would be a promise about a PostHog retention
-                                    setting we have not verified we can control on our plan, and a
-                                    policy that names a period we do not enforce is worse than one
-                                    that names a criterion we do.
-                                -->
                                 <td>The daily identifier cannot be linked to you after the day it was made. The event records
                                     behind it are reviewed every 12 months and deleted once they are no longer useful</td>
                                 <td>To compare one year with the next, and no longer</td>
