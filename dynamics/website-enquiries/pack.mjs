@@ -88,6 +88,13 @@ for (const workflow of workflows) {
 		}
 	}
 
+	// Power Automate rejects a step description over 256 characters, but only
+	// when the flow is turned on — the import itself still reports success.
+	for (const [name, step] of Object.entries({ ...triggers, ...actions })) {
+		const length = step.description?.length ?? 0;
+		if (length > 256) fail(`the description of ${name} is ${length} characters; the limit is 256`);
+	}
+
 	// The trigger filter must name exactly the Lead Source values the Worker
 	// writes, or the flow never fires for a web enquiry.
 	for (const trigger of Object.values(triggers)) {

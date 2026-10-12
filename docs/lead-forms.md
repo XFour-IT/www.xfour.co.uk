@@ -38,10 +38,15 @@ State on 12 Oct 2026, 23:00:
   A create that names another owner makes Dataverse assign the new Lead, and
   the assign checks Read on it at Ben's scope. Read at Business Unit would let
   a leaked secret read every Lead, so the design changed instead: the Worker no
-  longer sets the owner, and the flow (version 1.0.0.1) hands each Lead to its
-  owner. See step 2 and "Acknowledgement email and the follow-up task".
-- To finish: Ben imports `XFourWebsiteEnquiries_1_0_0_1.zip` over the existing
-  solution, this branch is deployed, then one test submission on each form.
+  longer sets the owner, and the flow (version 1.0.0.1 on) hands each Lead to
+  its owner. See step 2 and "Acknowledgement email and the follow-up task".
+- 1.0.0.1 imported on 12 Oct but **would not turn on**: one step description
+  was 260 characters and Power Automate allows 256. The import log still says
+  "Processed", and the upgrade switched the flow **off**. 1.0.0.2 fixes the
+  description, and `pack.mjs` now refuses any description over 256.
+- To finish: Ben imports `XFourWebsiteEnquiries_1_0_0_2.zip` over the existing
+  solution and checks the flow is **On**, this branch is deployed, then one
+  test submission on each form.
 - Ben may merge this branch once a test Lead lands with the right source and
   owner.
 
@@ -318,8 +323,10 @@ node dynamics/website-enquiries/pack.mjs
 
 That checks the parts agree — in particular that the trigger filter names the
 same Lead Source values as `LEAD_SOURCE_*` in `wrangler.jsonc`, because a
-mismatch imports cleanly and then never fires — and writes
-`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_1.zip`.
+mismatch imports cleanly and then never fires, and that no step description is
+over 256 characters, because that also imports cleanly and then will not turn
+on — and writes
+`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_2.zip`.
 
 Before importing, the account that will own the flow needs **Send As** on the
 `hello@xfour.co.uk` mailbox: Exchange admin centre → Recipients → Mailboxes →
@@ -336,9 +343,13 @@ work.
 4. When the import finishes, open the solution → the flow → **Turn on**. It is
    imported switched off on purpose.
 
-To update it (for example 1.0.0.0 → 1.0.0.1), import the new zip the same way.
+To update it (for example 1.0.0.1 → 1.0.0.2), import the new zip the same way.
 Power Apps sees the higher version and offers **Upgrade**; keep the default. It
 reuses the existing connections. Check the flow is still **On** afterwards.
+An upgrade switches the old version off before it turns the new one on, so if
+the new one fails to turn on, no version is running. The import log
+(Solutions → History → the import → Download log) shows why in the
+"Workflow Activation" row, even when the import itself says "Processed".
 
 It is an unmanaged solution, so the flow can be edited in the designer
 afterwards. If you change it there, export the solution and unpack it over

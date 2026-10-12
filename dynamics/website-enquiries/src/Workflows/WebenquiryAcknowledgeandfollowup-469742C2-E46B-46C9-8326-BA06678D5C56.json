@@ -57,7 +57,7 @@
         "Owner_for_this_journey": {
           "runAfter": {},
           "type": "Compose",
-          "description": "systemuser GUID of the owner for each journey. Ben owns both for now (decided 11 Oct 2026); to split the journeys, change one GUID. The website does not set the owner: naming another owner on create would need the website's app user to have Read on every Lead.",
+          "description": "systemuser GUID of the owner for each journey. Ben owns both (11 Oct 2026); to split the journeys, change one GUID. The website does not set the owner, because that would need its app user to have Read on every Lead.",
           "inputs": "@if(equals(triggerOutputs()?['body/leadsourcecode'], 828640001), 'bd166bb6-921f-ef11-840b-002248425de8', 'bd166bb6-921f-ef11-840b-002248425de8')"
         },
         "Give_the_Lead_to_its_owner": {

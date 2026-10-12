@@ -8,7 +8,7 @@
     <Descriptions>
       <Description description="Acknowledges each website enquiry and raises the follow-up task. The Leads themselves are created by the x4-website Worker; see docs/lead-forms.md in the website repo." languagecode="1033" />
     </Descriptions>
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>xfourwebsite</UniqueName>
