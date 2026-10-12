@@ -1,0 +1,316 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { BOOKING_URL } from '../../data/booking';
+
+// XFO-65. Journey A: implementation and migration.
+//
+// The second Journey A page (plan section 1.3). The landing page at
+// /dynamics-365 says who XFour is for, what it does and what it costs to start;
+// this page goes one level down on the work most of those buyers arrive with --
+// putting Dynamics 365 in, or moving onto it -- and says how that work actually
+// runs. It has to be at least 600 words of the page's own copy, because the
+// site had about 250 words in total and search engines had nothing to find. A
+// test counts them.
+//
+// Search. This buyer is national and searches by intent: "Dynamics 365
+// implementation partner", "Dynamics 365 data migration", "Power Platform
+// implementation". Those phrases are in the title, the H1 and the headings,
+// where they are true. No town is named and no local-search copy belongs here
+// (plan rule 6).
+//
+// The plan's example search term was "Dynamics 365 Business Central
+// implementation partner". Business Central is not on this page on purpose:
+// everything XFour has published, and every cleared case study, is Dataverse
+// work -- the customer engagement apps and the Power Platform. Claiming a
+// product we have no named work in would be the first thing a buyer checks.
+// If Ben confirms Business Central delivery, it goes in the hero and the
+// first section.
+//
+// Language: licences, migration, automation, reporting -- Journey A's own words,
+// never Journey B's response times, cover hours or price per user (plan rule
+// 2). One call to action, the Bookings link, no form (plan rule 3).
+//
+// The URL sits under /dynamics-365 so the journey reads in the address bar, and
+// so analytics.js tags it as Journey A from the path.
+//
+// Proof is only what XFO-43 cleared: Allseas Shipping Co (with VisiMedia) and
+// Selwood Housing, named with permission. The 91% booking-time figure is our
+// own estimate, not a client result, so it is not here. The £1,950 + VAT
+// readiness check is the price already published on /dynamics-365.
+
+// How the work runs, in the order it happens. Each step names what the client
+// has in hand at the end of it, because "what do I get, and when do I decide"
+// is the question this buyer is actually asking.
+const steps = [
+	{
+		title: 'Scope it',
+		body: 'A 30-minute call, then a short piece of discovery: the processes the system has to run, the data you have today and where it lives, the people who will use it, and anything it has to connect to. You get a written scope with a fixed price. Nothing is built until you have agreed it.',
+	},
+	{
+		title: 'Get the licences and environments right',
+		body: 'We work out which licences each group of users actually needs. People who work in the system all day need a full licence; people who only look things up or approve requests usually do not, and that difference is often the largest saving in the whole project. Then we set up development, test and production environments, with source control and a release pipeline from the first day — not added later, when it is harder.',
+	},
+	{
+		title: 'Build and configure',
+		body: 'Tables, forms, business rules and security roles, built as managed solutions so that what reaches production is exactly what was tested. Your people see working screens early and often, because a requirement nobody saw until go-live is a requirement that was misunderstood.',
+	},
+	{
+		title: 'Migrate the data',
+		body: 'This is the step that decides whether the project succeeds. We map every source field to where it lands, clean the duplicates and the gaps before they move, and run trial loads into the test environment until the counts and the totals reconcile. You sign off the trial before the real one happens.',
+	},
+	{
+		title: 'Cut over and stay',
+		body: 'A planned cut-over, timed for a quiet point in your week or month, with a way back agreed in advance. After go-live we stay on hand while people settle in, fix what the first real weeks of use turn up, and hand over the documentation so the system is yours, not ours.',
+	},
+];
+
+// Where migrations come from. The headings are the sentences a buyer uses
+// about their own situation, which is also how they search.
+const sources = [
+	{
+		title: 'Spreadsheets and shared mailboxes',
+		body: 'The most common start. The data is there, but in several versions, with no single owner. Most of the work is deciding which copy is true before anything moves.',
+	},
+	{
+		title: 'An old database or a system nobody supports',
+		body: 'Access databases, line-of-business systems from a supplier that has gone, and tools one person built years ago. We get the data out, work out what it means, and keep the history you need.',
+	},
+	{
+		title: 'A system someone else controls',
+		body: 'A platform a third party owns, where every change needs their agreement and their timetable. Moving onto Dynamics 365 puts the system — and the data — back in your hands.',
+	},
+	{
+		title: 'An existing Dynamics 365 that went wrong',
+		body: 'You do not always need to start again. Often the fix is to put the environments, source control and release process right, then migrate the customisations into a structure that can be maintained. The readiness check tells you which.',
+	},
+];
+---
+
+<BaseLayout
+	title="Dynamics 365 Implementation and Migration Partner | XFour"
+	description="Dynamics 365 and Power Platform implementation and data migration for UK businesses. Licences, environments, migration and reporting, at a fixed price agreed in writing."
+	navCurrent="/dynamics-365"
+	mainClass="page journey-a"
+>
+	<Fragment slot="head">
+		<script is:inline type="application/ld+json" set:html={JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Dynamics 365', item: 'https://www.xfour.co.uk/dynamics-365' },
+				{ '@type': 'ListItem', position: 2, name: 'Implementation and migration', item: 'https://www.xfour.co.uk/dynamics-365/implementation-and-migration' },
+			],
+		})} />
+	</Fragment>
+
+	<!-- =========================== Hero =========================== -->
+	<section class="clean-block clean-hero journey-hero">
+		<div class="text">
+			<p class="crumb"><a href="/dynamics-365">Dynamics 365</a> / Implementation and migration</p>
+			<h1 class="h2">Dynamics 365 implementation and migration, done in the right order</h1>
+			<p>
+				XFour is a Microsoft Partner and a Dynamics 365 implementation partner for businesses
+				anywhere in the UK. We put in Dynamics 365 and the Power Platform, move your data
+				onto it without stopping the business, and leave you with a system you own and can
+				change safely.
+			</p>
+			<p class="mb-0">
+				<a class="btn btn-primary btn-lg" role="button" data-booking-link href={BOOKING_URL} target="_blank" rel="noopener">
+					Book a 30-minute scoping call
+				</a>
+			</p>
+		</div>
+	</section>
+
+	<!-- ==================== Why projects fail ==================== -->
+	<section class="clean-block" aria-labelledby="why-heading">
+		<div class="container narrow">
+			<h2 id="why-heading" class="text-info">Why Dynamics 365 projects go wrong</h2>
+			<p>
+				Most failed Dynamics 365 implementations did not fail because of the software. They
+				failed in the first few weeks, on decisions nobody wrote down: the wrong licences
+				bought for the wrong people, one environment shared by everyone, customisations made
+				straight in production, and data migration left until the end and treated as a copy
+				and paste.
+			</p>
+			<p class="mb-0">
+				We have been called in to fix every one of those. So we start with them. The licences,
+				the environments and the migration plan are settled before anything is built, and the
+				reporting you want at the end shapes the data model at the start — because a report
+				can only be as good as the data underneath it.
+			</p>
+		</div>
+	</section>
+
+	<!-- ==================== How the work runs ==================== -->
+	<section class="clean-block dark" aria-labelledby="steps-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="steps-heading" class="text-info">How a Dynamics 365 implementation runs</h2>
+				<p>Five steps, in this order. You know the price before step two starts.</p>
+			</div>
+			<ol class="steps">
+				{steps.map((step) => (
+					<li>
+						<h3 class="h5">{step.title}</h3>
+						<p class="mb-0">{step.body}</p>
+					</li>
+				))}
+			</ol>
+		</div>
+	</section>
+
+	<!-- =================== Where you migrate from =================== -->
+	<section class="clean-block" aria-labelledby="sources-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="sources-heading" class="text-info">Dynamics 365 data migration, from wherever you are now</h2>
+				<p>Four places a migration usually starts. The method is the same; the hard part is different in each.</p>
+			</div>
+			<div class="row g-4">
+				{sources.map((item) => (
+					<div class="col-md-6">
+						<div class="source-card h-100">
+							<h3 class="h5">{item.title}</h3>
+							<p class="mb-0">{item.body}</p>
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= Automation and reporting ================= -->
+	<section class="clean-block dark" aria-labelledby="after-heading">
+		<div class="container narrow">
+			<h2 id="after-heading" class="text-info">Automation and reporting, built in from the start</h2>
+			<p>
+				A migration is the cheapest moment to take repeated work out of people's hands. While
+				the processes are on the table anyway, we move the approvals, reminders and hand-offs
+				into Power Automate, built as part of the solution so they are version-controlled and
+				do not stop working when one person leaves.
+			</p>
+			<p class="mb-0">
+				Reporting is planned the same way. We agree the handful of numbers the business is run
+				on before the data model is fixed, so the reports come from one source and agree with
+				each other on the first day.
+			</p>
+		</div>
+	</section>
+
+	<!-- ========================= Proof ========================= -->
+	<section class="clean-block" aria-labelledby="proof-heading">
+		<div class="container narrow">
+			<h2 id="proof-heading" class="text-info">Two implementations we have delivered</h2>
+			<h3 class="h5">Allseas Shipping Co <span class="proof-note">— delivered with VisiMedia</span></h3>
+			<p>
+				Allseas booked their work on a legacy system an overseas partner owned outright. We
+				implemented Dynamics 365 with source control from day one — five environments, three
+				developers, Azure DevOps — and moved them off it. Allseas now own the system their
+				business runs on.
+			</p>
+			<h3 class="h5">Selwood Housing</h3>
+			<p class="mb-0">
+				Ten developers shared three environments, with nothing in source control and
+				customisations unmanaged in production. Three environments became thirteen,
+				everything went under source control with one build, and failed releases stopped.
+			</p>
+		</div>
+	</section>
+
+	<!-- ==================== Call to action ==================== -->
+	<section class="clean-block dark" id="book" aria-labelledby="book-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="book-heading" class="text-info">Start with the call</h2>
+			</div>
+			<div class="closing text-center">
+				<p>
+					Thirty minutes, no charge. Tell us what you run today and what has to change. You leave
+					knowing what we would do first and roughly what it would cost. Delivery is then quoted
+					as a fixed price against a written scope. If you already run Dynamics 365, the
+					three-day readiness check at £1,950 + VAT is the other way in.
+				</p>
+				<p class="mt-4">
+					<a class="btn btn-primary btn-lg" role="button" data-booking-link href={BOOKING_URL} target="_blank" rel="noopener">
+						Book a 30-minute scoping call
+					</a>
+				</p>
+				<p class="mb-0">
+					<a href="/dynamics-365#cost">What it costs to start →</a>
+				</p>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	/* Same flat navy hero as /dynamics-365: the theme's :before paints
+	   currentColor, so this costs no image request. */
+	.journey-hero {
+		color: #082044;
+		background-color: #082044;
+	}
+
+	.journey-hero .text {
+		max-width: 46rem;
+	}
+
+	.crumb {
+		font-size: 0.9rem;
+		opacity: 0.85;
+	}
+
+	.crumb a {
+		color: inherit;
+		text-decoration: underline;
+	}
+
+	.journey-a .block-heading p {
+		max-width: 680px;
+	}
+
+	/* Long-form sections read at a line length people can follow. */
+	.narrow {
+		max-width: 760px;
+	}
+
+	.narrow p,
+	.steps p,
+	.source-card p {
+		line-height: 1.7;
+	}
+
+	.steps {
+		max-width: 760px;
+		margin: 0 auto;
+		padding-left: 1.4rem;
+	}
+
+	.steps li + li {
+		margin-top: 1.75rem;
+	}
+
+	.source-card {
+		background-color: #fff;
+		border: 1px solid rgba(8, 32, 68, 0.12);
+		border-radius: 6px;
+		padding: 28px 26px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+	}
+
+	.proof-note {
+		font-size: 0.9rem;
+		font-weight: 400;
+		opacity: 0.75;
+	}
+
+	.closing {
+		max-width: 720px;
+		margin: 0 auto;
+	}
+
+	.closing p {
+		line-height: 1.7;
+	}
+</style>

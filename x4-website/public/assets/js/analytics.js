@@ -61,6 +61,10 @@
        so a lead can be traced back to the journey that produced it. */
     function journeyFor(path) {
         if (path.indexOf('/legal/') !== -1) return 'legal';
+        /* The pages under the Journey A landing page (XFO-65 onwards). Same
+           journey as the landing page, so every Journey A booking is counted
+           together; the page itself is on each event as $pathname. */
+        if (path.indexOf('/dynamics-365/') !== -1) return 'dynamics-365';
 
         /* The live site serves extensionless URLs (/app-development), while the
            files on disk and local previews are .html. Match on the name with any

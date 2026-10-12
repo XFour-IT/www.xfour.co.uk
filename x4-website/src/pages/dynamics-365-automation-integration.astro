@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { BOOKING_URL } from '../data/booking';
 
 // XFO-66. A Journey A page: automation and integration, for the Dynamics 365
 // and Power Platform buyer. The plan asks for 600 words or more (plan section
@@ -16,11 +17,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 //     product: Dynamics 365 integration, Power Automate, Dataverse, Business
 //     Central. No town is named on this page, and none belongs on it.
 //
-// The Microsoft Bookings link, the same one /dynamics-365 and /app-development
-// use. Keep ?anonymous: it is what lets a stranger book without a Microsoft
-// sign-in.
-const BOOKING_URL =
-	'https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&ismsaljsauthenabled&ep=mcard';
+// The Microsoft Bookings link is in src/data/booking.ts, shared with the
+// other Journey A pages.
 
 // The symptoms, in the words a buyer uses for them. If a reader nods at two of
 // these, the page is for them.
