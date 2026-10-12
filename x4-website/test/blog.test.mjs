@@ -34,16 +34,19 @@ const EXISTING_PAGES = [
 	'/blog',
 ];
 
-const PUBLISHED_POSTS = ['/blog/sample-dynamics-365-environment-planning', '/blog/sample-managed-it-retainer-coverage'];
+// No real post has shipped yet -- the two sample posts were pulled before
+// this PR could merge, because a merge would have put "Sample post: ..."
+// pages live under Ben's byline where Google would index them. B1 (1
+// November) is the first real post; add its path here once it ships so the
+// order and per-post checks below start covering it.
+const PUBLISHED_POSTS = [];
 
 const blogIndex = readFileSync(join(DIST, 'blog.html'), 'utf8');
 
 test('the index lists posts newest first', () => {
 	const order = [...blogIndex.matchAll(/href="(\/blog\/[a-z0-9-]+)"/g)].map((m) => m[1]);
-	assert.deepEqual(order, [
-		'/blog/sample-managed-it-retainer-coverage', // publishDate 2026-10-03
-		'/blog/sample-dynamics-365-environment-planning', // publishDate 2026-10-01
-	]);
+	assert.deepEqual(order, PUBLISHED_POSTS, 'no posts are published yet');
+	assert.match(blogIndex, /No posts published yet\./);
 });
 
 test('the index excludes drafts', () => {
@@ -79,6 +82,7 @@ test('the sitemap contains every published post and all the existing pages', () 
 		assert.ok(locs.includes(path), `${path} is missing from the sitemap`);
 	}
 	assert.ok(!locs.some((path) => path.includes('draft-fixture')), 'the draft fixture must not be in the sitemap');
+	assert.ok(!locs.some((path) => path.includes('/blog/sample-')), 'no sample post must be in the sitemap');
 });
 
 test('the RSS feed parses and its item count matches the published post count', () => {
@@ -102,4 +106,5 @@ test('the RSS feed parses and its item count matches the published post count', 
 	}
 
 	assert.doesNotMatch(rss, /draft-fixture/, 'the draft fixture must not be in the feed');
+	assert.doesNotMatch(rss, /\/blog\/sample-/, 'no sample post must be in the feed');
 });
