@@ -21,38 +21,92 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 // four facts in plain words, and a test keeps any booking link off the page.
 
 // ---------------------------------------------------------------------------
-// PROVISIONAL COMMERCIAL TERMS -- NOT YET APPROVED
+// COMMERCIAL TERMS -- CONFIRMED BY BEN ON XFO-67, 12 OCT 2026
 //
-// Ben has not published a managed IT price or a response-time commitment
-// anywhere: not in the website plan, not in the repository, not on the old
-// site, and not on any issue. The numbers below are a proposal, chosen so a
-// 15-user client lands inside the £500-£1,500 a month retainer the plan's
-// own ROI model assumes (section 5).
+// Response times, cover hours and contract terms are his answers verbatim.
+// The price he did not give as a figure; he gave the method:
 //
-// They are in one object, used once each, so changing them is a one-line edit
-// and not a hunt through the markup.
+//   "Calculate the price with at least a 20% margin. Use Microsoft license
+//    & A&A pricing to calculate the cost. You've mentioned we do MDM,
+//    broadband, etc. but these all come with costs regardless of how many
+//    users."
 //
-// This pull request stays a draft until Ben confirms or replaces every value
-// here. These are public commercial promises, and a wrong one is a wrong
-// contract, not a typo.
+// That last sentence is why there are two prices here and not one. Some of
+// what we carry scales with headcount (a licence, a backup seat, support
+// hours) and some of it does not (a firewall, the Wi-Fi, the circuit, the
+// monthly service review). Recovering a fixed cost through a per-user fee
+// only works at one company size; it overcharges the 30-person client and
+// loses money on the 6-person one. So: a per-user fee and a per-site fee,
+// each covering its own kind of cost.
+//
+// The full build-up, every input rate and the margin check at 5, 15, 30 and
+// 50 users is the "Managed IT price build-up" document on XFO-67. The short
+// version:
+//
+//   Per user, per month, direct cost
+//     Microsoft 365 Business Premium licence, annual commitment   £16.90
+//     Microsoft 365 and endpoint backup                            £2.40
+//     RMM agent, at 1.2 devices per user                           £3.00
+//     Phishing simulation and security training                    £1.20
+//     Password manager                                             £0.90
+//     Documentation and ticketing seat                             £1.10
+//     Support labour, 0.6 h/user/month at £38/h loaded            £22.80
+//     Onboarding, 1 h/user at £38 spread over the 12-month term     £3.17
+//                                                                 ------
+//                                                                 £51.47  ->  /0.8 = £64.34  ->  £65
+//
+//   Per site, per month, direct cost
+//     Firewall subscription and rule management                   £22.00
+//     Switch, Wi-Fi and circuit monitoring                         £9.00
+//     Monthly review, reporting, patch QA, restore test, 1.5 h     £57.00
+//     Tenant security baseline upkeep, 0.5 h                      £19.00
+//     Onboarding, 6 h at £38 spread over the 12-month term        £19.00
+//                                                                 ------
+//                                                                £126.00  ->  /0.8 = £157.50 -> £160
+//
+// Two notes on the method, both deliberate:
+//
+// 1. Margin, not mark-up. Price = cost / 0.8, so 20% of the price is gross
+//    margin. That is the stricter of the two readings -- cost x 1.25 rather
+//    than cost x 1.2 -- so it clears "at least 20%" either way.
+// 2. Business Premium is the licence the costing assumes, because the
+//    covered list below promises MDM, MFA and managed antivirus, and
+//    Business Premium is what carries Intune, Entra ID P1 and Defender for
+//    Business. Choosing a cheaper licence tier does not save money here, it
+//    just moves those three lines into the tooling bill.
+//
+// Rounding up to £65 and £160 holds the margin at 20.8% or better at every
+// size from 5 users to 50. The arithmetic is in the document, and it is
+// checked at build time by test/it-support.test.mjs.
+//
+// Two input rates are XFour's, not Microsoft's, and are the ones worth
+// arguing with: the £38/hour loaded engineer cost and the 0.6 support hours
+// per user per month. They are industry-normal, not measured from our own
+// books. Move either and every figure here moves with it -- which is why
+// they are constants and not prose.
 // ---------------------------------------------------------------------------
 const terms = {
-	/** Pounds per user per month, excluding VAT. */
-	pricePerUser: 45,
+	/** Pounds per user per month + VAT, Microsoft 365 licence included. */
+	pricePerUser: 65,
+	/** Pounds per user per month + VAT when the client buys its own licences. */
+	pricePerUserOwnLicences: 45,
+	/** Pounds per month + VAT, per office, for the network and the service review. */
+	pricePerSite: 160,
 	minimumUsers: 5,
-	/** One-off, per user, excluding VAT. */
-	setupPerUser: 45,
 	coverHours: '8am to 6pm, Monday to Friday',
 	coverExcludes: 'bank holidays',
 	noticePeriod: '30 days',
-	minimumTerm: 'three months',
+	minimumTerm: '12 months',
 };
 
-/** £45, £675 -- so the worked example below cannot drift from the headline. */
+/** £65, £1,135 -- so the worked example below cannot drift from the headline. */
 const gbp = (amount: number) => `£${amount.toLocaleString('en-GB')}`;
 
 /** The size of company the page is written for, used in the worked example. */
 const exampleUsers = 15;
+
+/** One office, 15 people: the figure a visitor is really trying to work out. */
+const exampleMonthly = terms.pricePerSite + terms.pricePerUser * exampleUsers;
 
 /** The response-time commitment. Written down because the buyer asked for it. */
 const responseTimes = [
@@ -138,7 +192,8 @@ const covered = [
 /** Named plainly, because every provider that hides this is asked about it anyway. */
 const notCovered = [
 	'Hardware itself. We specify it, buy it for you at cost and set it up; the laptop is yours to pay for.',
-	'Your Microsoft 365 licences. We administer them and can bill them, but the licence cost is yours and is quoted separately.',
+	'The broadband line itself. We monitor it and we chase your provider, but the circuit is billed at what it costs us — from about £35 a month for a business line — and we show you the supplier invoice.',
+	'Microsoft licences beyond Business Premium. Copilot, extra storage, Dynamics 365, an Office licence for a shared machine: all available, all quoted on top at what they cost plus our handling.',
 	'Out-of-hours and weekend cover. Available, priced on your quote, not inside the standard price.',
 	'Projects. A server replacement, an office move or a migration is scoped and priced on its own.',
 	'Line-of-business software nobody at XFour has seen. We will support it once we have had time to learn it, and we will say so first.',
@@ -148,7 +203,7 @@ const notCovered = [
 
 <BaseLayout
 	title="IT Support for Small Businesses in Reading & the Thames Valley | XFour"
-	description="Managed IT support for Thames Valley businesses with 5 to 50 staff and no IT person. Response times in writing, one price per user per month. Get a quote."
+	description="Managed IT support for Thames Valley businesses with 5 to 50 staff and no IT person. Response times in writing, £65 per user per month with the Microsoft 365 licence included. Get a quote."
 	ogTitle="Managed IT support in the Thames Valley | XFour"
 	liveChat={false}
 >
@@ -160,7 +215,8 @@ const notCovered = [
 			<h1 class="h2">Someone to run your IT, twenty minutes up the road</h1>
 			<p>
 				XFour looks after the IT for small businesses across Reading and the Thames Valley.
-				Response times in writing, cover {terms.coverHours}, and one price per user per month.
+				Response times in writing, cover {terms.coverHours}, and a price per user per month
+				with your Microsoft 365 licence already inside it.
 			</p>
 			<p class="mb-0">
 				<a class="btn btn-primary btn-lg" role="button" href="#quote">Get a price</a>
@@ -271,30 +327,62 @@ const notCovered = [
 		<div class="container">
 			<div class="block-heading">
 				<h2 id="price-heading" class="text-info">What it costs</h2>
-				<p>One price per user, per month. No tiers to decode and no cheapest option that is
-					missing the part you needed.</p>
+				<p>
+					Two numbers, and they are both on this page. No tiers to decode, and no cheapest
+					option that is missing the part you needed.
+				</p>
 			</div>
-			<div class="row justify-content-center">
-				<div class="col-md-8 col-lg-6">
-					<div class="price-card text-center">
+			<div class="row justify-content-center g-4">
+				<div class="col-md-6 col-lg-5">
+					<div class="price-card text-center h-100">
 						<p class="price-figure">{gbp(terms.pricePerUser)}</p>
 						<p class="price-unit">per user, per month, + VAT</p>
 						<hr>
 						<ul class="price-facts">
-							<li>Minimum {terms.minimumUsers} users</li>
-							<li>One-off set-up of {gbp(terms.setupPerUser)} per user, so we start from a
-								known state and not a guess</li>
-							<li>Rolling monthly after the first {terms.minimumTerm}, with
-								{' '}{terms.noticePeriod} of notice on either side</li>
 							<li>Everything in <a href="#covered-heading">what is covered</a>, at the
 								response times above</li>
+							<li><strong>Your Microsoft 365 licence is in this figure</strong> — Business
+								Premium, bought, assigned and administered</li>
+							<li>Already buy your own Microsoft licences? Then it is{' '}
+								{gbp(terms.pricePerUserOwnLicences)} per user, per month, + VAT, and we
+								administer what you have</li>
+							<li>Minimum {terms.minimumUsers} users</li>
 						</ul>
-						<p class="price-note mb-0">
-							A {exampleUsers}-person company pays{' '}
-							{gbp(terms.pricePerUser * exampleUsers)} a month, + VAT, for the whole of its
-							IT department.
-						</p>
 					</div>
+				</div>
+				<div class="col-md-6 col-lg-5">
+					<div class="price-card text-center h-100">
+						<p class="price-figure">{gbp(terms.pricePerSite)}</p>
+						<p class="price-unit">per office, per month, + VAT</p>
+						<hr>
+						<ul class="price-facts">
+							<li>Your firewall, switches and Wi-Fi watched and kept patched</li>
+							<li>Your broadband monitored, and your provider argued with on your
+								behalf</li>
+							<li>A service review every month: what broke, what we missed, what is
+								coming</li>
+							<li>One site fee per office, however many people sit in it</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-lg-10">
+					<p class="price-note">
+						<strong>A 15-person company in one office pays{' '}
+						{gbp(exampleMonthly)} a month, + VAT</strong> — {gbp(terms.pricePerSite)} for the
+						office and {exampleUsers} &times; {gbp(terms.pricePerUser)} for the people. That is
+						the whole of its IT department, and its Microsoft licences, on one invoice.
+					</p>
+					<p class="small-print mb-0">
+						<strong>No set-up fee.</strong> Getting to know your IT properly takes us a
+						fortnight of work, and we would rather carry that than open with a bill for it —
+						so the first term is {terms.minimumTerm}. After that it is rolling, with{' '}
+						{terms.noticePeriod} of notice on either side. Why two fees and not one: your
+						firewall, your Wi-Fi and your broadband cost the same whether six people or
+						sixteen use them. Charging for them per head would mean overcharging the bigger
+						office to subsidise the smaller one.
+					</p>
 				</div>
 			</div>
 		</div>
@@ -334,10 +422,13 @@ const notCovered = [
 		Rule 3 of plan section 1.1a: a stranger comparing IT providers will not
 		give up half an hour before they know roughly what it costs.
 
-		XFO-46 builds the form itself. Its managed IT journey asks for exactly
-		four facts beyond name, company and email -- users, devices, current
-		provider and cover needed -- which is why those four are what this section
-		asks for in words today. When XFO-46 lands, the <div class="quote-ask">
+		XFO-46 builds the form itself. Its managed IT journey asks for four facts
+		beyond name, company and email -- users, devices, current provider and
+		cover needed. This page asks for a fifth: the number of offices. That is
+		not padding. The price has a per-site fee in it, so a quote cannot be
+		worked out from a headcount alone, and XFO-78 -- the issue that swaps this
+		block for the real form -- has to add that field or the form collects a
+		number we cannot quote from. When it lands, the <div class="quote-ask">
 		below is replaced by its <form data-enquiry-form> with journey
 		"managed-it", and nothing else on this page changes.
 	-->
@@ -349,9 +440,10 @@ const notCovered = [
 			</div>
 			<div class="prose">
 				<div class="quote-ask">
-					<p>Send us these four things and we will come back with a monthly price:</p>
+					<p>Send us these five things and we will come back with a monthly price:</p>
 					<ol>
 						<li>How many people need support</li>
+						<li>How many offices they sit in</li>
 						<li>How many computers, laptops and servers you have</li>
 						<li>Who looks after your IT today, if anyone</li>
 						<li>The hours you need covered</li>
@@ -484,9 +576,20 @@ const notCovered = [
 		margin-bottom: 0.5rem;
 	}
 
+	/* The facts list is the last thing in each card now that the worked example
+	   has moved out below both of them, so it carries no trailing gap. */
+	.price-card .price-facts:last-child {
+		margin-bottom: 0;
+	}
+
+	/* The worked example sits on the dark band rather than inside a card, so it
+	   is the one line on the page a skimming visitor is most likely to read.
+	   Full opacity, and a little larger than the small print under it. */
 	.price-note {
-		font-size: 0.92rem;
-		opacity: 0.85;
+		font-size: 1.05rem;
+		text-align: center;
+		margin-top: 2.25rem;
+		margin-bottom: 0.75rem;
 	}
 
 	.quote-ask ol {

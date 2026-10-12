@@ -72,6 +72,54 @@ test('the page states a price per user per month', () => {
 	assert.match(text, /\+ VAT/, 'the price does not say whether VAT is included');
 });
 
+test('the page states the per-site fee as well as the per-user fee', () => {
+	/* Ben's instruction on XFO-67: the firewall, the Wi-Fi and the circuit cost
+	   the same whatever the headcount, so they are charged per office. A page
+	   that shows only the per-user figure quotes a price we cannot honour. */
+	assert.match(text, /per office, per month/i, 'the per-site fee is gone');
+	assert.match(text, /site fee/i, 'nothing explains that there is a fee per office');
+});
+
+test('the price still clears the 20% margin floor it was built from', () => {
+	/* The prices on this page are not a judgement call, they are cost / 0.8 --
+	   per XFO-67. Somebody will one day round £65 down to £59 to win a deal.
+	   This is the test that tells them what that costs.
+
+	   Inputs are the direct costs from the build-up in the page's header
+	   comment. Keep the two in step: if the cost model changes, change both. */
+	const costPerUser = 51.47;
+	const costPerSite = 126.0;
+	const floor = 0.2;
+
+	/* The figures actually served to the visitor, read back out of the HTML, so
+	   this cannot pass against numbers that are no longer on the page. */
+	const perUser = Number(text.match(/£(\d+) per user, per month/)?.[1]
+		?? text.match(/£(\d+)\s*per user, per month/)?.[1]);
+	const perSite = Number(text.match(/£(\d+) per office, per month/)?.[1]);
+	assert.ok(perUser > 0, 'could not read the per-user price off the page');
+	assert.ok(perSite > 0, 'could not read the per-site price off the page');
+
+	/* One office, every company size this page is written for. */
+	for (const users of [5, 15, 30, 50]) {
+		const revenue = perSite + perUser * users;
+		const cost = costPerSite + costPerUser * users;
+		const margin = (revenue - cost) / revenue;
+		assert.ok(
+			margin >= floor,
+			`at ${users} users the margin is ${(margin * 100).toFixed(1)}%, under the 20% floor`,
+		);
+	}
+});
+
+test('the page states the contract terms it commits to', () => {
+	/* No set-up fee and a 12-month first term are a pair: we carry the
+	   onboarding cost, the term is what recovers it. Dropping the term while
+	   keeping "no set-up fee" gives away a fortnight of work. */
+	assert.match(text, /No set-up fee/i, 'the no-set-up-fee promise is gone');
+	assert.match(text, /12 months/, 'the minimum term is not stated');
+	assert.match(text, /Minimum 5 users/i, 'the minimum user count is not stated');
+});
+
 test('the call to action is a quote, not a booking', () => {
 	/* data-booking-link is how the Microsoft Bookings link is marked on the
 	   pages that legitimately use it. It may not appear here. */
