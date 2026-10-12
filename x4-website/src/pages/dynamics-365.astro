@@ -42,6 +42,8 @@ const work = [
 	{
 		title: 'Automation',
 		body: 'The repeated work taken out by hand and put into Power Automate and Dataverse, built so it is parameterised and version-controlled rather than wired to one person’s account.',
+		href: '/dynamics-365-automation-integration',
+		more: 'Automation and integration in detail',
 	},
 	{
 		title: 'Reporting',
@@ -156,6 +158,7 @@ const proof = [
 					<div class="col-md-6">
 						<h3 class="h5">{item.title}</h3>
 						<p class="mb-0">{item.body}</p>
+						{item.href && <p class="mt-2 mb-0"><a href={item.href}>{item.more} →</a></p>}
 					</div>
 				))}
 			</div>
