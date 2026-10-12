@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.24093.227" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.24093.00227">
+  <Entities />
+  <Roles />
+  <Workflows>
+    <Workflow WorkflowId="{469742c2-e46b-46c9-8326-ba06678d5c56}" Name="Web enquiry - acknowledge and create follow-up task" Description="When the website creates a Lead with source Web - Dynamics 365 or Web - Managed IT: raise a follow-up task due one working day later, then email an acknowledgement from hello@xfour.co.uk.">
+      <JsonFileName>/Workflows/WebenquiryAcknowledgeandfollowup-469742C2-E46B-46C9-8326-BA06678D5C56.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>0</StateCode>
+      <StatusCode>1</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <ModernFlowType>0</ModernFlowType>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="Web enquiry - acknowledge and create follow-up task" />
+      </LocalizedNames>
+      <Descriptions>
+        <Description languagecode="1033" description="When the website creates a Lead with source Web - Dynamics 365 or Web - Managed IT: raise a follow-up task due one working day later, then email an acknowledgement from hello@xfour.co.uk." />
+      </Descriptions>
+    </Workflow>
+  </Workflows>
+  <FieldSecurityProfiles />
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls />
+  <EntityDataProviders />
+  <connectionreferences>
+    <connectionreference connectionreferencelogicalname="xfw_websiteenquiries_dataverse">
+      <connectionreferencedisplayname>XFour website enquiries - Dataverse</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps</connectorid>
+      <description>Reads the new Lead and creates the follow-up task.</description>
+      <iscustomizable>1</iscustomizable>
+      <promptingbehavior>0</promptingbehavior>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="xfw_websiteenquiries_outlook">
+      <connectionreferencedisplayname>XFour website enquiries - Outlook (sends as hello@)</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_office365</connectorid>
+      <description>Sends the acknowledgement from the hello@xfour.co.uk shared mailbox. The account behind this connection needs Send As on hello@.</description>
+      <iscustomizable>1</iscustomizable>
+      <promptingbehavior>0</promptingbehavior>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+  </connectionreferences>
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>

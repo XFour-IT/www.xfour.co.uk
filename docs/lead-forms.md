@@ -19,15 +19,19 @@ is deliberate: a form that silently drops a lead is worse than no form.
 | Who does the four tenant jobs | Ben, then sends the values back |
 | The five values | Received 12 Oct 2026 and set in `wrangler.jsonc` |
 
-What is left, checked against the Cloudflare API on 12 Oct 2026, when the
-`x4-website` Worker had **no runtime secrets at all**:
+| Both runtime secrets, Assign on Lead | Done by Ben, 12 Oct 2026 |
+| Acknowledgement + task flow | A solution file Ben imports — see below |
 
-- `ENTRA_CLIENT_SECRET` has to be a **runtime** secret on the Worker (see
-  below — it went into the Build settings by mistake).
-- `TURNSTILE_SECRET_KEY` has to be added to the same place (step 5). Until now
-  it was only on the preview Worker.
-- The application user's role needs **Assign** on Lead as well as Create
-  (step 2).
+State on 12 Oct 2026, 22:30:
+
+- Both forms are **live on www.xfour.co.uk**, deployed from this branch by
+  accident on 12 Oct (a dashboard Deploy picked up the branch's latest upload).
+  Ben decided to keep them live. The next deploy of `main` removes them again
+  until this branch is merged.
+- A test submission on the live Managed IT form was **refused by Dataverse**:
+  `missing prvReadLead privilege`. The role needs Read and Write on Lead at User
+  scope as well (step 2).
+- The flow is in `dynamics/website-enquiries/`, not yet imported.
 
 ---
 
@@ -138,18 +142,32 @@ user in step 2, not from a delegated or application permission grant.
 2. Pick the app registration from step 1.
 3. Give it a security role that can **create Lead only**. Do not give it System
    Administrator. Either:
-   - copy `Salesperson` and strip everything except Create, Append and Assign
-     on Lead, or
-   - create a role named `Website enquiry form` with **Create** and **Assign**
-     on the Lead entity, at user scope or wider, and nothing else.
+   - copy `Salesperson` and strip everything except Create, Read, Write and
+     Assign on Lead, or
+   - create a role named `Website enquiry form` with **Create**, **Read**,
+     **Write** and **Assign** on the Lead entity, and nothing else.
+
+   Set Read and Write to **User** scope (the smallest circle). Create and
+   Assign can be User scope too.
 
 Why Assign: the Worker creates each Lead already owned by Ben (the
 `LEAD_OWNER_*` vars). Creating a record owned by somebody else counts as
 assigning it, and Dataverse refuses the whole create without the Assign
-privilege. Read is **not** needed — the Worker never reads a Lead back.
+privilege.
 
-The point of the narrow role: if the client secret ever leaked, the worst an
-attacker could do is create junk leads.
+Why Read and Write, when the Worker never reads a Lead back: Dataverse checks
+them itself during that assignment. On 12 Oct 2026 the live form was refused
+with `missing prvReadLead privilege` with Create and Assign alone. Write is
+there because assigning is a change to the record, so it is the next check in
+line.
+
+Why User scope is still safe: at User scope the application user can only read
+or change Leads it owns, and it owns none — every Lead is handed to Ben as it
+is created. So if the client secret ever leaked, the worst an attacker could do
+is still create junk leads. If a submission is still refused at User scope,
+read the `enquiry_dataverse_failed` line in the Worker log before widening
+anything: Read at Business Unit or Organisation would let a leaked secret read
+every Lead in the CRM. Widen one privilege, one step, only if the log names it.
 
 ### 3. Add the two Lead Source option set values
 
@@ -242,20 +260,71 @@ git-ignored.
 ## Acknowledgement email and the follow-up task
 
 These are deliberately **not** in the Worker. Both are done in one Power Automate
-flow, triggered on Lead create, filtered to the two web lead sources:
-
-1. **Send the acknowledgement.** Send an email from `hello@xfour.co.uk` to the
-   lead's email address. The Dynamics `Send an email` action keeps a copy against
-   the lead record, so the thread stays in one place.
-2. **Create the follow-up task.** A Task regarding the lead, owned by the lead's
-   owner, due **one working day** after creation. That is the SLA the success
-   message on the form promises, so if the SLA changes, change both.
+flow, **Web enquiry - acknowledge and create follow-up task**, which lives in
+this repo as a Power Platform solution: `dynamics/website-enquiries/`.
 
 Why not in the Worker: sending from a real mailbox through the Worker would need
 `Mail.Send` application permission on the app registration, which by default lets
-it send as anybody in the tenant. Power Automate avoids that, keeps the email
-template editable by somebody who is not a developer, and keeps the activity
-history on the lead.
+it send as anybody in the tenant. Power Automate avoids that and keeps the email
+text editable by somebody who is not a developer.
+
+### What the flow does
+
+Trigger: a Lead is **created** with Lead Source `Web — Dynamics 365` or
+`Web — Managed IT` (828640001 / 828640002). Any other Lead is ignored.
+
+Then, side by side:
+
+1. **Create the follow-up task.** A Task regarding the Lead, owned by the
+   Lead's owner, high priority, due **one working day** after the Lead was
+   created: Friday +3 days, Saturday +2, any other day +1, on UK time. Bank
+   holidays are not skipped. The description repeats the form answers.
+2. **Send the acknowledgement** from the `hello@xfour.co.uk` shared mailbox to
+   the Lead's email address. The text is fixed and **contains nothing the
+   visitor typed** — not even their name. Otherwise anyone could put somebody
+   else's address in the form and use it to send that person a message of
+   their choosing from hello@.
+
+If the email fails, the task subject is changed to start
+`NO ACKNOWLEDGEMENT SENT - reply by hand`, and the run is marked failed. If
+the task cannot be created, the run is marked failed. Power Automate emails the
+flow owner about failed runs, so neither failure is silent.
+
+The SLA in the task (one working day) is the promise made by the success
+message in `contact-us.astro`. If one changes, change both.
+
+### Building and importing it
+
+```bash
+node dynamics/website-enquiries/pack.mjs
+```
+
+That checks the parts agree — in particular that the trigger filter names the
+same Lead Source values as `LEAD_SOURCE_*` in `wrangler.jsonc`, because a
+mismatch imports cleanly and then never fires — and writes
+`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_0.zip`.
+
+Before importing, the account that will own the flow needs **Send As** on the
+`hello@xfour.co.uk` mailbox: Exchange admin centre → Recipients → Mailboxes →
+hello@ → Delegation → Send as → add the account. It can take up to an hour to
+work.
+
+1. make.powerapps.com → pick the XFour environment (the one at
+   `xfour.crm11.dynamics.com`) → **Solutions** → **Import solution**.
+2. Browse to the zip → Next → Import.
+3. It asks for two connections. For **XFour website enquiries - Dataverse**,
+   pick or create a Microsoft Dataverse connection. For **XFour website
+   enquiries - Outlook (sends as hello@)**, pick or create an Office 365
+   Outlook connection, signed in as the account that has Send As on hello@.
+4. When the import finishes, open the solution → the flow → **Turn on**. It is
+   imported switched off on purpose.
+
+It is an unmanaged solution, so the flow can be edited in the designer
+afterwards. If you change it there, export the solution and unpack it over
+`src/`, so the repo does not drift from what runs.
+
+The new publisher is `XFour website` (prefix `xfw`). It is separate from the
+publisher that owns the Lead Source values, and nothing else uses it.
 
 ---
 

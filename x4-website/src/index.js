@@ -393,10 +393,11 @@ async function createLead(config, lead, env) {
 			Accept: 'application/json',
 			'OData-MaxVersion': '4.0',
 			'OData-Version': '4.0',
-			// No `Prefer: return=representation`. That makes Dataverse read the
-			// record back, which needs Read on Lead, and the application user is
-			// deliberately limited to creating. The new id comes back in the
-			// OData-EntityId header of the 204 instead.
+			// No `Prefer: return=representation`: the new id comes back in the
+			// OData-EntityId header of the 204, so nothing here reads the record.
+			// The role still needs Read (and Write) on Lead at user scope, because
+			// Dataverse checks them itself when the create sets ownerid — seen in
+			// production on 12 Oct 2026. See docs/lead-forms.md, step 2.
 		},
 		body: JSON.stringify(lead),
 	});

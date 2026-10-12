@@ -128,8 +128,8 @@ test('Dynamics journey creates a lead with the right source, owner and answers',
 });
 
 test('the lead create never asks Dataverse to read the record back', async () => {
-	// return=representation needs Read on Lead, which the create-only
-	// application user does not have, so the create would be refused.
+	// return=representation would need Read on every Lead the application
+	// user creates and hands to Ben. Its role only has Read at user scope.
 	const { status, calls } = await post(VALID_DYNAMICS);
 
 	assert.equal(status, 200);
