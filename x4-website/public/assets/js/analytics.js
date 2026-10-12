@@ -72,6 +72,10 @@
            as 'other', so bookings taken from it can be told apart from every
            other booking on the site. */
         if (page === 'dynamics-365') return 'dynamics-365';
+        /* Journey A's own pages (XFO-66) count as the same journey as its
+           landing page. The page itself is still on every event as the URL, so
+           a booking can be traced to this page when it matters. */
+        if (page === 'dynamics-365-automation-integration') return 'dynamics-365';
         if (page === 'app-development') return 'app-development';
         if (page === 'services') return 'services';
         if (page === 'contact-us') return 'contact';
