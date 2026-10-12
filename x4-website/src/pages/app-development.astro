@@ -1,5 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// The email fallback under the closing call to action. hello@xfour.co.uk must
+// be receiving mail before this page is deployed (Ben, 7 October 2026). This
+// note lives here, in the frontmatter, because frontmatter never reaches the
+// browser: an internal name and date do not belong in the page source a
+// visitor can read (XFO-96).
 ---
 
 <BaseLayout
@@ -453,7 +459,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <p>Thirty minutes on a call. You describe what you need; we tell you which of the three packages fits, roughly what it costs, and roughly how long it takes. If it is not something we should build, we will say that too.</p>
             <!-- Second of the two booking hrefs — see the comment in the hero. Change both together. -->
             <p class="mt-4"><a class="btn btn-primary btn-lg" role="button" data-booking-link href="https://bookings.cloud.microsoft/bookwithme/user/f88c86d426534c27b206669a47304f11@xfour.co.uk/meetingtype/njvB-bvc7kqemKescI1BCg2?anonymous&amp;ismsaljsauthenabled&amp;ep=mcard" target="_blank" rel="noopener">Book a 30-minute build review</a></p>
-            <!-- hello@xfour.co.uk must be receiving mail before this page is deployed (Ben, 7 Oct 2026). -->
             <p>Or email <strong><a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a></strong> with a sentence about what you want to build.</p>
         </div>
     </div>

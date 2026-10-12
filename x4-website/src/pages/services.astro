@@ -1,5 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// These notes live here, in the frontmatter, because frontmatter never reaches
+// the browser: internal task references and the reasons behind a decision do
+// not belong in the page source a visitor can read (XFO-96).
+//
+// The Managed IT card. XFO-67: now an anchor, the same treatment the App
+// Development card was given, so this card reaches the new /it-support page.
+// The new home page is the main door to it, but that is held in a draft pull
+// request and this card is live today. Body copy replaced with the plain terms
+// the Journey B page actually promises.
+//
+// The App & Prototype Development card. The four cards before it are plain divs
+// with no link. This fifth one is an anchor so it actually reaches the new
+// /app-development page. Body copy is the approved hero sub-headline from that
+// page (XFO-17), reused verbatim.
 ---
 
 <BaseLayout
@@ -14,11 +29,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <p>Seamless Solutions, Smarter Business - Your Partner in Dynamics 365 & Managed IT Services.</p>
         </div>
         <div class="row justify-content-center">
-            <!-- XFO-67: now an anchor, the same treatment the App Development card
-                 was given, so this card reaches the new /it-support page. The new home
-                 page is the main door to it, but that is held in a draft pull request
-                 and this card is live today. Body copy replaced with the plain terms
-                 the Journey B page actually promises. -->
             <a class="col-md-5 feature-box text-decoration-none text-reset" href="/it-support" data-bss-hover-animate="pulse"><i class="fas fa-laptop icon"></i>
                 <h4>Managed IT</h4>
                 <p>Response times in writing, cover hours that fit your day, and one price per user per month. For Thames Valley businesses with no IT person.</p>
@@ -35,9 +45,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 <h4>Project Management</h4>
                 <p>Ensure your project is a success and rely on our proven team of business change managers and subject matter experts to provide the best service.&nbsp;</p>
             </div>
-            <!-- The four cards above are plain divs with no link. This fifth one is an
-                 anchor so it actually reaches the new /app-development page. Body copy is
-                 the approved hero sub-headline from that page (XFO-17), reused verbatim. -->
             <a class="col-md-5 feature-box text-decoration-none text-reset" href="/app-development" data-bss-hover-animate="pulse"><i class="fab fa-apple icon"></i>
                 <h4>App &amp; Prototype Development</h4>
                 <p>XFour Labs builds native iOS apps and working prototypes for people who need something real in weeks, not a slide deck in months.</p>
