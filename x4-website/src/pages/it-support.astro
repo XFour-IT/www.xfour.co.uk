@@ -20,87 +20,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 // costs. The form itself is XFO-46; until it lands this page asks for the same
 // four facts in plain words, and a test keeps any booking link off the page.
 
-// ---------------------------------------------------------------------------
-// COMMERCIAL TERMS -- CONFIRMED BY BEN ON XFO-67, 12 OCT 2026
-//
-// Response times, cover hours and contract terms are his answers verbatim.
-// The price he did not give as a figure; he gave the method:
-//
-//   "Calculate the price with at least a 20% margin. Use Microsoft license
-//    & A&A pricing to calculate the cost. You've mentioned we do MDM,
-//    broadband, etc. but these all come with costs regardless of how many
-//    users."
-//
-// That last sentence is why there are two prices here and not one. Some of
-// what we carry scales with headcount (a licence, a backup seat, support
-// hours) and some of it does not (a firewall, the Wi-Fi, the circuit, the
-// monthly service review). Recovering a fixed cost through a per-user fee
-// only works at one company size; it overcharges the 30-person client and
-// loses money on the 6-person one. So: a per-user fee and a per-site fee,
-// each covering its own kind of cost.
-//
-// The full build-up, every input rate and the margin check at 5, 15, 30 and
-// 50 users is the "Managed IT price build-up" document on XFO-67. The short
-// version:
-//
-//   Per user, per month, direct cost
-//     Microsoft 365 Business Premium licence, annual commitment   £16.90
-//     Microsoft 365 and endpoint backup                            £2.40
-//     RMM agent, at 1.2 devices per user                           £3.00
-//     Phishing simulation and security training                    £1.20
-//     Password manager                                             £0.90
-//     Documentation and ticketing seat                             £1.10
-//     Support labour, 0.6 h/user/month at £38/h loaded            £22.80
-//     Onboarding, 1 h/user at £38 spread over the 12-month term     £3.17
-//                                                                 ------
-//                                                                 £51.47  ->  /0.8 = £64.34  ->  £65
-//
-//   Per site, per month, direct cost
-//     Firewall subscription and rule management                   £22.00
-//     Switch, Wi-Fi and circuit monitoring                         £9.00
-//     Monthly review, reporting, patch QA, restore test, 1.5 h     £57.00
-//     Tenant security baseline upkeep, 0.5 h                      £19.00
-//     Onboarding, 6 h at £38 spread over the 12-month term        £19.00
-//                                                                 ------
-//                                                                £126.00  ->  /0.8 = £157.50 -> £160
-//
-// Two notes on the method, both deliberate:
-//
-// 1. Margin, not mark-up. Price = cost / 0.8, so 20% of the price is gross
-//    margin. That is the stricter of the two readings -- cost x 1.25 rather
-//    than cost x 1.2 -- so it clears "at least 20%" either way.
-// 2. Business Premium is the licence the costing assumes, because the
-//    covered list below promises MDM, MFA and managed antivirus, and
-//    Business Premium is what carries Intune, Entra ID P1 and Defender for
-//    Business. Choosing a cheaper licence tier does not save money here, it
-//    just moves those three lines into the tooling bill.
-//
-// Rounding up to £65 and £160 holds the margin at 20.8% or better at every
-// size from 5 users to 50. The arithmetic is in the document, and it is
-// checked at build time by test/it-support.test.mjs.
-//
-// Two input rates are XFour's, not Microsoft's, and are the ones worth
-// arguing with: the £38/hour loaded engineer cost and the 0.6 support hours
-// per user per month. They are industry-normal, not measured from our own
-// books. Move either and every figure here moves with it -- which is why
-// they are constants and not prose.
-// ---------------------------------------------------------------------------
-const terms = {
-	/** Pounds per user per month + VAT, Microsoft 365 licence included. */
-	pricePerUser: 65,
-	/** Pounds per user per month + VAT when the client buys its own licences. */
-	pricePerUserOwnLicences: 45,
-	/** Pounds per month + VAT, per office, for the network and the service review. */
-	pricePerSite: 160,
-	minimumUsers: 5,
-	coverHours: '8am to 6pm, Monday to Friday',
-	coverExcludes: 'bank holidays',
-	noticePeriod: '30 days',
-	minimumTerm: '12 months',
-};
-
-/** £65, £1,135 -- so the worked example below cannot drift from the headline. */
-const gbp = (amount: number) => `£${amount.toLocaleString('en-GB')}`;
+// The offer itself -- price, terms, response times, what is and is not
+// covered -- lives in src/data/managed-it.ts, with the price build-up and the
+// commercial terms Ben confirmed on XFO-67. Two more Journey B pages read the
+// same file (XFO-68), so it is the one place to change any of it.
+import ManagedItQuote from '../components/ManagedItQuote.astro';
+import { terms, gbp, responseTimes, covered, notCovered, towns } from '../data/managed-it';
 
 /** The size of company the page is written for, used in the worked example. */
 const exampleUsers = 15;
@@ -108,97 +33,8 @@ const exampleUsers = 15;
 /** One office, 15 people: the figure a visitor is really trying to work out. */
 const exampleMonthly = terms.pricePerSite + terms.pricePerUser * exampleUsers;
 
-/** The response-time commitment. Written down because the buyer asked for it. */
-const responseTimes = [
-	{
-		priority: 'The business has stopped',
-		meaning: 'Nobody can work. Your email is down, your internet is down, or your main system is unreachable.',
-		response: '1 working hour',
-	},
-	{
-		priority: 'One person has stopped',
-		meaning: 'One member of staff cannot do their job. A dead laptop, a locked account, a printer nobody can reach.',
-		response: '4 working hours',
-	},
-	{
-		priority: 'Everything else',
-		meaning: 'It works, but it is wrong or slow. A new starter to set up, a licence to move, a question to answer.',
-		response: '1 working day',
-	},
-];
-
-/** What the per-user price covers. Grouped the way the buyer thinks about it. */
-const covered = [
-	{
-		icon: 'fas fa-headset',
-		title: 'Your people',
-		points: [
-			'Unlimited support requests by phone, email or chat',
-			'A named engineer who knows your business, not a queue',
-			'New starters set up, leavers shut off the same day',
-			'Password resets, account lockouts and licence changes',
-		],
-	},
-	{
-		icon: 'fas fa-laptop',
-		title: 'Your devices',
-		points: [
-			'Every Windows PC and Mac monitored and patched',
-			'Antivirus managed and watched, not just installed',
-			'Disk, battery and age tracked, so a failure is replaced and not survived',
-			'Phones and tablets enrolled, so a lost phone is wiped and not a breach',
-		],
-	},
-	{
-		icon: 'fab fa-microsoft',
-		title: 'Microsoft 365',
-		points: [
-			'Email, Teams, SharePoint and OneDrive administered',
-			'Licences bought, assigned and reviewed, so you stop paying for staff who left',
-			'Multi-factor authentication turned on and kept on',
-			'Spam and phishing filtering tuned to your mail',
-		],
-	},
-	{
-		icon: 'fas fa-shield-alt',
-		title: 'Keeping you safe',
-		points: [
-			'Backups of Microsoft 365 and your files, checked monthly by restoring one',
-			'Security patching inside 14 days of release, critical fixes faster',
-			'A written record of who has access to what',
-			'We tell you when something looks wrong, before you notice it',
-		],
-	},
-	{
-		icon: 'fas fa-network-wired',
-		title: 'Your office',
-		points: [
-			'Your broadband, firewall, switches and Wi-Fi looked after',
-			'On-site visits when a problem cannot be fixed remotely',
-			'Office moves and new desks planned with you',
-		],
-	},
-	{
-		icon: 'fas fa-phone-alt',
-		title: 'Your suppliers',
-		points: [
-			'We deal with your broadband provider, your software vendors and your landlord',
-			'One number to call, whoever is actually at fault',
-			'Renewals flagged before they roll over',
-		],
-	},
-];
-
-/** Named plainly, because every provider that hides this is asked about it anyway. */
-const notCovered = [
-	'Hardware itself. We specify it, buy it for you at cost and set it up; the laptop is yours to pay for.',
-	'The broadband line itself. We monitor it and we chase your provider, but the circuit is billed at what it costs us — from about £35 a month for a business line — and we show you the supplier invoice.',
-	'Microsoft licences beyond Business Premium. Copilot, extra storage, Dynamics 365, an Office licence for a shared machine: all available, all quoted on top at what they cost plus our handling.',
-	'Out-of-hours and weekend cover. Available, priced on your quote, not inside the standard price.',
-	'Projects. A server replacement, an office move or a migration is scoped and priced on its own.',
-	'Line-of-business software nobody at XFour has seen. We will support it once we have had time to learn it, and we will say so first.',
-	'Dynamics 365 and Power Platform work. That is the other half of what we do, and it is quoted as consultancy.',
-];
+/** "Reading, Wokingham, ... High Wycombe, Oxford" from the one list of towns. */
+const townList = towns.join(', ');
 ---
 
 <BaseLayout
@@ -243,6 +79,8 @@ const notCovered = [
 				<h2 id="covered-heading" class="text-info">What is covered</h2>
 				<p>
 					One price, and this is what is inside it. Nothing here is an upgrade or an add-on.
+					Every item, and where each one stops, is on
+					<a href="/it-support/whats-included">what is included</a>.
 				</p>
 			</div>
 			<div class="row justify-content-center g-4">
@@ -252,7 +90,7 @@ const notCovered = [
 							<i class:list={[group.icon, 'icon']} aria-hidden="true"></i>
 							<h3 class="h5">{group.title}</h3>
 							<ul>
-								{group.points.map((point) => <li>{point}</li>)}
+								{group.items.map((item) => <li>{item.text}</li>)}
 							</ul>
 						</div>
 					</div>
@@ -400,9 +238,9 @@ const notCovered = [
 			<div class="prose">
 				<p>
 					XFour is in Reading. When a problem cannot be fixed down the wire, somebody drives to
-					you — Reading, Wokingham, Bracknell, Newbury, Basingstoke, Maidenhead, Slough, High
-					Wycombe, Oxford. If you are further out, say where you are and we will tell you
-					honestly whether we can get to you.
+					you — {townList}. If you are further out, say where you are and we will tell you
+					honestly whether we can get to you. <a href="/it-support/thames-valley">The area we
+					cover</a>, town by town.
 				</p>
 				<p>
 					You get the same engineer, and they learn your business. That is the part a national
@@ -417,45 +255,7 @@ const notCovered = [
 	</section>
 
 	<!-- ===================== The call to action ===================== -->
-	<!--
-		The one call to action on this page, and it is a quote and not a booking.
-		Rule 3 of plan section 1.1a: a stranger comparing IT providers will not
-		give up half an hour before they know roughly what it costs.
-
-		XFO-46 builds the form itself. Its managed IT journey asks for four facts
-		beyond name, company and email -- users, devices, current provider and
-		cover needed. This page asks for a fifth: the number of offices. That is
-		not padding. The price has a per-site fee in it, so a quote cannot be
-		worked out from a headcount alone, and XFO-78 -- the issue that swaps this
-		block for the real form -- has to add that field or the form collects a
-		number we cannot quote from. When it lands, the <div class="quote-ask">
-		below is replaced by its <form data-enquiry-form> with journey
-		"managed-it", and nothing else on this page changes.
-	-->
-	<section class="clean-block clean-form" id="quote" aria-labelledby="quote-heading">
-		<div class="container">
-			<div class="block-heading">
-				<h2 id="quote-heading" class="text-info">Get a price for your business</h2>
-				<p>You get a figure, not a sales process. If we are not the right fit we will say so.</p>
-			</div>
-			<div class="prose">
-				<div class="quote-ask">
-					<p>Send us these five things and we will come back with a monthly price:</p>
-					<ol>
-						<li>How many people need support</li>
-						<li>How many offices they sit in</li>
-						<li>How many computers, laptops and servers you have</li>
-						<li>Who looks after your IT today, if anyone</li>
-						<li>The hours you need covered</li>
-					</ol>
-					<p class="mb-0">
-						Email <a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a> or call
-						<a href="tel:+441183702920">0118 370 2920</a> and ask for a managed IT quote.
-					</p>
-				</div>
-			</div>
-		</div>
-	</section>
+	<ManagedItQuote />
 </BaseLayout>
 
 <style>
@@ -590,13 +390,5 @@ const notCovered = [
 		text-align: center;
 		margin-top: 2.25rem;
 		margin-bottom: 0.75rem;
-	}
-
-	.quote-ask ol {
-		padding-left: 1.3rem;
-	}
-
-	.quote-ask li {
-		margin-bottom: 0.4rem;
 	}
 </style>
