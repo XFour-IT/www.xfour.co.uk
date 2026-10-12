@@ -7,6 +7,7 @@
 import SiteNav from '../components/SiteNav.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import LiveChat from '../components/LiveChat.astro';
+import { canonicalUrl } from '../lib/canonical';
 
 interface Props {
 	/** <title> and, unless ogTitle is given, og:title. */
@@ -15,6 +16,9 @@ interface Props {
 	description: string;
 	ogTitle?: string;
 	ogDescription?: string;
+	/** og:type. Defaults to 'website' so no existing page changes; a blog post
+	    page passes 'article'. */
+	ogType?: string;
 	/** Class on <main>. Kept per page because the old pages set it per page. */
 	mainClass?: string;
 	/** href of this page's nav link, so that link gets Bootstrap's `active`. */
@@ -26,6 +30,7 @@ const {
 	description,
 	ogTitle = title,
 	ogDescription = description,
+	ogType = 'website',
 	mainClass = 'page',
 	navCurrent,
 } = Astro.props;
@@ -33,16 +38,7 @@ const {
 // Built from the page's own URL, so a page cannot be given the canonical tag of
 // another page -- which is the kind of copy-and-paste mistake this layout
 // exists to prevent.
-//
-// The build writes about-us.html, but the URL people and search engines use is
-// /about-us, so the .html and the index are taken off the end. The home page
-// keeps its single trailing slash; no other page has one. This matches the URLs
-// the Worker serves today exactly.
-const path = Astro.url.pathname
-	.replace(/\.html$/, '')
-	.replace(/\/index$/, '/')
-	.replace(/(.)\/+$/, '$1');
-const canonical = new URL(path, Astro.site).href;
+const canonical = canonicalUrl(Astro.url, Astro.site!);
 ---
 
 <!DOCTYPE html>
@@ -54,7 +50,7 @@ const canonical = new URL(path, Astro.site).href;
 	<title>{title}</title>
 	<meta name="description" content={description}>
 	<link rel="canonical" href={canonical}>
-	<meta property="og:type" content="website">
+	<meta property="og:type" content={ogType}>
 	<meta property="og:site_name" content="XFour">
 	<meta property="og:title" content={ogTitle}>
 	<meta property="og:description" content={ogDescription}>
