@@ -28,6 +28,15 @@ const here = dirname(fileURLToPath(import.meta.url));
 const DIST = join(here, '../dist');
 const PUBLIC = join(here, '../public');
 
+// The sitemap is generated at build time (XFO-93), not a file in public/ any
+// more, and @astrojs/sitemap can split it across more than one sitemap-N.xml.
+function readSitemap() {
+	return readdirSync(DIST)
+		.filter((name) => /^sitemap-\d+\.xml$/.test(name))
+		.map((name) => readFileSync(join(DIST, name), 'utf8'))
+		.join('\n');
+}
+
 /* The path is fixed, not a preference: the home page (XFO-63) sends its
    Dynamics door to /dynamics-365, so the built file has to be this one. */
 const PAGE = 'dynamics-365.html';
@@ -110,7 +119,7 @@ test('it publishes only the proof that is cleared', () => {
 });
 
 test('the page is reachable from every page, and is in the sitemap', () => {
-    const sitemap = readFileSync(join(PUBLIC, 'sitemap.xml'), 'utf8');
+    const sitemap = readSitemap();
     assert.match(sitemap, /dynamics-365/, 'a page we want found is not in the sitemap');
     assert.match(html, /href="\/dynamics-365"/, 'the nav link to this journey is missing');
 });
