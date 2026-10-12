@@ -85,8 +85,9 @@ test('the price still clears the 20% margin floor it was built from', () => {
 	   per XFO-67. Somebody will one day round £65 down to £59 to win a deal.
 	   This is the test that tells them what that costs.
 
-	   Inputs are the direct costs from the build-up in the page's header
-	   comment. Keep the two in step: if the cost model changes, change both. */
+	   Inputs are the direct costs from the build-up in the header comment of
+	   src/data/managed-it.ts. Keep the two in step: if the cost model changes,
+	   change both. */
 	const costPerUser = 51.47;
 	const costPerSite = 126.0;
 	const floor = 0.2;

@@ -1,0 +1,67 @@
+---
+// The one call to action on every Journey B page, and it is a quote and not a
+// booking. Rule 3 of plan section 1.1a: a stranger comparing IT providers
+// will not give up half an hour before they know roughly what it costs.
+//
+// It is a component, not a block on each page, because there are three
+// Journey B pages and one quote ask (XFO-68). Copied three times, the three
+// would drift -- and XFO-78 would have three places to swap instead of one.
+//
+// XFO-46 builds the form itself. Its managed IT journey asks for four facts
+// beyond name, company and email -- users, devices, current provider and cover
+// needed. This block asks for a fifth: the number of offices. That is not
+// padding. The price has a per-site fee in it, so a quote cannot be worked out
+// from a headcount alone, and XFO-78 -- the issue that swaps this block for
+// the real form -- has to add that field or the form collects a number we
+// cannot quote from. When it lands, the <div class="quote-ask"> below is
+// replaced by its <form data-enquiry-form> with journey "managed-it", and
+// nothing else on any of the three pages changes.
+---
+
+<section class="clean-block clean-form" id="quote" aria-labelledby="quote-heading">
+	<div class="container">
+		<div class="block-heading">
+			<h2 id="quote-heading" class="text-info">Get a price for your business</h2>
+			<p>You get a figure, not a sales process. If we are not the right fit we will say so.</p>
+		</div>
+		<div class="quote-ask">
+			<p>Send us these five things and we will come back with a monthly price:</p>
+			<ol>
+				<li>How many people need support</li>
+				<li>How many offices they sit in</li>
+				<li>How many computers, laptops and servers you have</li>
+				<li>Who looks after your IT today, if anyone</li>
+				<li>The hours you need covered</li>
+			</ol>
+			<p class="mb-0">
+				Email <a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a> or call
+				<a href="tel:+441183702920">0118 370 2920</a> and ask for a managed IT quote.
+			</p>
+		</div>
+	</div>
+</section>
+
+<style>
+	/* The theme caps .block-heading p at 420px, which is too narrow here. */
+	.block-heading p {
+		max-width: 680px;
+	}
+
+	.quote-ask {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.quote-ask p,
+	.quote-ask li {
+		line-height: 1.7;
+	}
+
+	.quote-ask ol {
+		padding-left: 1.3rem;
+	}
+
+	.quote-ask li {
+		margin-bottom: 0.4rem;
+	}
+</style>
