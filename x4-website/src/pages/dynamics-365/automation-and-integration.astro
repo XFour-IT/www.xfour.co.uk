@@ -1,10 +1,14 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { BOOKING_URL } from '../data/booking';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { BOOKING_URL } from '../../data/booking';
 
 // XFO-66. A Journey A page: automation and integration, for the Dynamics 365
 // and Power Platform buyer. The plan asks for 600 words or more (plan section
 // 1.3), and a test holds that floor.
+//
+// Lives at /dynamics-365/automation-and-integration, next to the
+// implementation page. The old flat address, /dynamics-365-automation-integration,
+// redirects here (public/_redirects).
 //
 // Same rules as the landing page at /dynamics-365, which this page sits under:
 //
@@ -122,10 +126,21 @@ const proof = [
 	navCurrent="/dynamics-365"
 	mainClass="page journey-a"
 >
+	<Fragment slot="head">
+		<script is:inline type="application/ld+json" set:html={JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Dynamics 365', item: 'https://www.xfour.co.uk/dynamics-365' },
+				{ '@type': 'ListItem', position: 2, name: 'Automation and integration', item: 'https://www.xfour.co.uk/dynamics-365/automation-and-integration' },
+			],
+		})} />
+	</Fragment>
 
 	<!-- =========================== Hero =========================== -->
 	<section class="clean-block clean-hero journey-hero">
 		<div class="text">
+			<p class="crumb"><a href="/dynamics-365">Dynamics 365</a> / Automation and integration</p>
 			<h1 class="h2">Dynamics 365 automation and integration</h1>
 			<p>
 				Take the repeated work out of people’s hands and put it into Power Automate and
@@ -318,6 +333,16 @@ const proof = [
 
 	.journey-hero .text {
 		max-width: 46rem;
+	}
+
+	.crumb {
+		font-size: 0.9rem;
+		opacity: 0.85;
+	}
+
+	.crumb a {
+		color: inherit;
+		text-decoration: underline;
 	}
 
 	/* The theme caps .block-heading p at 420px, which is too narrow for these
