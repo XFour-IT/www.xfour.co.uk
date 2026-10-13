@@ -37,6 +37,9 @@ const JOURNEYS = {
 		subject: (company) => `Managed IT quote — ${company}`,
 		fields: [
 			{ name: 'users', label: 'Number of users', required: true, integer: true, min: 1, max: 10000 },
+			// The price is per office as well as per user (XFO-67), so a quote
+			// cannot be worked out without this one.
+			{ name: 'offices', label: 'Number of offices', required: true, integer: true, min: 1, max: 500 },
 			{ name: 'devices', label: 'Number of devices', required: true, integer: true, min: 1, max: 20000 },
 			{ name: 'current_provider', label: 'Current provider', required: false, max: 100 },
 			{ name: 'cover', label: 'Cover needed', required: true, max: 100 },
