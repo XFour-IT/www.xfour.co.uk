@@ -11,6 +11,13 @@
  * Configuration lives in wrangler.jsonc (vars) and in Worker secrets. See
  * docs/lead-forms.md for the runbook. If the Dataverse vars are not set the
  * endpoint returns 503 and refuses to pretend it worked.
+ *
+ * A validated submission is written to the ENQUIRY_RETRY_KV namespace before
+ * the Dataverse call (XFO-72), so a failed create — Dynamics down, a refused
+ * token, an expired client secret — does not lose the enquiry. The scheduled
+ * handler below retries everything still in KV on the Cron Trigger in
+ * wrangler.jsonc, and removes an entry the moment its Lead exists, so a
+ * redelivered or repeated retry run never creates the same Lead twice.
  */
 
 /** Journeys the form endpoint accepts, and the shape each one must have. */
@@ -89,6 +96,12 @@ export default {
 
 		return env.ASSETS.fetch(request);
 	},
+
+	// Cron Trigger (see wrangler.jsonc). Retries every enquiry still sitting in
+	// ENQUIRY_RETRY_KV because its inline Dataverse create failed.
+	async scheduled(event, env, ctx) {
+		return await retryPendingEnquiries(env);
+	},
 };
 
 async function handleEnquiry(request, env, ctx) {
@@ -134,14 +147,129 @@ async function handleEnquiry(request, env, ctx) {
 	}
 
 	const lead = buildLead(journeyKey, journey, values, env);
+
+	// Durable before the Dataverse call, not after, so a crash or a timeout
+	// between the two can only mean a harmless unused retry record rather than
+	// a lost lead.
+	const submissionId = crypto.randomUUID();
+	await putRetryRecord(env, submissionId, { journeyKey, lead, attempts: 0, createdAt: new Date().toISOString() });
+
 	const created = await createLead(config.value, lead, env);
 	if (!created.ok) {
-		console.error('enquiry_dataverse_failed', created.status, created.detail);
+		await reportDataverseFailure(env, created, journeyKey);
+		// The record stays in ENQUIRY_RETRY_KV. The Cron Trigger retries it, so
+		// the enquiry survives even though this request answers an error.
 		return json({ ok: false, error: 'crm_unavailable' }, 502);
 	}
 
+	await deleteRetryRecord(env, submissionId);
 	console.log('enquiry_lead_created', JSON.stringify({ journey: journeyKey, leadid: created.leadid }));
 	return json({ ok: true, journey: journeyKey });
+}
+
+/* -------------------------------------------------------------------------- */
+/* Retry (XFO-72)                                                             */
+/* -------------------------------------------------------------------------- */
+
+const RETRY_KEY_PREFIX = 'enquiry:';
+
+function retryKey(submissionId) {
+	return `${RETRY_KEY_PREFIX}${submissionId}`;
+}
+
+async function putRetryRecord(env, submissionId, record) {
+	if (!env.ENQUIRY_RETRY_KV) return; // Not bound yet — see docs/lead-forms.md.
+	await env.ENQUIRY_RETRY_KV.put(retryKey(submissionId), JSON.stringify(record));
+}
+
+async function deleteRetryRecord(env, submissionId) {
+	if (!env.ENQUIRY_RETRY_KV) return;
+	await env.ENQUIRY_RETRY_KV.delete(retryKey(submissionId));
+}
+
+/**
+ * Retries every enquiry still waiting in ENQUIRY_RETRY_KV. An entry is
+ * deleted the instant its Lead exists in Dataverse, so running this twice in
+ * a row — a redelivered Cron tick, or a manual re-run — finds nothing left
+ * for an entry already retried and creates no second Lead for it.
+ */
+async function retryPendingEnquiries(env) {
+	if (!env.ENQUIRY_RETRY_KV) return { attempted: 0, created: 0 };
+
+	const config = dataverseConfig(env);
+	if (!config.ok) {
+		// Same reason the endpoint itself 503s: do not spend retries against a
+		// tenant that is not configured yet.
+		return { attempted: 0, created: 0 };
+	}
+
+	let attempted = 0;
+	let created = 0;
+	let cursor;
+
+	do {
+		const page = await env.ENQUIRY_RETRY_KV.list({ prefix: RETRY_KEY_PREFIX, cursor });
+		for (const { name } of page.keys) {
+			const raw = await env.ENQUIRY_RETRY_KV.get(name);
+			if (!raw) continue; // Already cleared by an earlier run in this same pass.
+			attempted += 1;
+
+			const record = JSON.parse(raw);
+			const result = await createLead(config.value, record.lead, env);
+
+			if (result.ok) {
+				await env.ENQUIRY_RETRY_KV.delete(name);
+				created += 1;
+				console.log(
+					'enquiry_lead_created_on_retry',
+					JSON.stringify({ journey: record.journeyKey, leadid: result.leadid, attempts: record.attempts + 1 }),
+				);
+				continue;
+			}
+
+			record.attempts += 1;
+			record.lastFailedAt = new Date().toISOString();
+			await env.ENQUIRY_RETRY_KV.put(name, JSON.stringify(record));
+			await reportDataverseFailure(env, result, record.journeyKey);
+		}
+		cursor = page.list_complete ? undefined : page.cursor;
+	} while (cursor);
+
+	return { attempted, created };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Alerting                                                                   */
+/* -------------------------------------------------------------------------- */
+
+async function reportDataverseFailure(env, created, journeyKey) {
+	console.error('enquiry_dataverse_failed', created.status, created.detail);
+	await sendAlert(
+		env,
+		`enquiry_dataverse_failed: journey=${journeyKey} status=${created.status} detail=${String(created.detail).slice(0, 300)}`,
+	);
+}
+
+/**
+ * Posts a short JSON message to ALERT_WEBHOOK_URL (a Slack/Teams incoming
+ * webhook or any endpoint that accepts `{ text }`), so a Dataverse outage is
+ * noticed from somewhere other than a customer calling in. Not configured is
+ * not an error — the line is still in the Worker log either way — and a
+ * failure sending the alert itself must never fail the enquiry. See
+ * docs/lead-forms.md for how to point this at a webhook.
+ */
+async function sendAlert(env, message) {
+	const url = str(env.ALERT_WEBHOOK_URL);
+	if (!url) return;
+	try {
+		await fetch(url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ text: message }),
+		});
+	} catch (err) {
+		console.error('enquiry_alert_failed', String(err && err.message ? err.message : err));
+	}
 }
 
 /* -------------------------------------------------------------------------- */
