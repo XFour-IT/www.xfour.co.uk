@@ -19,6 +19,10 @@ import { BOOKING_URL } from '../data/booking';
 // so a scoping call lands in the same calendar as an app build review until a
 // separate meeting type exists.
 //
+// The managed IT form has the same fields as the quote form on the Journey B
+// pages (src/components/ManagedItQuote.astro). Change one, change both: the
+// Worker refuses a post that is missing a required field (XFO-78).
+//
 // The page notes live here, not in HTML comments, because HTML comments ship
 // in the page source (XFO-96).
 ---
@@ -176,13 +180,19 @@ import { BOOKING_URL } from '../data/booking';
                             <div class="invalid-feedback d-block" data-error-for="email"></div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-6 mb-3">
+                            <div class="col-sm-4 mb-3">
                                 <label class="form-label" for="mit-users">How many users?</label>
                                 <input class="form-control" type="number" id="mit-users" name="users" required
                                     min="1" max="10000" step="1" inputmode="numeric">
                                 <div class="invalid-feedback d-block" data-error-for="users"></div>
                             </div>
-                            <div class="col-sm-6 mb-3">
+                            <div class="col-sm-4 mb-3">
+                                <label class="form-label" for="mit-offices">How many offices?</label>
+                                <input class="form-control" type="number" id="mit-offices" name="offices"
+                                    required min="1" max="500" step="1" inputmode="numeric">
+                                <div class="invalid-feedback d-block" data-error-for="offices"></div>
+                            </div>
+                            <div class="col-sm-4 mb-3">
                                 <label class="form-label" for="mit-devices">How many devices?</label>
                                 <input class="form-control" type="number" id="mit-devices" name="devices"
                                     required min="1" max="20000" step="1" inputmode="numeric">

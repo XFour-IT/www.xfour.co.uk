@@ -42,6 +42,7 @@ const VALID_MANAGED_IT = {
 	company: 'Harvard Computation',
 	email: 'grace@example.com',
 	users: '42',
+	offices: '2',
 	devices: '55',
 	current_provider: 'Nobody yet',
 	cover: '24/7',
@@ -160,8 +161,30 @@ test('Managed IT journey creates a lead with the other source and the user count
 	assert.equal(lead.leadsourcecode, 100000002);
 	assert.equal(lead.numberofemployees, 42);
 	assert.match(lead.description, /Number of users: 42/);
+	assert.match(lead.description, /Number of offices: 2/);
 	assert.match(lead.description, /Number of devices: 55/);
 	assert.match(lead.description, /Cover needed: 24\/7/);
+});
+
+test('a managed IT enquiry without the number of offices is refused', async () => {
+	// The price has a fee per office as well as per user (XFO-67). An enquiry
+	// without the office count cannot be priced without emailing the sender
+	// back, which is the thing the quote form exists to avoid (XFO-78).
+	const fields = { ...VALID_MANAGED_IT };
+	delete fields.offices;
+	const { status, body, calls } = await post(fields);
+
+	assert.equal(status, 422);
+	assert.ok(body.fields.offices, 'expected an error against the offices field');
+	assert.equal(calls.length, 0);
+});
+
+test('the number of offices must be a whole number from 1 to 500', async () => {
+	for (const offices of ['0', '501', '1.5', 'two']) {
+		const { status, body } = await post({ ...VALID_MANAGED_IT, offices });
+		assert.equal(status, 422, `offices=${offices} was accepted`);
+		assert.ok(body.fields.offices, `no error against offices=${offices}`);
+	}
 });
 
 test('the Turnstile token and the visitor IP are both sent for verification', async () => {
@@ -214,6 +237,7 @@ test('validation reports every bad field at once and stops before Turnstile', as
 		'cover',
 		'devices',
 		'email',
+		'offices',
 		'users',
 	]);
 	assert.equal(calls.length, 0);

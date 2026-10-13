@@ -130,6 +130,33 @@ test('the call to action is a quote, not a booking', () => {
 	assert.match(text, /Get a price/i, 'nothing on the page offers a price');
 });
 
+test('every Journey B page has exactly one managed IT quote form, and it asks for offices', () => {
+	/* XFO-78. The three pages share one quote form (ManagedItQuote.astro). The
+	   price is per office as well as per user, so a form without the office
+	   count collects an enquiry nobody can price. Two forms on a page would
+	   also double the Turnstile widgets and confuse the analytics funnel. */
+	for (const file of ['it-support.html', 'it-support/whats-included.html', 'it-support/thames-valley.html']) {
+		const page = readFileSync(join(here, '../dist', file), 'utf8');
+		const forms = page.match(/<form\b[^>]*\bdata-enquiry-form\b[^>]*>[\s\S]*?<\/form>/g) ?? [];
+		assert.equal(forms.length, 1, `${file}: expected one enquiry form, found ${forms.length}`);
+
+		const [form] = forms;
+		assert.match(form, /<form\b[^>]*data-journey="managed-it"/, `${file}: the form is not the managed IT journey`);
+		assert.match(form, /name="journey" value="managed-it"/, `${file}: the form does not post journey managed-it`);
+		assert.match(form, /<input\b[^>]*name="offices"[^>]*\brequired\b/, `${file}: the form has no required offices input`);
+		for (const field of ['users', 'devices', 'current_provider', 'cover']) {
+			assert.match(form, new RegExp(`name="${field}"`), `${file}: the form has no ${field} field`);
+		}
+
+		/* The form needs JavaScript, because Turnstile does. Without the script
+		   it never submits, and without the noscript line the visitor is stuck. */
+		assert.match(page, /src="\/assets\/js\/enquiry-form\.js"/, `${file}: the form script is not loaded`);
+		const noscript = form.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
+		assert.match(noscript, /tel:\+441183702920/, `${file}: no phone number for a visitor without JavaScript`);
+		assert.match(noscript, /mailto:hello@xfour\.co\.uk/, `${file}: no email address for a visitor without JavaScript`);
+	}
+});
+
 test('the page says it is local', () => {
 	/* Proximity is the whole argument for Journey B. A page that could have been
 	   written by a national help desk has lost its only advantage. */
