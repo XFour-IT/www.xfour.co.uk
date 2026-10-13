@@ -111,7 +111,7 @@
               "item/scheduledend": "@outputs('Due_one_working_day_later')",
               "item/prioritycode": 2,
               "item/regardingobjectid_lead_task@odata.bind": "/leads(@{triggerOutputs()?['body/leadid']})",
-              "item/ownerid@odata.bind": "/systemusers(@{outputs('Owner_for_this_journey')})"
+              "item/ownerid_task@odata.bind": "/systemusers(@{outputs('Owner_for_this_journey')})"
             },
             "authentication": "@parameters('$authentication')"
           }

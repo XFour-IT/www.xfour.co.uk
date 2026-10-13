@@ -95,6 +95,17 @@ for (const workflow of workflows) {
 		if (length > 256) fail(`the description of ${name} is ${length} characters; the limit is 256`);
 	}
 
+	// On an activity table the Dataverse connector names the owner lookup
+	// ownerid_<table>, not ownerid. The plain name also fails only at turn-on.
+	const activitySets = { tasks: 'task', emails: 'email', phonecalls: 'phonecall', appointments: 'appointment' };
+	for (const [name, action] of Object.entries(actions)) {
+		const parameters = action.inputs?.parameters ?? {};
+		const table = activitySets[parameters.entityName];
+		if (table && 'item/ownerid@odata.bind' in parameters) {
+			fail(`${name} sets item/ownerid@odata.bind on ${parameters.entityName}; use item/ownerid_${table}@odata.bind`);
+		}
+	}
+
 	// The trigger filter must name exactly the Lead Source values the Worker
 	// writes, or the flow never fires for a web enquiry.
 	for (const trigger of Object.values(triggers)) {

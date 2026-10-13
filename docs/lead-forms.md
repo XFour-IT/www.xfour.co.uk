@@ -26,7 +26,7 @@ is deliberate: a form that silently drops a lead is worse than no form.
 
 | Create and Assign on Lead at Business Unit | Done by Ben, 12 Oct 2026 |
 
-State on 12 Oct 2026, 23:00:
+State on 13 Oct 2026:
 
 - Both forms are **live on www.xfour.co.uk**, deployed from this branch by
   accident on 12 Oct (a dashboard Deploy picked up the branch's latest upload).
@@ -44,11 +44,16 @@ State on 12 Oct 2026, 23:00:
   was 260 characters and Power Automate allows 256. The import log still says
   "Processed", and the upgrade switched the flow **off**. 1.0.0.2 fixes the
   description, and `pack.mjs` now refuses any description over 256.
-- To finish: Ben imports `XFourWebsiteEnquiries_1_0_0_2.zip` over the existing
-  solution and checks the flow is **On**, this branch is deployed, then one
-  test submission on each form.
-- Ben may merge this branch once a test Lead lands with the right source and
-  owner.
+- 1.0.0.2 imported on 13 Oct and **would not turn on** either:
+  `WorkflowOperationParametersExtraParameter … 'item/ownerid@odata.bind'`. On
+  an activity table such as Task, the Dataverse connector calls the owner
+  lookup `ownerid_task`, not `ownerid` (the Lead keeps `ownerid`). 1.0.0.3
+  fixes it, and `pack.mjs` now refuses the plain name on an activity table.
+- Ben approved merging this branch before the test (13 Oct), because the
+  Worker change has to be live before a test can pass.
+- To finish: Ben imports `XFourWebsiteEnquiries_1_0_0_3.zip` over the existing
+  solution and checks the flow is **On**, then one test submission on each
+  form.
 
 ---
 
@@ -325,8 +330,9 @@ That checks the parts agree — in particular that the trigger filter names the
 same Lead Source values as `LEAD_SOURCE_*` in `wrangler.jsonc`, because a
 mismatch imports cleanly and then never fires, and that no step description is
 over 256 characters, because that also imports cleanly and then will not turn
-on — and writes
-`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_2.zip`.
+on, and that an activity table's owner uses its own lookup name
+(`ownerid_task`), for the same reason — and writes
+`dynamics/website-enquiries/dist/XFourWebsiteEnquiries_1_0_0_3.zip`.
 
 Before importing, the account that will own the flow needs **Send As** on the
 `hello@xfour.co.uk` mailbox: Exchange admin centre → Recipients → Mailboxes →
@@ -343,7 +349,7 @@ work.
 4. When the import finishes, open the solution → the flow → **Turn on**. It is
    imported switched off on purpose.
 
-To update it (for example 1.0.0.1 → 1.0.0.2), import the new zip the same way.
+To update it (for example 1.0.0.2 → 1.0.0.3), import the new zip the same way.
 Power Apps sees the higher version and offers **Upgrade**; keep the default. It
 reuses the existing connections. Check the flow is still **On** afterwards.
 An upgrade switches the old version off before it turns the new one on, so if
