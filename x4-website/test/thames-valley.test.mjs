@@ -11,13 +11,23 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const read = (file) => readFileSync(join(here, '../dist', file), 'utf8');
+const DIST = join(here, '../dist');
+const read = (file) => readFileSync(join(DIST, file), 'utf8');
 const mainOf = (page) => page.match(/<main[^>]*>([\s\S]*)<\/main>/)[1];
+
+// The sitemap is generated at build time (XFO-93), not a file in public/ any
+// more, and @astrojs/sitemap can split it across more than one sitemap-N.xml.
+function readSitemap() {
+	return readdirSync(DIST)
+		.filter((name) => /^sitemap-\d+\.xml$/.test(name))
+		.map((name) => readFileSync(join(DIST, name), 'utf8'))
+		.join('\n');
+}
 
 const html = read('it-support/thames-valley.html');
 const main = mainOf(html);
@@ -83,6 +93,6 @@ test('no Journey A page uses the local page or its search terms', () => {
 });
 
 test('the page is in the sitemap', () => {
-	const sitemap = readFileSync(join(here, '../public/sitemap.xml'), 'utf8');
+	const sitemap = readSitemap();
 	assert.match(sitemap, /xfour\.co\.uk\/it-support\/thames-valley</);
 });
