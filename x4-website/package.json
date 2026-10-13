@@ -13,6 +13,8 @@
 		"test": "node --test 'test/*.test.mjs'"
 	},
 	"devDependencies": {
+		"@astrojs/rss": "^4.0.19",
+		"@astrojs/sitemap": "^3.7.4",
 		"astro": "^7.3.8",
 		"wrangler": "^4.149.0"
 	}

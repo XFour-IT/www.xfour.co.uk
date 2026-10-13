@@ -13,13 +13,22 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const DIST = join(here, '../dist');
 const PUBLIC = join(here, '../public');
+
+// The sitemap is generated at build time (XFO-93), not a file in public/ any
+// more, and @astrojs/sitemap can split it across more than one sitemap-N.xml.
+function readSitemap() {
+    return readdirSync(DIST)
+        .filter((name) => /^sitemap-\d+\.xml$/.test(name))
+        .map((name) => readFileSync(join(DIST, name), 'utf8'))
+        .join('\n');
+}
 
 const PAGE = 'dynamics-365/automation-and-integration.html';
 const PATH = '/dynamics-365/automation-and-integration';
@@ -113,7 +122,7 @@ test('it is linked from the landing page, and is in the sitemap', () => {
     assert.match(landing, new RegExp(`href="${PATH}"`), '/dynamics-365 does not link here');
     assert.doesNotMatch(landing, new RegExp(`href="${OLD_PATH}"`), '/dynamics-365 still links to the old address');
     assert.match(main, /href="\/dynamics-365"/, 'this page does not link back to the landing page');
-    const sitemap = readFileSync(join(PUBLIC, 'sitemap.xml'), 'utf8');
+    const sitemap = readSitemap();
     assert.match(sitemap, new RegExp(`<loc>https://www\\.xfour\\.co\\.uk${PATH}</loc>`), 'the page is not in the sitemap');
     assert.doesNotMatch(sitemap, new RegExp(OLD_PATH), 'the sitemap still lists the old address');
 });

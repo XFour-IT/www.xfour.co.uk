@@ -33,6 +33,15 @@ function htmlFiles(dir) {
     });
 }
 
+// The sitemap is generated at build time (XFO-93), not a file in public/ any
+// more, and @astrojs/sitemap can split it across more than one sitemap-N.xml.
+function readSitemap() {
+    return readdirSync(DIST)
+        .filter((name) => /^sitemap-\d+\.xml$/.test(name))
+        .map((name) => readFileSync(join(DIST, name), 'utf8'))
+        .join('\n');
+}
+
 const pages = htmlFiles(DIST).map((path) => ({
     name: relative(DIST, path).split('\\').join('/'),
     html: readFileSync(path, 'utf8')
@@ -176,6 +185,6 @@ test('the cookie name in the policy matches the one the code sets', () => {
 });
 
 test('the sitemap lists the cookie policy', () => {
-    const sitemap = readFileSync(join(PUBLIC, 'sitemap.xml'), 'utf8');
+    const sitemap = readSitemap();
     assert.match(sitemap, /legal\/cookies/, 'a published policy page should be indexable');
 });

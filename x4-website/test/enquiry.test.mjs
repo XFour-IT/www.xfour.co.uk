@@ -51,15 +51,14 @@ const VALID_MANAGED_IT = {
 };
 
 /**
- * Replaces global fetch for the duration of one call and records what the
- * Worker asked for. `turnstile` and `dataverse` choose the stubbed outcomes.
+ * Builds a fetch stub that answers the three outbound calls the Worker makes
+ * — Turnstile, the Entra token endpoint and the Dataverse Web API — plus any
+ * `ALERT_WEBHOOK_URL` post, and records every call made through it.
+ * `turnstile` and `dataverse` choose the stubbed outcomes.
  */
-async function post(fields, env = CONFIGURED_ENV, options = {}) {
-	const { turnstile = true, dataverse = { status: 204 }, origin = 'https://www.xfour.co.uk' } = options;
+function stubOutboundFetch({ turnstile = true, dataverse = { status: 204 } } = {}) {
 	const calls = [];
-	const realFetch = globalThis.fetch;
-
-	globalThis.fetch = async (input, init = {}) => {
+	const fetchImpl = async (input, init = {}) => {
 		const url = typeof input === 'string' ? input : input.url;
 		calls.push({ url, init });
 
@@ -79,10 +78,67 @@ async function post(fields, env = CONFIGURED_ENV, options = {}) {
 				headers: { 'OData-EntityId': `${url}(33333333-3333-3333-3333-333333333333)` },
 			});
 		}
+		if (url === 'https://alerts.example/webhook') {
+			return new Response(null, { status: 200 });
+		}
+		if (url === 'https://alerts.example/unreachable') {
+			throw new Error('getaddrinfo ENOTFOUND alerts.example');
+		}
 		throw new Error(`unexpected outbound call to ${url}`);
 	};
+	return { calls, fetchImpl };
+}
 
+/** Runs `fn` with global fetch replaced by `fetchImpl`, then always restores it. */
+async function withStubbedFetch(fetchImpl, fn) {
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = fetchImpl;
 	try {
+		return await fn();
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+}
+
+/**
+ * An in-memory stand-in for a Cloudflare KV namespace: `put`/`get`/`delete`/
+ * `list` with the same shapes the real binding returns, enough for the
+ * Worker's retry code to run against in a test.
+ */
+function createFakeKV() {
+	const store = new Map();
+	return {
+		async put(key, value) {
+			store.set(key, value);
+		},
+		async get(key) {
+			return store.has(key) ? store.get(key) : null;
+		},
+		async delete(key) {
+			store.delete(key);
+		},
+		async list({ prefix = '' } = {}) {
+			const keys = [...store.keys()].filter((key) => key.startsWith(prefix)).map((name) => ({ name }));
+			return { keys, list_complete: true, cursor: undefined };
+		},
+		size() {
+			return store.size;
+		},
+		_itemsForTest() {
+			return store.values();
+		},
+	};
+}
+
+/**
+ * Posts one enquiry. `turnstile` and `dataverse` choose the stubbed outcomes;
+ * see `stubOutboundFetch`.
+ */
+async function post(fields, env = CONFIGURED_ENV, options = {}) {
+	const { turnstile = true, dataverse = { status: 204 }, origin = 'https://www.xfour.co.uk' } = options;
+	const { calls, fetchImpl } = stubOutboundFetch({ turnstile, dataverse });
+
+	return withStubbedFetch(fetchImpl, async () => {
 		const request = new Request('https://www.xfour.co.uk/api/enquiry', {
 			method: 'POST',
 			headers: {
@@ -95,9 +151,7 @@ async function post(fields, env = CONFIGURED_ENV, options = {}) {
 		const response = await worker.fetch(request, env, {});
 		const body = await response.json();
 		return { status: response.status, body, calls };
-	} finally {
-		globalThis.fetch = realFetch;
-	}
+	});
 }
 
 function leadFrom(calls) {
@@ -386,4 +440,130 @@ test('the browser can read the Turnstile site key from the config route', async 
 
 	assert.equal(response.status, 200);
 	assert.deepEqual(await response.json(), { turnstileSiteKey: '0xSITEKEY' });
+});
+
+/* -------------------------------------------------------------------------- */
+/* Retry (XFO-72)                                                             */
+/* -------------------------------------------------------------------------- */
+
+test('a successful inline create never touches the retry KV', async () => {
+	const kv = createFakeKV();
+	const env = { ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv };
+
+	const { status } = await post(VALID_DYNAMICS, env);
+
+	assert.equal(status, 200);
+	assert.equal(kv.size(), 0);
+});
+
+test('a Dataverse failure keeps the submission in the retry KV instead of losing it', async () => {
+	const kv = createFakeKV();
+	const env = { ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv };
+
+	const { status, body } = await post(VALID_DYNAMICS, env, { dataverse: { status: 500 } });
+
+	// The visitor still sees today's error — this is about not losing the
+	// enquiry behind the scenes, not about changing what they are told.
+	assert.equal(status, 502);
+	assert.equal(body.error, 'crm_unavailable');
+	assert.equal(kv.size(), 1);
+
+	const [raw] = [...kv._itemsForTest()];
+	const record = JSON.parse(raw);
+	assert.equal(record.journeyKey, 'dynamics');
+	assert.equal(record.lead.companyname, 'Analytical Engines Ltd');
+	assert.equal(record.attempts, 0);
+});
+
+test('the scheduled retry creates the Lead that the inline attempt lost, and exactly one', async () => {
+	const kv = createFakeKV();
+	const env = { ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv };
+
+	// The inline attempt fails — Dataverse is down — and the submission is
+	// held rather than lost.
+	const { status: firstStatus } = await post(VALID_DYNAMICS, env, { dataverse: { status: 500 } });
+	assert.equal(firstStatus, 502);
+	assert.equal(kv.size(), 1);
+
+	// Dataverse recovers. The Cron Trigger fires and retries what is in KV.
+	const { calls, fetchImpl } = stubOutboundFetch({ dataverse: { status: 204 } });
+	await withStubbedFetch(fetchImpl, () => worker.scheduled({}, env, {}));
+
+	assert.equal(calls.filter((c) => c.url.includes('/api/data/v9.2/leads')).length, 1, 'expected exactly one Lead create');
+	assert.equal(kv.size(), 0, 'the retried entry is cleared once its Lead exists');
+
+	// A second retry pass — a redelivered Cron tick, or a re-run before the
+	// next schedule — must create nothing a second time: there is nothing
+	// left in KV to retry.
+	const { calls: secondCalls, fetchImpl: secondFetchImpl } = stubOutboundFetch({ dataverse: { status: 204 } });
+	await withStubbedFetch(secondFetchImpl, () => worker.scheduled({}, env, {}));
+
+	assert.equal(secondCalls.filter((c) => c.url.includes('/api/data/v9.2/leads')).length, 0, 'expected no second Lead create');
+});
+
+test('a retry that still fails keeps the entry in KV and counts the attempt', async () => {
+	const kv = createFakeKV();
+	const env = { ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv };
+
+	await post(VALID_DYNAMICS, env, { dataverse: { status: 500 } });
+	assert.equal(kv.size(), 1);
+
+	const { fetchImpl } = stubOutboundFetch({ dataverse: { status: 500 } });
+	await withStubbedFetch(fetchImpl, () => worker.scheduled({}, env, {}));
+
+	assert.equal(kv.size(), 1, 'a still-failing retry must not drop the enquiry');
+	const [raw] = [...kv._itemsForTest()];
+	assert.equal(JSON.parse(raw).attempts, 1);
+});
+
+test('a retry run with nothing configured yet leaves the retry KV alone', async () => {
+	const kv = createFakeKV();
+	const env = { ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv };
+
+	await post(VALID_DYNAMICS, env, { dataverse: { status: 500 } });
+	assert.equal(kv.size(), 1);
+
+	const unconfiguredEnv = { ...env, DATAVERSE_URL: '' };
+	const result = await worker.scheduled({}, unconfiguredEnv, {});
+
+	assert.deepEqual(result, { attempted: 0, created: 0 });
+	assert.equal(kv.size(), 1, 'the enquiry must still be waiting once the tenant is configured');
+});
+
+test('without an ENQUIRY_RETRY_KV binding, the enquiry endpoint still works as before', async () => {
+	// No ENQUIRY_RETRY_KV on this env at all — the binding has to be added to
+	// wrangler.jsonc and deployed before it exists.
+	const { status, body } = await post(VALID_DYNAMICS, CONFIGURED_ENV);
+	assert.equal(status, 200);
+	assert.deepEqual(body, { ok: true, journey: 'dynamics' });
+});
+
+/* -------------------------------------------------------------------------- */
+/* Alerting (XFO-72)                                                         */
+/* -------------------------------------------------------------------------- */
+
+test('a Dataverse failure posts to the alert webhook when one is configured', async () => {
+	const env = { ...CONFIGURED_ENV, ALERT_WEBHOOK_URL: 'https://alerts.example/webhook' };
+
+	const { calls } = await post(VALID_DYNAMICS, env, { dataverse: { status: 500 } });
+
+	const alert = calls.find((c) => c.url === 'https://alerts.example/webhook');
+	assert.ok(alert, 'expected a webhook post');
+	const payload = JSON.parse(alert.init.body);
+	assert.match(payload.text, /enquiry_dataverse_failed/);
+	assert.match(payload.text, /journey=dynamics/);
+});
+
+test('no ALERT_WEBHOOK_URL means no webhook call, same as today', async () => {
+	const { calls } = await post(VALID_DYNAMICS, CONFIGURED_ENV, { dataverse: { status: 500 } });
+	assert.equal(calls.filter((c) => c.url.startsWith('https://alerts.example')).length, 0);
+});
+
+test('a webhook that cannot be reached does not turn a reported failure into a 500', async () => {
+	const env = { ...CONFIGURED_ENV, ALERT_WEBHOOK_URL: 'https://alerts.example/unreachable' };
+
+	const { status, body } = await post(VALID_DYNAMICS, env, { dataverse: { status: 500 } });
+
+	assert.equal(status, 502);
+	assert.equal(body.error, 'crm_unavailable');
 });

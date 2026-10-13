@@ -18,12 +18,22 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const html = readFileSync(join(here, '../dist/it-support.html'), 'utf8');
+const DIST = join(here, '../dist');
+const html = readFileSync(join(DIST, 'it-support.html'), 'utf8');
+
+// The sitemap is generated at build time (XFO-93), not a file in public/ any
+// more, and @astrojs/sitemap can split it across more than one sitemap-N.xml.
+function readSitemap() {
+	return readdirSync(DIST)
+		.filter((name) => /^sitemap-\d+\.xml$/.test(name))
+		.map((name) => readFileSync(join(DIST, name), 'utf8'))
+		.join('\n');
+}
 
 /* Everything outside <main> is the shared nav and footer. Only the page's own
    content is under test. */
@@ -165,6 +175,6 @@ test('the page says it is local', () => {
 });
 
 test('the page is in the sitemap', () => {
-	const sitemap = readFileSync(join(here, '../public/sitemap.xml'), 'utf8');
+	const sitemap = readSitemap();
 	assert.match(sitemap, /xfour\.co\.uk\/it-support</, 'a local landing page that search cannot find');
 });

@@ -1,0 +1,56 @@
+---
+// Build format is `file` and trailingSlash is `never` (astro.config.mjs), so
+// /blog has to come from blog.astro, not blog/index.astro -- the latter would
+// make /blog redirect to /blog/.
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+	(a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
+);
+// `post.data.author` is a reference; the index shows the author's name, so
+// each one is resolved to the authors collection entry it points to.
+const authorNames = new Map(
+	await Promise.all(posts.map(async (post) => [post.id, (await getEntry(post.data.author)).data.name])),
+);
+
+const dateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout
+	title="Blog | XFour"
+	description="Dynamics 365, Power Platform and managed IT, written by the team who do the work."
+	navCurrent="/blog"
+>
+	<link slot="head" rel="alternate" type="application/rss+xml" title="XFour Blog" href="/blog/rss.xml">
+	<section class="clean-block clean-info dark">
+		<div class="container">
+			<div class="block-heading">
+				<h1 class="text-info">Blog</h1>
+				<p>Dynamics 365, Power Platform and managed IT, written by the team who do the work.</p>
+			</div>
+		</div>
+	</section>
+	<section class="clean-block">
+		<div class="container">
+			<div class="mx-auto" style="max-width: 50rem;">
+				{posts.length === 0 ? (
+					<p>No posts published yet.</p>
+				) : (
+					<ul class="list-unstyled">
+						{posts.map((post) => (
+							<li class="mb-5">
+								<h2 class="h4 mb-1"><a href={`/blog/${post.id}`}>{post.data.title}</a></h2>
+								<p class="text-muted mb-2">
+									<time datetime={post.data.publishDate.toISOString()}>{dateFormat.format(post.data.publishDate)}</time>
+									{' · '}{authorNames.get(post.id)}
+								</p>
+								<p>{post.data.description}</p>
+							</li>
+						))}
+					</ul>
+				)}
+			</div>
+		</div>
+	</section>
+</BaseLayout>

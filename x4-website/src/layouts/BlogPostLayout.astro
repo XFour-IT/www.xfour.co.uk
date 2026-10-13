@@ -1,0 +1,70 @@
+---
+// The layout for a single blog post, over BaseLayout rather than beside it:
+// og:type becomes 'article', and the page carries BlogPosting JSON-LD that no
+// other page on the site needs.
+import BaseLayout from './BaseLayout.astro';
+import { canonicalUrl } from '../lib/canonical';
+
+interface Author {
+	name: string;
+	jobTitle: string;
+	bio: string;
+	linkedin: string;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	author: Author;
+	publishDate: Date;
+	updatedDate?: Date;
+}
+
+const { title, description, author, publishDate, updatedDate } = Astro.props;
+
+const canonical = canonicalUrl(Astro.url, Astro.site!);
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: title,
+	description,
+	author: { '@type': 'Person', name: author.name, jobTitle: author.jobTitle, sameAs: author.linkedin },
+	datePublished: publishDate.toISOString(),
+	dateModified: (updatedDate ?? publishDate).toISOString(),
+	url: canonical,
+};
+
+const dateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout title={`${title} | XFour`} description={description} ogType="article" navCurrent="/blog">
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	<link slot="head" rel="alternate" type="application/rss+xml" title="XFour Blog" href="/blog/rss.xml">
+	<article class="clean-block">
+		<div class="container">
+			<div class="mx-auto" style="max-width: 50rem;">
+				<h1>{title}</h1>
+				<p class="text-muted">
+					By {author.name}, {author.jobTitle} · <time datetime={publishDate.toISOString()}>{dateFormat.format(publishDate)}</time>
+					{updatedDate && <> · updated <time datetime={updatedDate.toISOString()}>{dateFormat.format(updatedDate)}</time></>}
+				</p>
+				<slot />
+				<footer class="card bg-light border-0 mt-5">
+					<div class="card-body">
+						<h2 class="h6 mb-1">{author.name}</h2>
+						<p class="text-info mb-2">{author.jobTitle}</p>
+						<p>{author.bio}</p>
+						<p class="mb-0">
+							<a href={author.linkedin} rel="noopener">
+								<i class="fab fa-linkedin" aria-hidden="true"></i>
+								<span class="visually-hidden">{author.name} on LinkedIn</span>
+								LinkedIn
+							</a>
+						</p>
+					</div>
+				</footer>
+			</div>
+		</div>
+	</article>
+</BaseLayout>
