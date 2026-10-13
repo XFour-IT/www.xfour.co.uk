@@ -127,3 +127,7 @@ x4-website/.wrangler/
 # built HTML is not committed.
 x4-website/dist/
 x4-website/.astro/
+
+# Worker secrets for local development (wrangler dev). Never commit these.
+x4-website/.dev.vars
+dynamics/website-enquiries/dist/
