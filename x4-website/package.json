@@ -2,6 +2,7 @@
 	"name": "x4-website",
 	"version": "0.0.0",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"build": "astro build",
 		"dev": "astro dev",

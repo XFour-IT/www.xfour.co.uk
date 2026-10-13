@@ -1,0 +1,266 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ManagedItQuote from '../../components/ManagedItQuote.astro';
+import { terms, gbp, towns } from '../../data/managed-it';
+
+// XFO-68. The local page for Journey B: managed IT in Reading and the Thames
+// Valley, written for local search ("IT support Reading", "IT support
+// Wokingham", and so on).
+//
+// Plan section 1.1a rule 6: Journey B is local, Journey A is national. Local
+// search terms, town names and the LocalBusiness data below belong to this
+// journey only. Nothing on /dynamics-365 or /app-development links here or
+// borrows this copy, and test/thames-valley.test.mjs fails the build if one
+// starts to.
+//
+// /it-support is the offer; this page is the area. It answers the local
+// questions -- do you come to us, where are you, do you charge for travel, how
+// far out do you go -- and sends the visitor back to the offer for the detail.
+// The two are written to rank for different questions so that they do not
+// compete for the same one.
+//
+// Nothing here is invented to look local. There are no client names, because
+// none have agreed to be named yet (XFO-3, Phase 2), and no "trusted by 100
+// Berkshire businesses", because nobody has counted. The registered office at
+// Winnersh Triangle is the one on Companies House; the Reading address is the
+// postal one on /contact-us.
+
+const townList = `${towns.slice(0, -1).join(', ')} and ${towns.at(-1)}`;
+
+// Structured data for search engines: who we are, where we work, when we
+// answer. The address is the published postal address from /contact-us. It is
+// mail only, which is why the page tells people to ring first.
+const localBusiness = {
+	'@context': 'https://schema.org',
+	'@type': 'ProfessionalService',
+	name: 'XFour',
+	description: 'Managed IT support for small businesses in Reading and the Thames Valley.',
+	url: 'https://www.xfour.co.uk/it-support/thames-valley',
+	telephone: '+44 118 370 2920',
+	email: 'support@xfour.co.uk',
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: '4b Paddock Road',
+		addressLocality: 'Reading',
+		postalCode: 'RG4 5BY',
+		addressCountry: 'GB',
+	},
+	areaServed: towns.map((name) => ({ '@type': 'City', name })),
+	openingHoursSpecification: {
+		'@type': 'OpeningHoursSpecification',
+		dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+		opens: '08:00',
+		closes: '18:00',
+	},
+};
+
+/** Real questions a local buyer asks before they ask for a price. */
+const questions = [
+	{
+		q: 'Will somebody come to our office?',
+		a: `Yes, when a problem cannot be fixed remotely. Most problems can, and are fixed in minutes without anyone getting in a car. When one cannot, an engineer drives to you, in cover hours: ${terms.coverHours}.`,
+	},
+	{
+		q: 'Do you charge for travel or call-outs?',
+		a: 'No, not in the towns on this page. On-site visits are part of the monthly price.',
+	},
+	{
+		q: 'Can we visit you?',
+		a: 'Our Reading address is for post only, so please ring first. In practice we come to you. That is the point of using somebody local.',
+	},
+	{
+		q: 'We are outside the towns on this list. Can you still help?',
+		a: 'Possibly. Tell us where you are when you ask for a price, and we will tell you honestly whether we can get to you when it matters. We would rather say no now than be slow later.',
+	},
+	{
+		q: 'What does it cost?',
+		a: `${gbp(terms.pricePerUser)} per user, per month, + VAT, with your Microsoft 365 licence inside it, and ${gbp(terms.pricePerSite)} per office, per month, + VAT. The same price in every town on this page.`,
+	},
+];
+---
+
+<BaseLayout
+	title="IT Support in Reading, Wokingham, Bracknell & the Thames Valley | XFour"
+	description={`Local IT support for small businesses in Reading, Wokingham, Bracknell, Newbury, Maidenhead and across the Thames Valley. Engineers based in Reading, on-site visits included, from ${gbp(terms.pricePerUser)} per user per month.`}
+	ogTitle="IT support in Reading and the Thames Valley | XFour"
+>
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(localBusiness)} />
+
+	<section class="clean-block clean-hero tv-hero">
+		<div class="text">
+			<h1 class="h2">IT support in Reading and across the Thames Valley</h1>
+			<p class="mb-0">
+				XFour is based in Reading. We run the IT for small businesses with 5 to 50 staff in
+				{townList} — and when something cannot be fixed down the wire, we drive to you.
+			</p>
+		</div>
+	</section>
+
+	<!-- ===================== Where we go ===================== -->
+	<section class="clean-block" aria-labelledby="area-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="area-heading" class="text-info">The towns we cover</h2>
+				<p>
+					On-site visits are part of the monthly price in every one of these. There is no
+					call-out charge and no mileage on the invoice.
+				</p>
+			</div>
+			<ul class="town-list">
+				{towns.map((town) => (
+					<li><i class="fas fa-map-marker-alt" aria-hidden="true"></i> IT support in {town}</li>
+				))}
+			</ul>
+			<p class="text-center area-note mb-0">
+				Further out? Ask. If we cannot reach you quickly when it matters, we will say so before you
+				sign.
+			</p>
+		</div>
+	</section>
+
+	<!-- ===================== Why local ===================== -->
+	<section class="clean-block dark" aria-labelledby="local-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="local-heading" class="text-info">Why a local IT company</h2>
+			</div>
+			<div class="prose">
+				<p>
+					Most IT problems are fixed remotely, wherever your provider is. Being local matters
+					for the rest: the failed switch in the comms cupboard, the Wi-Fi that drops in one
+					room, the laptop that will not start at all. A national help desk sends a courier or
+					a stranger. We send the engineer who already knows your setup.
+				</p>
+				<p>
+					You get one named engineer, and they learn your business: your office, your
+					suppliers and your people. That is the part a national help desk cannot sell you at
+					any price.
+				</p>
+				<p class="mb-0">
+					XFour is a Reading company. Our registered office is at Winnersh Triangle,
+					Wokingham, and our postal address is in Reading. <a href="/about-us">Who we are</a>.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== The offer, in short ===================== -->
+	<section class="clean-block" aria-labelledby="offer-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="offer-heading" class="text-info">What you get, in short</h2>
+			</div>
+			<div class="prose">
+				<ul class="offer-list">
+					<li>Unlimited support by phone, email or chat, {terms.coverHours}</li>
+					<li>Response within 1 working hour when the business has stopped</li>
+					<li>Every computer and phone monitored, patched and protected</li>
+					<li>Microsoft 365 run for you, with the licence in the price</li>
+					<li>Backups, checked every month by restoring one</li>
+					<li>Your broadband, firewall and Wi-Fi looked after</li>
+				</ul>
+				<p class="mb-0">
+					<strong>{gbp(terms.pricePerUser)} per user and {gbp(terms.pricePerSite)} per office, per
+					month, + VAT.</strong> The full offer, response times and price are on
+					<a href="/it-support">the managed IT page</a>. Every item, with where each one stops,
+					is on <a href="/it-support/whats-included">what is included</a>.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== Questions ===================== -->
+	<section class="clean-block dark" aria-labelledby="faq-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="faq-heading" class="text-info">Questions local businesses ask us</h2>
+			</div>
+			<div class="prose">
+				<dl class="faq">
+					{questions.map((item) => (
+						<>
+							<dt>{item.q}</dt>
+							<dd>{item.a}</dd>
+						</>
+					))}
+				</dl>
+			</div>
+		</div>
+	</section>
+
+	<ManagedItQuote />
+</BaseLayout>
+
+<style>
+	/* Flat brand navy, matching /it-support. */
+	.tv-hero {
+		color: #082044;
+		background-color: #082044;
+	}
+
+	.tv-hero .text {
+		max-width: 44rem;
+	}
+
+	.block-heading p {
+		max-width: 680px;
+	}
+
+	.prose {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.prose p,
+	.prose li,
+	.prose dd {
+		line-height: 1.7;
+	}
+
+	.town-list {
+		list-style: none;
+		padding: 0;
+		margin: 0 auto 1.5rem;
+		max-width: 760px;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+		gap: 0.75rem 1.5rem;
+	}
+
+	.town-list li {
+		font-weight: 600;
+	}
+
+	.town-list .fas {
+		/* 7.2:1 on white. */
+		color: #15479c;
+		margin-right: 0.4rem;
+	}
+
+	.area-note {
+		max-width: 680px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.offer-list li {
+		margin-bottom: 0.4rem;
+	}
+
+	.offer-list {
+		margin-bottom: 1.5rem;
+	}
+
+	.faq dt {
+		font-weight: 700;
+		margin-top: 1.25rem;
+	}
+
+	.faq dt:first-child {
+		margin-top: 0;
+	}
+
+	.faq dd {
+		margin-bottom: 0;
+	}
+</style>

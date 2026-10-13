@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ManagedItQuote from '../../components/ManagedItQuote.astro';
+import { terms, gbp, covered, notCovered } from '../../data/managed-it';
+
+// XFO-68. What is included in managed IT, item by item, with where each item
+// stops. Journey B, plan section 1.3: "the plain list, with the boundaries
+// stated".
+//
+// The landing page (/it-support) already lists what is covered, in one line
+// per item. This page is for the buyer one step further on: the one holding
+// three providers' lists side by side, or the one about to sign, who wants to
+// know what "unlimited support" actually means before it matters. So every
+// item carries its limit next to it -- not in a footnote, not behind a link.
+//
+// Ben's instruction on the task: "State the limits also. Do not hide the
+// limits." That is why the limit is a required field in the data and not an
+// optional one, and why a test fails if any item here has none.
+//
+// Nothing on this page is written here. The items, the limits, the exclusions
+// and the terms all come from src/data/managed-it.ts, which the landing page
+// reads too, so the two pages cannot disagree about what a client pays for.
+
+const itemCount = covered.reduce((count, group) => count + group.items.length, 0);
+
+/** The contract in plain lines. Each is a term Ben confirmed on XFO-67. */
+const contractTerms = [
+	`${gbp(terms.pricePerUser)} per user, per month, + VAT, with the Microsoft 365 Business Premium licence inside it.`,
+	`${gbp(terms.pricePerUserOwnLicences)} per user, per month, + VAT, if you already buy your own Microsoft licences.`,
+	`${gbp(terms.pricePerSite)} per office, per month, + VAT. One site fee per office, however many people sit in it.`,
+	`Minimum ${terms.minimumUsers} users.`,
+	'No set-up fee.',
+	`The first term is ${terms.minimumTerm}. After that it is rolling, with ${terms.noticePeriod} of notice on either side.`,
+	`Cover hours are ${terms.coverHours}, excluding ${terms.coverExcludes}. Out-of-hours and weekend cover is available and is priced on your quote.`,
+];
+---
+
+<BaseLayout
+	title="What Is Included in Our Managed IT Support | XFour"
+	description={`Everything inside XFour's managed IT support for small businesses in Reading and the Thames Valley, item by item, with where each item stops. ${gbp(terms.pricePerUser)} per user per month + VAT.`}
+	ogTitle="What is included in XFour managed IT support"
+>
+	<section class="clean-block clean-hero included-hero">
+		<div class="text">
+			<h1 class="h2">What is included, and where it stops</h1>
+			<p class="mb-0">
+				Everything our managed IT support covers, in {itemCount} plain lines. Next to each
+				one is its limit. You should not have to find out what "unlimited" means after you
+				have signed.
+			</p>
+		</div>
+	</section>
+
+	<section class="clean-block py-4 included-jump">
+		<div class="container">
+			<nav aria-label="On this page">
+				<ul class="jump-list">
+					{covered.map((group, index) => (
+						<li><a href={`#group-${index}`}>{group.title}</a></li>
+					))}
+					<li><a href="#excluded-heading">Not included</a></li>
+					<li><a href="#terms-heading">The contract</a></li>
+				</ul>
+			</nav>
+		</div>
+	</section>
+
+	<!-- ===================== Included, with limits ===================== -->
+	<section class="clean-block" aria-labelledby="included-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="included-heading" class="text-info">Included in the price</h2>
+				<p>
+					All of this is inside {gbp(terms.pricePerUser)} per user and {gbp(terms.pricePerSite)}
+					per office, per month, + VAT. Nothing here is an upgrade or an add-on.
+				</p>
+			</div>
+			<div class="prose">
+				{covered.map((group, index) => (
+					<div class="included-group" id={`group-${index}`}>
+						<h3 class="h4">
+							<i class:list={[group.icon, 'icon']} aria-hidden="true"></i>
+							{group.title}
+						</h3>
+						<ul class="included-list">
+							{group.items.map((item) => (
+								<li>
+									<span class="included-item">{item.text}</span>
+									<span class="included-limit"><strong>Where it stops:</strong> {item.limit}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== Not included ===================== -->
+	<section class="clean-block dark" aria-labelledby="excluded-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="excluded-heading" class="text-info">Not included</h2>
+				<p>
+					These are not in the monthly price. Most of them we can still do for you, and we tell
+					you the cost before we start.
+				</p>
+			</div>
+			<div class="prose">
+				<ul class="not-covered">
+					{notCovered.map((item) => <li>{item}</li>)}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===================== The contract ===================== -->
+	<section class="clean-block" aria-labelledby="terms-heading">
+		<div class="container">
+			<div class="block-heading">
+				<h2 id="terms-heading" class="text-info">The contract</h2>
+				<p>The terms, in full. There is no second list.</p>
+			</div>
+			<div class="prose">
+				<ul class="contract-terms">
+					{contractTerms.map((line) => <li>{line}</li>)}
+				</ul>
+				<p class="mb-0">
+					Response times, and what each priority means, are on
+					<a href="/it-support#response-heading">the managed IT page</a>. We cover
+					<a href="/it-support/thames-valley">Reading and the Thames Valley</a>.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<ManagedItQuote />
+</BaseLayout>
+
+<style>
+	/* Flat brand navy, matching /it-support. .clean-block.clean-hero:before paints
+	   currentColor over the band, so both are set and the hero costs no image. */
+	.included-hero {
+		color: #082044;
+		background-color: #082044;
+	}
+
+	.included-hero .text {
+		max-width: 44rem;
+	}
+
+	.block-heading p {
+		max-width: 680px;
+	}
+
+	.prose {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.prose p,
+	.prose li {
+		line-height: 1.7;
+	}
+
+	.included-jump {
+		border-bottom: 1px solid rgba(8, 32, 68, 0.12);
+	}
+
+	.jump-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5rem 1.5rem;
+	}
+
+	.included-group {
+		margin-bottom: 2.5rem;
+		/* Clear the sticky navigation when a jump link lands here. */
+		scroll-margin-top: 6rem;
+	}
+
+	.included-group:last-child {
+		margin-bottom: 0;
+	}
+
+	.included-group .icon {
+		/* 7.2:1 on white. */
+		color: #15479c;
+		margin-right: 0.5rem;
+	}
+
+	.included-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.included-list li {
+		padding: 0.9rem 0;
+		border-bottom: 1px solid rgba(8, 32, 68, 0.12);
+	}
+
+	.included-item {
+		display: block;
+		font-weight: 600;
+	}
+
+	/* The limit is the point of the page, so it is not small print: same size
+	   as the item, full contrast, only the weight differs. */
+	.included-limit {
+		display: block;
+	}
+
+	.not-covered li,
+	.contract-terms li {
+		margin-bottom: 0.6rem;
+	}
+
+	#excluded-heading,
+	#terms-heading {
+		scroll-margin-top: 6rem;
+	}
+</style>

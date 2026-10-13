@@ -6,6 +6,8 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "x4-website",
 	"compatibility_date": "2025-05-06",
+	// The enquiry form endpoint (/api/*). Everything else is static.
+	"main": "./src/index.js",
 	// Astro writes the site to ./dist. `wrangler deploy` runs the build itself
 	// (see "build" below), so the Cloudflare Workers Builds command does not
 	// have to change: `npm ci` then `npx wrangler deploy` still does the whole
@@ -19,39 +21,49 @@
 		// bare 404 and the custom page is dead weight. (The old .htaccess tried
 		// to do this, but Workers does not read .htaccess.)
 		"not_found_handling": "404-page",
-		"html_handling": "auto-trailing-slash"
+		"html_handling": "auto-trailing-slash",
+		"binding": "ASSETS",
+		// Without this, a request that matches no asset is answered with 404.html
+		// and never reaches the Worker — so POST /api/enquiry would 404. Only
+		// /api/* goes to the Worker; every page and asset is served straight from
+		// the asset server, as before.
+		"run_worker_first": ["/api/*"]
 	},
 	"observability": {
 		"enabled": true
+	},
+	/**
+	 * Enquiry form configuration — see docs/lead-forms.md.
+	 *
+	 * These are not secrets, so they live here in the repo. The two real secrets
+	 * (ENTRA_CLIENT_SECRET and TURNSTILE_SECRET_KEY) are set with
+	 * `wrangler secret put` and must never be written into this file.
+	 *
+	 * While DATAVERSE_URL, ENTRA_TENANT_ID, ENTRA_CLIENT_ID or the client secret
+	 * are blank, POST /api/enquiry answers 503 instead of silently losing a lead.
+	 */
+	"vars": {
+		// The XFour production environment. No trailing slash.
+		"DATAVERSE_URL": "https://xfour.crm11.dynamics.com",
+		"ENTRA_TENANT_ID": "86492a79-a8af-44ee-a575-462f841e0ad5",
+		// App registration "XFour website enquiry forms".
+		"ENTRA_CLIENT_ID": "f100b65e-b13e-4e54-9749-bdc34a629d83",
+		// Site key of the "xfour.co.uk enquiry forms" Turnstile widget. Public by
+		// design; the matching secret key is a Worker secret.
+		"TURNSTILE_SITE_KEY": "0x4AAAAAAFT_mDl3N3uC7M63",
+		// Integer values of the two new Lead Source option set entries.
+		// "Web — Dynamics 365" and "Web — Managed IT".
+		"LEAD_SOURCE_DYNAMICS": "828640001",
+		"LEAD_SOURCE_MANAGED_IT": "828640002"
+		// No owner here. The Power Automate flow in dynamics/website-enquiries
+		// gives each Lead to its journey's owner, so the app user never needs
+		// Read on Leads it does not own. See docs/lead-forms.md.
 	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
 	// "placement": { "mode": "smart" },
-
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
 
 	/**
 	 * Service Bindings (communicate between multiple Workers)

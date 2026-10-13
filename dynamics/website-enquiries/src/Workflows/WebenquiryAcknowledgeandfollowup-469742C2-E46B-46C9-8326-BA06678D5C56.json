@@ -1,0 +1,240 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "xfw_websiteenquiries_dataverse"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "xfw_websiteenquiries_outlook"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "When_the_website_creates_a_Lead": {
+          "type": "OpenApiConnectionWebhook",
+          "description": "Only the two web Lead Source values (Web - Dynamics 365, Web - Managed IT). They must match LEAD_SOURCE_* in x4-website/wrangler.jsonc.",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "SubscribeWebhookTrigger",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "subscriptionRequest/message": 1,
+              "subscriptionRequest/entityname": "lead",
+              "subscriptionRequest/scope": 4,
+              "subscriptionRequest/filterexpression": "leadsourcecode eq 828640001 or leadsourcecode eq 828640002"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Owner_for_this_journey": {
+          "runAfter": {},
+          "type": "Compose",
+          "description": "systemuser GUID of the owner for each journey. Ben owns both (11 Oct 2026); to split the journeys, change one GUID. The website does not set the owner, because that would need its app user to have Read on every Lead.",
+          "inputs": "@if(equals(triggerOutputs()?['body/leadsourcecode'], 828640001), 'bd166bb6-921f-ef11-840b-002248425de8', 'bd166bb6-921f-ef11-840b-002248425de8')"
+        },
+        "Give_the_Lead_to_its_owner": {
+          "runAfter": {
+            "Owner_for_this_journey": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "description": "The website creates the Lead owned by its own app user. This hands it to the journey's owner, so it shows in their My Leads and the app user can no longer read it.",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "operationId": "UpdateRecord"
+            },
+            "parameters": {
+              "entityName": "leads",
+              "recordId": "@triggerOutputs()?['body/leadid']",
+              "item/ownerid@odata.bind": "/systemusers(@{outputs('Owner_for_this_journey')})"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Due_one_working_day_later": {
+          "runAfter": {},
+          "type": "Compose",
+          "description": "Friday +3 days, Saturday +2, any other day +1, judged on UK time. Bank holidays are not skipped.",
+          "inputs": "@addDays(triggerOutputs()?['body/createdon'], if(equals(dayOfWeek(convertFromUtc(triggerOutputs()?['body/createdon'], 'GMT Standard Time')), 5), 3, if(equals(dayOfWeek(convertFromUtc(triggerOutputs()?['body/createdon'], 'GMT Standard Time')), 6), 2, 1)))"
+        },
+        "Create_the_follow-up_task": {
+          "runAfter": {
+            "Due_one_working_day_later": [
+              "Succeeded"
+            ],
+            "Owner_for_this_journey": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "CreateRecord",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "tasks",
+              "item/subject": "Reply to web enquiry: @{triggerOutputs()?['body/subject']}",
+              "item/description": "This came in through the website form. The form told them we would reply within one working day.\n\n@{triggerOutputs()?['body/description']}",
+              "item/scheduledend": "@outputs('Due_one_working_day_later')",
+              "item/prioritycode": 2,
+              "item/regardingobjectid_lead_task@odata.bind": "/leads(@{triggerOutputs()?['body/leadid']})",
+              "item/ownerid_task@odata.bind": "/systemusers(@{outputs('Owner_for_this_journey')})"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_the_acknowledgement": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "description": "Runs alongside the task, so a failed task never holds up the email. Fixed text on purpose: nothing the visitor typed goes into this email, so the form cannot be used to send somebody else a message from hello@.",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SharedMailboxSendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/MailboxAddress": "hello@xfour.co.uk",
+              "emailMessage/To": "@triggerOutputs()?['body/emailaddress1']",
+              "emailMessage/Subject": "We have your enquiry - XFour",
+              "emailMessage/Body": "<p>Hello,</p>\n<p>Thank you for getting in touch with XFour. This email confirms that we have your enquiry.</p>\n<p>One of us will come back to you within one working day. If it is urgent, call us on 0118 370 2920.</p>\n<p>If you did not send us an enquiry, you can ignore this email. We will not contact you again.</p>\n<p>XFour<br>\nhello@xfour.co.uk | 0118 370 2920<br>\n<a href=\"https://www.xfour.co.uk\">www.xfour.co.uk</a></p>",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Flag_the_task_if_the_email_failed": {
+          "runAfter": {
+            "Send_the_acknowledgement": [
+              "Failed",
+              "TimedOut"
+            ],
+            "Create_the_follow-up_task": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "UpdateRecord",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "tasks",
+              "recordId": "@outputs('Create_the_follow-up_task')?['body/activityid']",
+              "item/subject": "NO ACKNOWLEDGEMENT SENT - reply by hand: @{triggerOutputs()?['body/subject']}",
+              "item/prioritycode": 2
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Mark_the_run_as_failed": {
+          "runAfter": {
+            "Flag_the_task_if_the_email_failed": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "Terminate",
+          "description": "Without this the run would show as succeeded after a failed email, and nobody would be told.",
+          "inputs": {
+            "runStatus": "Failed",
+            "runError": {
+              "code": "AcknowledgementNotSent",
+              "message": "The acknowledgement email to the new web Lead failed. Reply to them by hand."
+            }
+          }
+        },
+        "Mark_the_run_as_failed_if_no_task": {
+          "runAfter": {
+            "Create_the_follow-up_task": [
+              "Failed",
+              "TimedOut"
+            ],
+            "Send_the_acknowledgement": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "Terminate",
+          "description": "Waits for the email too, because Terminate would cancel a send still in progress. So a missing task always shows as a failed run.",
+          "inputs": {
+            "runStatus": "Failed",
+            "runError": {
+              "code": "FollowUpTaskNotCreated",
+              "message": "The follow-up task for the new web Lead was not created. Create it by hand."
+            }
+          }
+        },
+        "Mark_the_run_as_failed_if_not_assigned": {
+          "runAfter": {
+            "Give_the_Lead_to_its_owner": [
+              "Failed",
+              "TimedOut"
+            ],
+            "Send_the_acknowledgement": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ],
+            "Create_the_follow-up_task": [
+              "Succeeded",
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "Terminate",
+          "description": "Waits for the email and the task, because Terminate would cancel them. The Lead is still in Dynamics, owned by the website's app user; assign it by hand.",
+          "inputs": {
+            "runStatus": "Failed",
+            "runError": {
+              "code": "LeadNotAssigned",
+              "message": "The new web Lead could not be given to its owner. It is in Dynamics under the website's app user. Assign it by hand."
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

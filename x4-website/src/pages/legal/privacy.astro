@@ -1,5 +1,24 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// Internal notes for whoever edits this file next live here, in the
+// frontmatter, because frontmatter never reaches the browser. An HTML comment
+// ships in the page source, where any visitor can read it (XFO-96).
+//
+// How long we keep it. The periods for our own systems were confirmed by the
+// business on 11 October 2026 (XFO-47): 24 months from last contact for
+// non-customer enquiries and chats, 6 years after the work ends for customer
+// records. If either changes, the data protection addendum given to customers
+// has to change with it, or the two documents contradict each other.
+//
+// Website measurement is stated as a criterion rather than a number on
+// purpose. A fixed period would be a promise about a PostHog retention setting
+// we have not verified we can control on our plan, and a policy that names a
+// period we do not enforce is worse than one that names a criterion we do.
+//
+// Section 3, the enquiry forms, came with XFO-46. The forms add no new
+// processor: the Lead lands in the same Dynamics 365 system as the chat, and
+// the spam check is Cloudflare, who already host the site.
 ---
 
 <BaseLayout
@@ -33,8 +52,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     responsible.</p>
 
                 <h2 class="h4 mt-5">What this policy covers</h2>
-                <p>This policy covers <strong>www.xfour.co.uk</strong>: the live chat, our contact details, the booking link,
-                    and the measurement we run on the site.</p>
+                <p>This policy covers <strong>www.xfour.co.uk</strong>: the live chat, the enquiry forms, our contact details,
+                    the booking link, and the measurement we run on the site.</p>
                 <p>Two things it does not cover:</p>
                 <ul>
                     <li><strong>If you become a customer</strong>, your agreement with us includes a data protection addendum
@@ -69,10 +88,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     business, and <em>steps taken at your request before entering a contract</em> where you are asking us to
                     quote or to work for you.</p>
 
-                <h3 class="h5 mt-4">3. Measuring how the website is used</h3>
+                <h3 class="h5 mt-4">3. If you send one of our enquiry forms</h3>
+                <p><strong>What:</strong> your name, your company, your work email address and your answers about what you
+                    need — what you run today and what is not working, or how many users and devices you have, who looks
+                    after them and the cover you want.</p>
+                <p><strong>Why:</strong> to reply to you, to follow the enquiry up, and to keep a record of what you asked
+                    for. We do not add you to a marketing list.</p>
+                <p><strong>Lawful basis:</strong> <em>legitimate interests</em> in responding to an enquiry about our
+                    business, and <em>steps taken at your request before entering a contract</em> where you are asking us to
+                    quote or to work for you.</p>
+                <p><strong>Where it goes:</strong> straight into our own Dynamics 365 system as a sales enquiry, the same
+                    place as the live chat. To stop automated spam, the forms use Cloudflare Turnstile, which checks your
+                    network address and some details of your browser to tell a person from a bot. It does not track you
+                    across other websites and sets no advertising cookies.</p>
+
+                <h3 class="h5 mt-4">4. Measuring how the website is used</h3>
                 <p><strong>What:</strong> which pages were opened, in what order, where you arrived from, your approximate
                     location from your network address, your device and browser type, and clicks on our phone, email and
-                    booking links. We do not record your screen, we do not run surveys, and we do not build a profile of you.</p>
+                    booking links, and whether an enquiry form was sent — never what was typed into it. We do not record your screen, we do not run surveys, and we do not build a profile of you.</p>
                 <p><strong>Why:</strong> so we can tell which pages bring in work and which do not, and spend our effort on
                     the ones that do.</p>
                 <p><strong>Lawful basis:</strong> <em>legitimate interests</em> in understanding and improving our own
@@ -83,7 +116,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     footer of any page, and we stop.</p>
                 <p>Full detail of each tool is in our <a href="/legal/cookies">cookie policy</a>.</p>
 
-                <h3 class="h5 mt-4">4. Keeping the site available and secure</h3>
+                <h3 class="h5 mt-4">5. Keeping the site available and secure</h3>
                 <p><strong>What:</strong> your network address, your browser type and the requests your browser makes, as
                     processed by Cloudflare, who host and protect this site.</p>
                 <p><strong>Why:</strong> to serve the site, to block attacks and automated abuse, and to see whether pages
@@ -92,7 +125,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     it from attack. The cookie Cloudflare's security check uses is strictly necessary, so it does not need
                     your consent.</p>
 
-                <h3 class="h5 mt-4">5. Remembering your cookie choice</h3>
+                <h3 class="h5 mt-4">6. Remembering your cookie choice</h3>
                 <p><strong>What:</strong> one cookie recording your answer and the date you gave it. No name, no address, no
                     identifier for you.</p>
                 <p><strong>Lawful basis:</strong> this is strictly necessary to do the thing you asked us to do, which is to
@@ -135,7 +168,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                             </tr>
                             <tr>
                                 <td>Cloudflare</td>
-                                <td>Hosts and protects the website, and reports page performance</td>
+                                <td>Hosts and protects the website, reports page performance, and runs the spam check on the enquiry
+                                    forms</td>
                                 <td>Global network, including the United Kingdom</td>
                             </tr>
                         </tbody>
@@ -154,13 +188,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     together with the supplier's own technical safeguards.</p>
 
                 <h2 class="h4 mt-5">How long we keep it</h2>
-                <!--
-                    The periods below for our own systems were confirmed by the business on
-                    11 October 2026 (XFO-47): 24 months from last contact for non-customer
-                    enquiries and chats, 6 years after the work ends for customer records.
-                    If either changes, the data protection addendum given to customers has to
-                    change with it, or the two documents contradict each other.
-                -->
                 <div class="x4-cookie-table-wrap">
                     <table class="x4-cookie-table">
                         <caption class="visually-hidden">How long XFour keeps each kind of information</caption>
@@ -173,7 +200,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Live chat conversations and enquiries from people who do not become customers</td>
+                                <td>Live chat conversations, enquiry forms and other enquiries from people who do not become
+                                    customers</td>
                                 <td>24 months from your last contact with us, then deleted</td>
                                 <td>Long enough to pick up a conversation that goes quiet and comes back, and to show what we
                                     were asked and what we said</td>
@@ -186,13 +214,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                             </tr>
                             <tr>
                                 <td>Website measurement</td>
-                                <!--
-                                    Stated as a criterion rather than a number on purpose. A fixed
-                                    period here would be a promise about a PostHog retention
-                                    setting we have not verified we can control on our plan, and a
-                                    policy that names a period we do not enforce is worse than one
-                                    that names a criterion we do.
-                                -->
                                 <td>The daily identifier cannot be linked to you after the day it was made. The event records
                                     behind it are reviewed every 12 months and deleted once they are no longer useful</td>
                                 <td>To compare one year with the next, and no longer</td>
@@ -257,7 +278,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     takes effect. If the change is significant, and especially if it needs your consent, we will ask you again
                     rather than rely on an old answer.</p>
 
-                <p class="text-muted mt-5"><small>Last updated 11 October 2026. This policy replaces our previous one-page
+                <p class="text-muted mt-5"><small>Last updated 12 October 2026. This policy replaces our previous one-page
                     policy of 7 October 2026.</small></p>
             </article>
         </div>
