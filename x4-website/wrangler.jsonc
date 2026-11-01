@@ -33,6 +33,27 @@
 		"enabled": true
 	},
 	/**
+	 * Holds a validated enquiry from the moment it is written, just before the
+	 * Dataverse call, until its Lead exists (XFO-72). See docs/lead-forms.md.
+	 * The namespace (`x4-website-enquiry-retry`, free tier) already exists in
+	 * the XFour IT Limited account.
+	 */
+	"kv_namespaces": [
+		{
+			"binding": "ENQUIRY_RETRY_KV",
+			"id": "34fec4e160ab4c4093e63bfc6f9541ca"
+		}
+	],
+	/**
+	 * Retries whatever is still in ENQUIRY_RETRY_KV. Every 10 minutes is often
+	 * enough that an outage clears within one lead's working day, and rare
+	 * enough that a long outage does not spend the Dataverse rate limit on
+	 * retries instead of real traffic.
+	 */
+	"triggers": {
+		"crons": ["*/10 * * * *"]
+	},
+	/**
 	 * Enquiry form configuration — see docs/lead-forms.md.
 	 *
 	 * These are not secrets, so they live here in the repo. The two real secrets

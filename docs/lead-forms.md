@@ -467,17 +467,65 @@ Once configured, the acceptance test from the plan is:
 5. The analytics event fires once per submit with the right `journey`.
 
 Worker logs are in the Cloudflare dashboard (observability is on). Useful lines:
-`enquiry_lead_created`, `enquiry_dataverse_failed`, `enquiry_turnstile_rejected`,
-`enquiry_honeypot_tripped`, `enquiry_not_configured`.
+`enquiry_lead_created`, `enquiry_dataverse_failed`, `enquiry_lead_created_on_retry`,
+`enquiry_turnstile_rejected`, `enquiry_honeypot_tripped`, `enquiry_not_configured`,
+`enquiry_alert_failed`.
+
+---
+
+## If a Dataverse write fails: the retry (XFO-72)
+
+The visitor still sees today's "call us instead" message — this is about not
+losing the enquiry behind the scenes, not about changing what they are told.
+
+Before the Dataverse call, the validated submission is written to the
+`ENQUIRY_RETRY_KV` namespace (`x4-website-enquiry-retry`, already created in
+the XFour IT Limited account and bound in `wrangler.jsonc`). If the inline
+create fails, the record stays there; a Cron Trigger (`*/10 * * * *`, also in
+`wrangler.jsonc`) retries everything still in it. An entry is deleted the
+moment its Lead exists, in the inline attempt or in a retry, so a redelivered
+or repeated retry run never creates the same Lead twice — see
+`test/enquiry.test.mjs` ("the scheduled retry creates the Lead that the inline
+attempt lost, and exactly one").
+
+A still-failing retry keeps the record and counts the attempt; nothing is ever
+dropped from `ENQUIRY_RETRY_KV` on a failure, only on success. If
+`DATAVERSE_URL` (or the rest of the tenant config) is blank, the retry does
+nothing that tick rather than spending calls against a tenant that is not set
+up yet — same reasoning as the endpoint's own 503.
+
+### Alerting on a stuck enquiry
+
+`enquiry_dataverse_failed` was always logged; it is easy to miss in the
+Cloudflare dashboard, which is the thing XFO-72 exists to fix. Set the
+`ALERT_WEBHOOK_URL` secret to a Slack or Microsoft Teams incoming webhook URL
+(either is free and already in use at XFour) and the Worker posts
+`{ "text": "enquiry_dataverse_failed: ..." }` to it on every failed create,
+inline or retried:
+
+```bash
+cd x4-website
+npx wrangler secret put ALERT_WEBHOOK_URL
+```
+
+It is a secret, not a `vars` entry, because anyone holding the URL can post to
+that channel. Leaving it unset is safe — the Worker only logs, exactly as
+before — so the retry and the KV write-ahead work whether or not this is set
+up; this one step is the only thing standing between "a customer tells us" and
+"we already knew".
+
+A failed alert post (the webhook URL is wrong, or unreachable) is itself only
+logged (`enquiry_alert_failed`) and never turns a reported Dataverse failure
+into a 500 for the visitor.
 
 ---
 
 ## Known limits, worth a follow-up
 
-- **A failed Dataverse write loses the enquiry.** The visitor is told to call or
-  email, and the failure is logged, but nothing holds the submission for a retry.
-  A Queue or a KV write before the Dataverse call would fix this. Not Phase 0.
 - **No rate limit beyond Turnstile.** If junk ever gets through, add a Cloudflare
   rate limiting rule on `/api/enquiry` rather than writing counting code.
 - **The Bookings link is shared** with `/app-development`, so a Dynamics scoping
   call and an app build review land in the same calendar.
+- **A retry that keeps failing retries forever**, every 10 minutes, with no
+  backoff and no cap. Fine at this volume; revisit if `ENQUIRY_RETRY_KV` is
+  ever holding enough entries that this shows up on the Dataverse side.

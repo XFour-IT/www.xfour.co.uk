@@ -5,17 +5,25 @@
 //
 // It is a component, not a block on each page, because there are three
 // Journey B pages and one quote ask (XFO-68). Copied three times, the three
-// would drift -- and XFO-78 would have three places to swap instead of one.
+// would drift.
 //
-// XFO-46 builds the form itself. Its managed IT journey asks for four facts
-// beyond name, company and email -- users, devices, current provider and cover
-// needed. This block asks for a fifth: the number of offices. That is not
-// padding. The price has a per-site fee in it, so a quote cannot be worked out
-// from a headcount alone, and XFO-78 -- the issue that swaps this block for
-// the real form -- has to add that field or the form collects a number we
-// cannot quote from. When it lands, the <div class="quote-ask"> below is
-// replaced by its <form data-enquiry-form> with journey "managed-it", and
-// nothing else on any of the three pages changes.
+// It is the managed IT enquiry form from XFO-46 (XFO-78). It posts to
+// POST /api/enquiry with journey "managed-it", which creates a Lead in
+// Dynamics 365, and public/assets/js/enquiry-form.js drives it. The fields
+// match the managed IT form on /contact-us. Change one, change both: the
+// Worker refuses a post that is missing a required field.
+//
+// Five answers beyond name, company and email. The number of offices is not
+// padding. The price has a per-site fee in it (XFO-67), so a quote cannot be
+// worked out from a headcount alone.
+//
+// The form needs JavaScript, because Turnstile does. The <noscript> block and
+// the line under the form give the phone number and the email address, so this
+// buyer never hits a dead end. Buyers get hello@; support@ is for customers
+// raising a ticket (XFO-46).
+//
+// data-form-name is the same as on /contact-us, so the analytics funnel counts
+// both. The page URL on the event tells them apart.
 ---
 
 <section class="clean-block clean-form" id="quote" aria-labelledby="quote-heading">
@@ -25,21 +33,111 @@
 			<p>You get a figure, not a sales process. If we are not the right fit we will say so.</p>
 		</div>
 		<div class="quote-ask">
-			<p>Send us these five things and we will come back with a monthly price:</p>
-			<ol>
-				<li>How many people need support</li>
-				<li>How many offices they sit in</li>
-				<li>How many computers, laptops and servers you have</li>
-				<li>Who looks after your IT today, if anyone</li>
-				<li>The hours you need covered</li>
-			</ol>
-			<p class="mb-0">
-				Email <a href="mailto:support@xfour.co.uk">support@xfour.co.uk</a> or call
-				<a href="tel:+441183702920">0118 370 2920</a> and ask for a managed IT quote.
+			<p>Give us these five answers and we will come back with a monthly price, not a meeting request.</p>
+			<form data-enquiry-form data-journey="managed-it" data-form-name="enquiry-managed-it" novalidate>
+				<input type="hidden" name="journey" value="managed-it">
+				<div class="honeypot" aria-hidden="true">
+					<label for="quote-website">Website</label>
+					<input type="text" id="quote-website" name="website" tabindex="-1" autocomplete="off">
+				</div>
+				<div class="row">
+					<div class="col-md-4 mb-3">
+						<label class="form-label" for="quote-name">Your name</label>
+						<input class="form-control" type="text" id="quote-name" name="name" required
+							maxlength="100" autocomplete="name">
+						<div class="invalid-feedback d-block" data-error-for="name"></div>
+					</div>
+					<div class="col-md-4 mb-3">
+						<label class="form-label" for="quote-company">Company</label>
+						<input class="form-control" type="text" id="quote-company" name="company" required
+							maxlength="100" autocomplete="organization">
+						<div class="invalid-feedback d-block" data-error-for="company"></div>
+					</div>
+					<div class="col-md-4 mb-3">
+						<label class="form-label" for="quote-email">Work email</label>
+						<input class="form-control" type="email" id="quote-email" name="email" required
+							maxlength="120" autocomplete="email">
+						<div class="invalid-feedback d-block" data-error-for="email"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4 mb-3">
+						<label class="form-label" for="quote-users">How many people need support?</label>
+						<input class="form-control" type="number" id="quote-users" name="users" required
+							min="1" max="10000" step="1" inputmode="numeric">
+						<div class="invalid-feedback d-block" data-error-for="users"></div>
+					</div>
+					<div class="col-sm-4 mb-3">
+						<label class="form-label" for="quote-offices">How many offices do they sit in?</label>
+						<input class="form-control" type="number" id="quote-offices" name="offices" required
+							min="1" max="500" step="1" inputmode="numeric">
+						<div class="invalid-feedback d-block" data-error-for="offices"></div>
+					</div>
+					<div class="col-sm-4 mb-3">
+						<label class="form-label" for="quote-devices">How many computers, laptops and servers?</label>
+						<input class="form-control" type="number" id="quote-devices" name="devices" required
+							min="1" max="20000" step="1" inputmode="numeric">
+						<div class="invalid-feedback d-block" data-error-for="devices"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 mb-3">
+						<label class="form-label" for="quote-provider">Who looks after your IT today?</label>
+						<input class="form-control" type="text" id="quote-provider" name="current_provider"
+							maxlength="100" placeholder="A provider, somebody in-house, or nobody yet.">
+						<div class="invalid-feedback d-block" data-error-for="current_provider"></div>
+					</div>
+					<div class="col-md-6 mb-3">
+						<label class="form-label" for="quote-cover">What hours do you need covered?</label>
+						<select class="form-select" id="quote-cover" name="cover" required>
+							<option value="">Please choose…</option>
+							<option value="Business hours">Business hours, Monday to Friday</option>
+							<option value="Extended hours">Extended hours, early and late</option>
+							<option value="24/7">24 hours, every day</option>
+							<option value="Not sure">Not sure — tell me what is normal</option>
+						</select>
+						<div class="invalid-feedback d-block" data-error-for="cover"></div>
+					</div>
+				</div>
+				<div class="mb-3" data-turnstile></div>
+				<div class="form-check mb-3">
+					<input class="form-check-input" type="checkbox" value="yes" name="consent"
+						id="quote-consent" required>
+					<label class="form-check-label" for="quote-consent">I am happy for XFour to reply to
+						me about this enquiry. See our <a href="/legal/privacy">privacy policy</a>.</label>
+					<div class="invalid-feedback d-block" data-error-for="consent"></div>
+				</div>
+				<button class="btn btn-primary btn-lg" type="submit">Get my price</button>
+				<noscript>
+					<p class="mt-3 mb-0">This form needs JavaScript. Please call
+						<a href="tel:+441183702920">0118 370 2920</a> or email
+						<a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a> and ask for a managed IT
+						quote instead.</p>
+				</noscript>
+			</form>
+			<div class="enquiry-state ok" data-state="success" hidden>
+				<h3 class="h5">Thank you — that is with us.</h3>
+				<p class="mb-0">You will get an email confirming we have it, and one of us will come back to
+					you with a price within one working day.</p>
+			</div>
+			<div class="enquiry-state bad" data-state="error" hidden>
+				<p class="mb-0">Sorry — we could not send that. Please try again, or call
+					<a href="tel:+441183702920">0118 370 2920</a> or email
+					<a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a>.</p>
+			</div>
+			<div class="enquiry-state bad" data-state="fallback" hidden>
+				<p class="mb-0">This form is not available right now. Please call
+					<a href="tel:+441183702920">0118 370 2920</a> or email
+					<a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a> and ask for a managed IT quote.</p>
+			</div>
+			<p class="rather-talk mb-0">
+				Rather talk? Call <a href="tel:+441183702920">0118 370 2920</a> or email
+				<a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a>.
 			</p>
 		</div>
 	</div>
 </section>
+<script is:inline defer src="/assets/js/enquiry-form.js"></script>
 
 <style>
 	/* The theme caps .block-heading p at 420px, which is too narrow here. */
@@ -52,16 +150,39 @@
 		margin: 0 auto;
 	}
 
-	.quote-ask p,
-	.quote-ask li {
+	.quote-ask p {
 		line-height: 1.7;
 	}
 
-	.quote-ask ol {
-		padding-left: 1.3rem;
+	.rather-talk {
+		margin-top: 1.5rem;
+		color: #6c757d;
+		font-size: 0.95rem;
 	}
 
-	.quote-ask li {
-		margin-bottom: 0.4rem;
+	/* The honeypot must be reachable by a bot reading the markup and invisible
+	   to a person. Moving it off-screen does both; display:none is skipped by
+	   some form-filling bots. */
+	.honeypot {
+		position: absolute;
+		left: -10000px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+
+	.enquiry-state {
+		border-radius: 6px;
+		padding: 24px;
+	}
+
+	.enquiry-state.ok {
+		background-color: #e7f3ff;
+		border: 1px solid #b6daff;
+	}
+
+	.enquiry-state.bad {
+		background-color: #fdf0ef;
+		border: 1px solid #f5c6c3;
 	}
 </style>
