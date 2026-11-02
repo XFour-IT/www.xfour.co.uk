@@ -34,19 +34,23 @@ const EXISTING_PAGES = [
 	'/blog',
 ];
 
-// No real post has shipped yet -- the two sample posts were pulled before
-// this PR could merge, because a merge would have put "Sample post: ..."
-// pages live under Ben's byline where Google would index them. B1 (1
-// November) is the first real post; add its path here once it ships so the
-// order and per-post checks below start covering it.
-const PUBLISHED_POSTS = [];
+// The two sample posts were pulled before the blog-engine PR could merge,
+// because a merge would have put "Sample post: ..." pages live under Ben's
+// byline where Google would index them. A1 (15 November) is added here on
+// this branch. B1 (1 November) ships on its own branch (XFO-115); whichever
+// of the two merges second needs to reconcile this list with the other.
+const PUBLISHED_POSTS = ['/blog/dynamics-365-cost-small-business'];
 
 const blogIndex = readFileSync(join(DIST, 'blog.html'), 'utf8');
 
 test('the index lists posts newest first', () => {
 	const order = [...blogIndex.matchAll(/href="(\/blog\/[a-z0-9-]+)"/g)].map((m) => m[1]);
-	assert.deepEqual(order, PUBLISHED_POSTS, 'no posts are published yet');
-	assert.match(blogIndex, /No posts published yet\./);
+	assert.deepEqual(order, PUBLISHED_POSTS, 'the blog index must list published posts newest-first');
+	if (PUBLISHED_POSTS.length === 0) {
+		assert.match(blogIndex, /No posts published yet\./);
+	} else {
+		assert.doesNotMatch(blogIndex, /No posts published yet\./, 'a published post exists, so the empty-state copy must not show');
+	}
 });
 
 test('the index excludes drafts', () => {
