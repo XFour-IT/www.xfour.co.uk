@@ -162,7 +162,7 @@ test('every Journey B page has exactly one managed IT quote form, and it asks fo
 		   it never submits, and without the noscript line the visitor is stuck. */
 		assert.match(page, /src="\/assets\/js\/enquiry-form\.js"/, `${file}: the form script is not loaded`);
 		const noscript = form.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
-		assert.match(noscript, /tel:\+441183702920/, `${file}: no phone number for a visitor without JavaScript`);
+		assert.match(noscript, /tel:\+442045912641/, `${file}: no phone number for a visitor without JavaScript`);
 		assert.match(noscript, /mailto:hello@xfour\.co\.uk/, `${file}: no email address for a visitor without JavaScript`);
 	}
 });

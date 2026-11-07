@@ -45,7 +45,7 @@ const doors = [
 
 <BaseLayout
 	title="Dynamics 365 Consultancy and Managed IT Support | XFour"
-	description="XFour is a Microsoft Partner in Reading. Dynamics 365 and Power Platform consultancy across the UK, and managed IT support for small businesses in the Thames Valley. Call 0118 370 2920."
+	description="XFour is a Microsoft Partner in Reading. Dynamics 365 and Power Platform consultancy across the UK, and managed IT support for small businesses in the Thames Valley. Call 020 4591 2641."
 	navCurrent="/"
 	mainClass="page landing-page"
 >
@@ -63,7 +63,7 @@ const doors = [
 		</div>
 	</section>
 
-	<section class="clean-block" aria-labelledby="doors-heading">
+	<section class="clean-block ice" aria-labelledby="doors-heading">
 		<div class="container">
 			<div class="block-heading">
 				<h2 id="doors-heading" class="h3">Which one are you here for?</h2>
@@ -127,12 +127,13 @@ const doors = [
 </BaseLayout>
 
 <style>
-	/* .clean-block.clean-hero:before paints currentColor over the whole hero, so
-	   setting the colour here gives a flat brand navy band and no image request.
-	   It is the same navy that .xfour-hero used over its photograph. */
+	/* Brand guidelines v1.0 pattern: the mark's own diamond grid, kept to the
+	   right and faded towards the text side. Navy is the base colour the
+	   pattern sits on, not a fallback -- tokens.css turns off the theme's
+	   opaque :before scrim so the pattern actually shows. */
 	.home-hero {
-		color: #082044;
-		background-color: #082044;
+		color: var(--xf-navy);
+		background: var(--xf-navy) url('/assets/img/brand/patterns/XFour-Pattern_Navy_Right.svg') center right / cover no-repeat;
 	}
 
 	.home-hero .text {
@@ -140,16 +141,17 @@ const doors = [
 	}
 
 	.door {
-		border: 1px solid rgba(8, 32, 68, 0.12);
-		transition: box-shadow 0.2s ease, transform 0.2s ease;
+		border: 1px solid rgba(14, 27, 51, 0.12);
+		transition: border-color 0.2s ease, transform 0.2s ease;
 	}
 
 	/* The whole card is the click target, through .stretched-link on the button.
 	   The hover and focus states have to live on the card, or only the button
-	   looks alive. :focus-within carries the keyboard state. */
+	   looks alive. :focus-within carries the keyboard state. No shadow/glow per
+	   the brand guidelines, so the border colour carries the hover state. */
 	.door:hover,
 	.door:focus-within {
-		box-shadow: 0 0.5rem 1.5rem rgba(8, 32, 68, 0.15);
+		border-color: var(--xf-it-blue);
 		transform: translateY(-2px);
 	}
 
@@ -170,8 +172,7 @@ const doors = [
 		font-weight: 700;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		/* 7.2:1 on white. */
-		color: #15479c;
+		color: var(--xf-it-blue);
 	}
 
 	.door-points {
@@ -185,7 +186,7 @@ const doors = [
 
 	.proof-label {
 		letter-spacing: 0.06em;
-		color: #15479c;
+		color: var(--xf-it-blue);
 	}
 
 	.proof-band .block-heading {

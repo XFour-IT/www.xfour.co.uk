@@ -6,6 +6,9 @@ const year = new Date().getFullYear();
 
 <footer class="page-footer dark">
 	<div class="container">
+		<div class="footer-brand">
+			<img src="/assets/img/brand/XFour-IT_Horizontal_Full-colour-on-dark.svg" alt="XFour IT" height="32">
+		</div>
 		<div class="row d-xl-flex justify-content-xl-center">
 			<div class="col-sm-3">
 				<h5>About us</h5>
@@ -28,6 +31,17 @@ const year = new Date().getFullYear();
 		</div>
 	</div>
 	<div class="footer-copyright">
-		<p>© {year} XFour IT Limited</p>
+		<p>© {year} XFour IT Limited · Registered in England and Wales, company no. 11776254 · Registered
+			office: 100 Berkshire Place, C/O KT Wells Ltd, Winnersh Triangle, Wokingham, RG41 5RD</p>
+		<p><a href="mailto:hello@xfour.co.uk">hello@xfour.co.uk</a> · <a href="tel:+442045912641">020 4591 2641</a></p>
 	</div>
 </footer>
+
+<style>
+	/* Clear space of half the mark's height (brand guidelines v1.0), on a
+	   32px-tall lockup. */
+	.footer-brand {
+		padding-top: 16px;
+		margin-bottom: 16px;
+	}
+</style>
