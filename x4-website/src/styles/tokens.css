@@ -1,4 +1,8 @@
-/* XFour IT brand guidelines v1.0 tokens.
+/* XFour brand guidelines v1.0 tokens, copied from the brand kit's
+   "03 Colour & Type/xfour-tokens.css" (--xf-* names and values are exact;
+   --xf-radius-input is this site's own addition, for the 4px input rule
+   the guidelines don't give a token for).
+
    Loaded after bootstrap.min.css, so these win on source order without
    needing !important. The vendored Bootstrap build has its colours and
    radii baked into each selector as literal hex/rem values (not CSS custom
@@ -7,50 +11,54 @@
    never reads. */
 
 :root {
-	--it-blue: #2B6CF0;
-	--it-navy: #0E1B33;
-	--it-deep-blue: #1B4FC2;
-	--it-signal: #F5A524;
+	--xf-it-blue: #2B6CF0;
+	--xf-navy: #0E1B33;
+	--xf-deep-blue: #1B4FC2;
+	--xf-sky: #8DB4FF;
+	--xf-ice: #EAF1FE;
+	--xf-mist: #F4F6FA;
+	--xf-line: #DCE2EC;
+	--xf-slate: #5A6478;
+	--xf-signal: #F5A524;
+	--xf-white: #FFFFFF;
 
-	--it-radius-control: 8px; /* buttons and cards */
-	--it-radius-input: 4px; /* text inputs and selects */
-
-	--it-font-display: 'Funnel Display', Aptos, 'Segoe UI', system-ui, sans-serif;
-	--it-font-body: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
+	--xf-radius: 8px; /* buttons and cards */
+	--xf-radius-input: 4px; /* text inputs and selects */
 }
 
-/* Written as literal font-family lists, not var(--it-font-body/display), on
-   purpose: fontaine's build-time transform (astro.config.mjs) only rewrites
-   a literal `font-family: 'Name', ...` declaration to insert its generated
+/* Written as literal font-family lists, not a var(), on purpose: fontaine's
+   build-time transform (astro.config.mjs) only rewrites a literal
+   `font-family: 'Name', ...` declaration to insert its generated
    size-adjusted fallback face. A var() indirection -- including Bootstrap's
    own --bs-font-sans-serif chain -- hides the font name from that scan, so
-   the page would lose the CLS fix silently. */
+   the page would lose the CLS fix silently. Fallbacks match the guidelines:
+   Aptos Display/Segoe UI for the display face, Aptos/Segoe UI for body. */
 body {
 	font-family: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
-	color: var(--it-navy);
+	color: var(--xf-navy);
 }
 
 h1, h2, h3, h4, h5, h6,
 .navbar-brand {
-	font-family: 'Funnel Display', Aptos, 'Segoe UI', system-ui, sans-serif;
+	font-family: 'Funnel Display', 'Aptos Display', 'Segoe UI', system-ui, sans-serif;
 	font-weight: 700;
 	letter-spacing: -0.01em;
 }
 
 /* Links */
 a {
-	color: var(--it-blue);
+	color: var(--xf-it-blue);
 }
 
 a:hover,
 a:focus {
-	color: var(--it-deep-blue);
+	color: var(--xf-deep-blue);
 }
 
 /* The theme's heading-accent utility class, used across most pages'
    sub-headings ("Who we are", "Talk to us", etc.). */
 .text-info {
-	color: var(--it-blue) !important;
+	color: var(--xf-it-blue) !important;
 }
 
 /* Buttons -- radius 8px, no shadows/gradients, IT Blue / Deep Blue. The
@@ -59,14 +67,14 @@ a:focus {
 .btn,
 .btn-lg,
 .btn-sm {
-	border-radius: var(--it-radius-control);
+	border-radius: var(--xf-radius);
 }
 
 .btn-primary,
 .btn-primary:disabled,
 .btn-primary.disabled {
-	background-color: var(--it-blue);
-	border-color: var(--it-blue);
+	background-color: var(--xf-it-blue);
+	border-color: var(--xf-it-blue);
 }
 
 .btn-primary:hover,
@@ -75,8 +83,8 @@ a:focus {
 .btn-primary:active,
 .btn-primary.active,
 .show > .btn-primary.dropdown-toggle {
-	background-color: var(--it-deep-blue);
-	border-color: var(--it-deep-blue);
+	background-color: var(--xf-deep-blue);
+	border-color: var(--xf-deep-blue);
 }
 
 .btn-primary:focus,
@@ -89,13 +97,47 @@ a:focus {
 
 /* Cards -- radius 8px, no shadow. */
 .card {
-	border-radius: var(--it-radius-control);
+	border-radius: var(--xf-radius);
 }
 
 /* Inputs are already 4px in the vendored Bootstrap build; re-colour the
    focus ring to match the new blue instead of Bootstrap's default. */
 .form-control:focus,
 .form-select:focus {
-	border-color: var(--it-blue);
+	border-color: var(--xf-it-blue);
 	box-shadow: 0 0 0 .25rem rgba(43, 108, 240, .25);
+}
+
+/* Footer: moved onto Navy (brand dark surface) instead of the old
+   near-black grey, so it carries the mark and the IT Blue accent properly. */
+.page-footer.dark {
+	background-color: var(--xf-navy);
+}
+
+.page-footer.dark .footer-copyright {
+	background-color: var(--xf-navy);
+	border-color: var(--xf-navy);
+}
+
+.page-footer.dark .footer-copyright p {
+	color: var(--xf-sky);
+}
+
+.page-footer.dark h5,
+.page-footer.dark .h5 {
+	color: var(--xf-white);
+}
+
+.page-footer.dark a {
+	color: var(--xf-sky);
+}
+
+.page-footer.dark a:hover,
+.page-footer.dark a:focus {
+	color: var(--xf-white);
+}
+
+.page-footer.dark ul li:before,
+.page-footer.dark ul li:after {
+	background-color: var(--xf-it-blue);
 }

@@ -57,9 +57,16 @@ const canonical = canonicalUrl(Astro.url, Astro.site!);
 	<meta property="og:title" content={ogTitle}>
 	<meta property="og:description" content={ogDescription}>
 	<meta property="og:url" content={canonical}>
-	<meta name="twitter:card" content="summary">
+	<meta property="og:image" content={new URL('/assets/img/brand/XFour-IT_OpenGraph_1200x630.png', Astro.site)}>
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta name="twitter:card" content="summary_large_image">
+	<!-- Brand guidelines v1.0 favicon set -- see "02 Icons & Favicons/Favicons/XFour-IT/HTML snippet.txt" in the brand kit. -->
+	<link rel="icon" href="/favicon.ico" sizes="48x48">
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<link rel="manifest" href="/site.webmanifest">
 	<meta name="theme-color" content="#2B6CF0">
-	<link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
 	<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css?h=5c13df78c26e51f31fd577e41c4f5937">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">

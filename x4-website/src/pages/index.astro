@@ -129,9 +129,11 @@ const doors = [
 <style>
 	/* .clean-block.clean-hero:before paints currentColor over the whole hero, so
 	   setting the colour here gives a flat brand navy band and no image request. */
+	/* Brand guidelines v1.0 pattern: the mark's own diamond grid, kept to the
+	   right and faded towards the text side. */
 	.home-hero {
-		color: var(--it-navy);
-		background-color: var(--it-navy);
+		color: var(--xf-navy);
+		background: var(--xf-navy) url('/assets/img/brand/patterns/XFour-Pattern_Navy_Right.svg') center right / cover no-repeat;
 	}
 
 	.home-hero .text {
@@ -149,7 +151,7 @@ const doors = [
 	   the brand guidelines, so the border colour carries the hover state. */
 	.door:hover,
 	.door:focus-within {
-		border-color: var(--it-blue);
+		border-color: var(--xf-it-blue);
 		transform: translateY(-2px);
 	}
 
@@ -170,7 +172,7 @@ const doors = [
 		font-weight: 700;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: var(--it-blue);
+		color: var(--xf-it-blue);
 	}
 
 	.door-points {
@@ -184,7 +186,7 @@ const doors = [
 
 	.proof-label {
 		letter-spacing: 0.06em;
-		color: var(--it-blue);
+		color: var(--xf-it-blue);
 	}
 
 	.proof-band .block-heading {
