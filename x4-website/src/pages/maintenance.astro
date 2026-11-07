@@ -162,7 +162,7 @@ import '../styles/fonts.css';
   <style is:inline>
     .sign.error-page-wrapper {
       font-family: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
-      background-color: #179eca;
+      background-color: #0E1B33;
       position: relative;
     }
 
@@ -180,7 +180,7 @@ import '../styles/fonts.css';
       height: 44px;
       width: 44px;
       border-radius: 99px;
-      border: 12px solid #343c3f;
+      border: 12px solid #2B6CF0;
       position: absolute;
       top: 0px;
       left: 50%;
@@ -192,7 +192,7 @@ import '../styles/fonts.css';
       width: 190px;
       height: 15px;
       top: 71px;
-      background-color: #343c3f;
+      background-color: #2B6CF0;
     }
 
     .sign.error-page-wrapper .sign-container .post.left {
@@ -209,9 +209,8 @@ import '../styles/fonts.css';
 
     .sign.error-page-wrapper .sign-container .pane {
       transition: background-color .5s linear, border-color .5s linear;
-      box-shadow: 0 5px 0 rgba(0, 0, 0, .1) inset, 5px 0 0 rgba(0, 0, 0, .1) inset, 15px 15px 0 rgba(0, 0, 0, .1);
       background-color: #fff;
-      border: 20px solid #343c3f;
+      border: 20px solid #2B6CF0;
       height: 300px;
       text-align: center;
       position: absolute;
@@ -229,7 +228,7 @@ import '../styles/fonts.css';
       font-weight: 600;
       letter-spacing: -2px;
       text-transform: uppercase;
-      color: #ffba00;
+      color: #0E1B33;
     }
 
     .sign.error-page-wrapper .sign-container .pane.just-header .headline {
@@ -238,7 +237,7 @@ import '../styles/fonts.css';
 
     .sign.error-page-wrapper .sign-container .pane .context {
       transition: color .5s linear;
-      color: #ffba00;
+      color: #0E1B33;
       font-size: 24px;
       line-height: 32px;
     }
@@ -326,7 +325,7 @@ import '../styles/fonts.css';
       text-decoration: none;
       color: #fff;
       border: 2px solid white;
-      border-radius: 99px;
+      border-radius: 8px;
       padding: 9px 0 10px;
       width: 195px;
       overflow: hidden;
@@ -421,7 +420,7 @@ import '../styles/fonts.css';
   </style>
   <style is:inline>
     .background-color {
-      background-color: #179ECA !important;
+      background-color: #0E1B33 !important;
     }
 
 
@@ -429,12 +428,15 @@ import '../styles/fonts.css';
       color: #FFFFFF !important;
     }
 
+    /* Sky, the guidelines' pre-checked "on Navy" pair (8.3:1). */
     .secondary-text-color {
-      color: #73c5df !important;
+      color: #8DB4FF !important;
     }
 
+    /* On the white sign panel, so Navy text, not Signal (the guidelines
+       pair Signal with Navy text, not use it as text on a light surface). */
     .sign-text-color {
-      color: #FFBA00 !important;
+      color: #0E1B33 !important;
     }
 
     .sign-frame-color {
