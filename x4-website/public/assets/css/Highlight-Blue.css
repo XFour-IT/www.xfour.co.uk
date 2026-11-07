@@ -5,7 +5,9 @@
 }
 
 .highlight-blue p {
-  color: #c4d5ef;
+  /* White, not a tinted blue: on the IT Blue background, anything less than
+     white falls short of 4.5:1 for normal-size text. */
+  color: #fff;
   line-height: 1.5;
 }
 
@@ -54,7 +56,7 @@
 .highlight-blue .buttons .btn-primary, .highlight-blue .buttons .btn-primary:active {
   border: 2px solid rgba(255,255,255,0.7);
   border-radius: var(--xf-radius);
-  color: #ebeff1;
+  color: #fff;
   box-shadow: none;
   text-shadow: none;
   padding: 14px 24px;
