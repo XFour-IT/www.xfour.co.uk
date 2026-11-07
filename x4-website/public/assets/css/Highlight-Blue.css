@@ -1,6 +1,6 @@
 .highlight-blue {
   color: #fff;
-  background-color: #1e6add;
+  background-color: var(--it-blue);
   padding: 50px 0;
 }
 
@@ -53,7 +53,7 @@
 
 .highlight-blue .buttons .btn-primary, .highlight-blue .buttons .btn-primary:active {
   border: 2px solid rgba(255,255,255,0.7);
-  border-radius: 6px;
+  border-radius: var(--it-radius-control);
   color: #ebeff1;
   box-shadow: none;
   text-shadow: none;
