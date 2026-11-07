@@ -281,9 +281,8 @@ const proof = [
 </BaseLayout>
 
 <style>
-	/* .clean-block.clean-hero:before paints currentColor across the whole hero,
-	   so setting the colour here gives a flat brand navy band and costs no image
-	   request. Same navy, and the same reasoning, as the home page hero. */
+	/* Same navy + pattern hero as the home page -- see index.astro for why
+	   both the colour and the pattern image are set. */
 	.journey-hero {
 		color: var(--xf-navy);
 		background: var(--xf-navy) url('/assets/img/brand/patterns/XFour-Pattern_Navy_Right.svg') center right / cover no-repeat;

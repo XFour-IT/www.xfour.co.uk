@@ -259,9 +259,9 @@ const townList = towns.join(', ');
 </BaseLayout>
 
 <style>
-	/* Flat brand navy, matching the home page hero. .clean-block.clean-hero:before
-	   paints currentColor over the band, so both properties are set to the same
-	   value and the hero costs no image request. */
+	/* Same navy + pattern hero as the home page -- see index.astro for why
+	   both the colour and the pattern image are set (tokens.css disables
+	   the theme's opaque :before scrim so the pattern shows). */
 	.it-hero {
 		color: var(--xf-navy);
 		background: var(--xf-navy) url('/assets/img/brand/patterns/XFour-Pattern_Navy_Right.svg') center right / cover no-repeat;

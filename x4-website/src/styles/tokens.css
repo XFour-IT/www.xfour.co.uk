@@ -132,6 +132,16 @@ a:focus {
 	text-shadow: none;
 }
 
+/* The vendored theme's :before paints an opaque currentColor scrim over
+   the hero (designed for a dark overlay on a busy photo). Every hero on
+   this site sets its own navy + pattern-SVG background instead, so the
+   scrim was hiding the brand pattern completely -- confirmed by Codex
+   review on PR #48. Navy plus the fade built into the pattern itself
+   already gives the white hero text enough contrast without a scrim. */
+.clean-block.clean-hero:before {
+	background-color: transparent;
+}
+
 .clean-block.clean-hero::after {
 	content: "";
 	position: absolute;

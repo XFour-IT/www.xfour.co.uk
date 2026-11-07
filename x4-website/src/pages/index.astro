@@ -127,10 +127,10 @@ const doors = [
 </BaseLayout>
 
 <style>
-	/* .clean-block.clean-hero:before paints currentColor over the whole hero, so
-	   setting the colour here gives a flat brand navy band and no image request. */
 	/* Brand guidelines v1.0 pattern: the mark's own diamond grid, kept to the
-	   right and faded towards the text side. */
+	   right and faded towards the text side. Navy is the base colour the
+	   pattern sits on, not a fallback -- tokens.css turns off the theme's
+	   opaque :before scrim so the pattern actually shows. */
 	.home-hero {
 		color: var(--xf-navy);
 		background: var(--xf-navy) url('/assets/img/brand/patterns/XFour-Pattern_Navy_Right.svg') center right / cover no-repeat;
