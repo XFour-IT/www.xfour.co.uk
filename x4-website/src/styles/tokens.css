@@ -22,7 +22,13 @@
 	--xf-signal: #F5A524;
 	--xf-white: #FFFFFF;
 
-	--xf-radius: 8px; /* buttons and cards */
+	/* XFO-728 follow-up, 7 Nov 2026: Ben's own review of the live preview --
+	   "loosen it up ... less straight lines ... should flow, not be a string
+	   of boxes" -- so radius goes rounder than the original 8px brief, and
+	   primary CTAs go full pill. Still no shadows or gradients: those weren't
+	   the complaint, and the guidelines call them out as retired. */
+	--xf-radius: 16px; /* cards */
+	--xf-radius-pill: 999px; /* primary buttons */
 	--xf-radius-input: 4px; /* text inputs and selects */
 }
 
@@ -61,13 +67,13 @@ a:focus {
 	color: var(--xf-it-blue) !important;
 }
 
-/* Buttons -- radius 8px, no shadows/gradients, IT Blue / Deep Blue. The
+/* Buttons -- pill-shaped, no shadows/gradients, IT Blue / Deep Blue. The
    focus ring is an accessibility affordance (WCAG 2.4.7), not a decorative
    glow, so it is re-coloured rather than removed. */
 .btn,
 .btn-lg,
 .btn-sm {
-	border-radius: var(--xf-radius);
+	border-radius: var(--xf-radius-pill);
 }
 
 .btn-primary,
@@ -95,9 +101,55 @@ a:focus {
 	box-shadow: 0 0 0 .25rem rgba(43, 108, 240, .5);
 }
 
-/* Cards -- radius 8px, no shadow. */
+/* Cards -- rounder (16px), no shadow. */
 .card {
 	border-radius: var(--xf-radius);
+}
+
+/* ".dark" section bands shipped as the Bootstrap theme's neutral grey
+   (#f6f6f6), not a brand colour. Re-tinting every one of them to Mist gives
+   the alternating white/dark/navy rhythm an actual brand hue instead of
+   reading as off-brand grey -- the same "more colour" note, applied to every
+   page that reuses this shared band (about 15 of them), not just the home
+   page. */
+.clean-block.dark {
+	background-color: var(--xf-mist);
+}
+
+/* Section flow: a curved seam instead of a hard horizontal line between the
+   hero band and whatever follows. Shared on .clean-hero so it reaches every
+   page's hero in one place rather than per-page markup. The fill is the page
+   background (white), so it reads correctly wherever a .clean-hero is
+   followed by the default white .clean-block. */
+.clean-block.clean-hero {
+	padding-bottom: 56px;
+}
+
+/* Vendored Bootstrap theme default, not something this branch added --
+   caught while touching this selector for the wave divider above. "No
+   shadows" is explicit in the guidelines, so it goes. */
+.clean-block.clean-hero .text {
+	text-shadow: none;
+}
+
+.clean-block.clean-hero::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 72px;
+	z-index: 2;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0,38C240,98,480,2,720,40C960,78,1200,18,1440,56L1440,100L0,100Z' fill='%23ffffff'/%3E%3C/svg%3E");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+/* Opt-in section tint for pages that want a third tone besides white/Navy,
+   so a page doesn't have to choose between stark white and the full-strength
+   Mist of ".dark". Ice is the kit's lightest blue. */
+.clean-block.ice {
+	background-color: var(--xf-ice);
 }
 
 /* Inputs are already 4px in the vendored Bootstrap build; re-colour the
