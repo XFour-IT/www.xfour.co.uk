@@ -263,8 +263,8 @@ const townList = towns.join(', ');
 	   paints currentColor over the band, so both properties are set to the same
 	   value and the hero costs no image request. */
 	.it-hero {
-		color: #082044;
-		background-color: #082044;
+		color: var(--it-navy);
+		background-color: var(--it-navy);
 	}
 
 	.it-hero .text {
@@ -288,24 +288,22 @@ const townList = towns.join(', ');
 	}
 
 	.it-qualify {
-		border-bottom: 1px solid rgba(8, 32, 68, 0.12);
+		border-bottom: 1px solid rgba(14, 27, 51, 0.12);
 	}
 
 	/* The theme's .features .feature-box centres its text and hides overflow,
 	   which a list of covered items cannot live with. This is its own card. */
 	.covered-group {
 		background-color: #fff;
-		border: 1px solid rgba(8, 32, 68, 0.12);
-		border-radius: 6px;
+		border: 1px solid rgba(14, 27, 51, 0.12);
+		border-radius: var(--it-radius-control);
 		padding: 28px 26px;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 		text-align: left;
 	}
 
 	.covered-group .icon {
 		font-size: 2rem;
-		/* 7.2:1 on white. */
-		color: #15479c;
+		color: var(--it-blue);
 		margin-bottom: 0.75rem;
 		display: block;
 	}
@@ -336,7 +334,7 @@ const townList = towns.join(', ');
 	.response-figure {
 		font-weight: 700;
 		white-space: nowrap;
-		color: #15479c;
+		color: var(--it-blue);
 	}
 
 	.small-print {
@@ -347,10 +345,9 @@ const townList = towns.join(', ');
 
 	.price-card {
 		background-color: #fff;
-		border: 2px solid #15479c;
-		border-radius: 6px;
+		border: 2px solid var(--it-blue);
+		border-radius: var(--it-radius-control);
 		padding: 34px 30px;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 	}
 
 	.price-figure {
@@ -358,7 +355,7 @@ const townList = towns.join(', ');
 		font-weight: 700;
 		line-height: 1;
 		margin-bottom: 0.25rem;
-		color: #15479c;
+		color: var(--it-blue);
 	}
 
 	.price-unit {

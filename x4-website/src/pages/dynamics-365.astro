@@ -285,8 +285,8 @@ const proof = [
 	   so setting the colour here gives a flat brand navy band and costs no image
 	   request. Same navy, and the same reasoning, as the home page hero. */
 	.journey-hero {
-		color: #082044;
-		background-color: #082044;
+		color: var(--it-navy);
+		background-color: var(--it-navy);
 	}
 
 	.journey-hero .text {
@@ -303,16 +303,15 @@ const proof = [
 	.price-card,
 	.proof-card {
 		background-color: #fff;
-		border: 1px solid rgba(8, 32, 68, 0.12);
-		border-radius: 6px;
+		border: 1px solid rgba(14, 27, 51, 0.12);
+		border-radius: var(--it-radius-control);
 		padding: 28px 26px;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 	}
 
 	.price {
 		font-size: 1.6rem;
 		font-weight: 700;
-		color: #1e6add;
+		color: var(--it-blue);
 		margin-bottom: 0.75rem;
 	}
 
@@ -327,8 +326,7 @@ const proof = [
 		font-weight: 700;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		/* 7.2:1 on white. */
-		color: #15479c;
+		color: var(--it-blue);
 	}
 
 	.geography,
