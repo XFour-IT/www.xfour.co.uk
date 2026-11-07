@@ -2,6 +2,8 @@
 // The "be right back" page, served by hand when the site is taken down.
 // StatusPage.io "sign" template, moved across unchanged.
 import LiveChat from '../components/LiveChat.astro';
+// Self-hosted, static files -- no dependency on the site being up.
+import '../styles/fonts.css';
 ---
 
 <!DOCTYPE html>
@@ -10,7 +12,6 @@ import LiveChat from '../components/LiveChat.astro';
 <head>
   <script is:inline src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script is:inline src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" media="screen" rel="stylesheet" />
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" media="screen"
     rel="stylesheet" />
   <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
@@ -156,7 +157,7 @@ import LiveChat from '../components/LiveChat.astro';
   </style>
   <style is:inline>
     .sign.error-page-wrapper {
-      font-family: 'Source Sans Pro', sans-serif;
+      font-family: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
       background-color: #179eca;
       position: relative;
     }

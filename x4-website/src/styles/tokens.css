@@ -1,0 +1,101 @@
+/* XFour IT brand guidelines v1.0 tokens.
+   Loaded after bootstrap.min.css, so these win on source order without
+   needing !important. The vendored Bootstrap build has its colours and
+   radii baked into each selector as literal hex/rem values (not CSS custom
+   properties), so most of this file has to override those selectors
+   directly rather than redefine a Bootstrap variable Bootstrap itself
+   never reads. */
+
+:root {
+	--it-blue: #2B6CF0;
+	--it-navy: #0E1B33;
+	--it-deep-blue: #1B4FC2;
+	--it-signal: #F5A524;
+
+	--it-radius-control: 8px; /* buttons and cards */
+	--it-radius-input: 4px; /* text inputs and selects */
+
+	--it-font-display: 'Funnel Display', Aptos, 'Segoe UI', system-ui, sans-serif;
+	--it-font-body: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Written as literal font-family lists, not var(--it-font-body/display), on
+   purpose: fontaine's build-time transform (astro.config.mjs) only rewrites
+   a literal `font-family: 'Name', ...` declaration to insert its generated
+   size-adjusted fallback face. A var() indirection -- including Bootstrap's
+   own --bs-font-sans-serif chain -- hides the font name from that scan, so
+   the page would lose the CLS fix silently. */
+body {
+	font-family: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
+	color: var(--it-navy);
+}
+
+h1, h2, h3, h4, h5, h6,
+.navbar-brand {
+	font-family: 'Funnel Display', Aptos, 'Segoe UI', system-ui, sans-serif;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+/* Links */
+a {
+	color: var(--it-blue);
+}
+
+a:hover,
+a:focus {
+	color: var(--it-deep-blue);
+}
+
+/* The theme's heading-accent utility class, used across most pages'
+   sub-headings ("Who we are", "Talk to us", etc.). */
+.text-info {
+	color: var(--it-blue) !important;
+}
+
+/* Buttons -- radius 8px, no shadows/gradients, IT Blue / Deep Blue. The
+   focus ring is an accessibility affordance (WCAG 2.4.7), not a decorative
+   glow, so it is re-coloured rather than removed. */
+.btn,
+.btn-lg,
+.btn-sm {
+	border-radius: var(--it-radius-control);
+}
+
+.btn-primary,
+.btn-primary:disabled,
+.btn-primary.disabled {
+	background-color: var(--it-blue);
+	border-color: var(--it-blue);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-check:active + .btn-primary,
+.btn-primary:active,
+.btn-primary.active,
+.show > .btn-primary.dropdown-toggle {
+	background-color: var(--it-deep-blue);
+	border-color: var(--it-deep-blue);
+}
+
+.btn-primary:focus,
+.btn-check:active + .btn-primary:focus,
+.btn-primary:active:focus,
+.btn-primary.active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+	box-shadow: 0 0 0 .25rem rgba(43, 108, 240, .5);
+}
+
+/* Cards -- radius 8px, no shadow. */
+.card {
+	border-radius: var(--it-radius-control);
+}
+
+/* Inputs are already 4px in the vendored Bootstrap build; re-colour the
+   focus ring to match the new blue instead of Bootstrap's default. */
+.form-control:focus,
+.form-select:focus {
+	border-color: var(--it-blue);
+	box-shadow: 0 0 0 .25rem rgba(43, 108, 240, .25);
+}

@@ -16,6 +16,11 @@
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.4",
 		"astro": "^7.3.8",
+		"fontaine": "^1.0.3",
 		"wrangler": "^4.149.0"
+	},
+	"dependencies": {
+		"@fontsource/funnel-display": "^5.3.0",
+		"@fontsource/host-grotesk": "^5.3.0"
 	}
 }

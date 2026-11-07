@@ -1,0 +1,9 @@
+/* Brand guidelines v1.0: Funnel Display for headings, Host Grotesk for body
+   text. Latin subset only, self-hosted via @fontsource so the build does not
+   depend on Google Fonts (or Cloudflare's Google-Fonts rewrite) at request
+   time. Each file already sets font-display: swap. */
+@import '@fontsource/funnel-display/latin-700.css';
+@import '@fontsource/funnel-display/latin-800.css';
+@import '@fontsource/host-grotesk/latin-400.css';
+@import '@fontsource/host-grotesk/latin-500.css';
+@import '@fontsource/host-grotesk/latin-600.css';

@@ -7,6 +7,9 @@
 // stand up when the rest of the site is not working, so it loads none of the
 // site's CSS or JavaScript.
 import LiveChat from '../components/LiveChat.astro';
+// Self-hosted, static files -- no external dependency, so this still fits
+// the "stands up when the rest of the site is not working" rule above.
+import '../styles/fonts.css';
 
 interface Props {
 	title: string;
@@ -22,7 +25,6 @@ const { title, code } = Astro.props;
   <head>
     <script is:inline src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script is:inline src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" media="screen" rel="stylesheet" />
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" media="screen" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
     <title>{title}</title>
@@ -34,7 +36,7 @@ const { title, code } = Astro.props;
     </style>
     <style is:inline>
   .plain.error-page-wrapper {
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Host Grotesk', Aptos, 'Segoe UI', system-ui, sans-serif;
     background-color:#6355bc;
     padding:0 5%;
     position:relative;
