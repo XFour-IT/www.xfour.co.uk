@@ -1,0 +1,6 @@
+# PostHog project API key in x4-website/public/assets/js/analytics.js (XFO-751).
+# This is PostHog's client-side project key: it only lets a browser send
+# events into this PostHog project, grants no read access, and cannot be used
+# to pull data out. It is meant to run in public page source. Confirmed as a
+# false positive during the full-history gitleaks sweep in XFO-743.
+de712c02a198f3e4ef629462ead92b4d6564eaa2:x4-website/public/assets/js/analytics.js:generic-api-key:15
