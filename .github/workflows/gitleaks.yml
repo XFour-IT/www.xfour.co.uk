@@ -1,0 +1,56 @@
+name: Gitleaks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Scan for secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download gitleaks v8.30.1 and verify checksum
+        env:
+          GITLEAKS_VERSION: "8.30.1"
+          # SHA-256 of gitleaks_8.30.1_linux_x64.tar.gz, from the project's
+          # published checksums file for this release. Verified against the
+          # downloaded file below so a compromised mirror or MITM can't swap
+          # the binary silently.
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -euo pipefail
+          curl -fsSL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          chmod +x gitleaks
+
+      - name: Determine commit range to scan
+        id: range
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.ref }}"
+            git fetch --no-tags origin "${base}:refs/remotes/origin/${base}"
+            echo "range=origin/${base}..HEAD" >> "$GITHUB_OUTPUT"
+          else
+            before="${{ github.event.before }}"
+            if [ -z "${before}" ] || [ "${before}" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${before}" 2>/dev/null; then
+              echo "range=HEAD~1..HEAD" >> "$GITHUB_OUTPUT"
+            else
+              echo "range=${before}..${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Run gitleaks
+        run: ./gitleaks git --log-opts="${{ steps.range.outputs.range }}" --redact=100 --no-banner
