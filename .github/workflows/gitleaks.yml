@@ -56,7 +56,10 @@ jobs:
           else
             before="${{ github.event.before }}"
             if [ -z "${before}" ] || [ "${before}" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${before}" 2>/dev/null; then
-              echo "range=HEAD~1..HEAD" >> "$GITHUB_OUTPUT"
+              # First push, or a force-push that dropped the old tip: nothing to
+              # diff against, so walk everything reachable. HEAD~1..HEAD would
+              # skip every other commit in the push (XFO-1146).
+              echo "range=${{ github.sha }}" >> "$GITHUB_OUTPUT"
             else
               echo "range=${before}..${{ github.sha }}" >> "$GITHUB_OUTPUT"
             fi
