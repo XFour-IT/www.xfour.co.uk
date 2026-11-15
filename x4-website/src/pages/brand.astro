@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// XFO-1084: a public page for partners, press and advertising partners who
+// need the XFour logo, colours or type without emailing us for the kit.
+// Scoped with Ben: logos only (no favicons/OG/pattern/font downloads), a
+// public-friendly summary of the guidelines rather than the internal
+// document itself, fully public and indexable (the BaseLayout default --
+// no noindex needed).
+
+const logos = [
+	{
+		file: 'XFour-IT_Horizontal_Full-colour',
+		label: 'Full colour',
+		use: 'White or light backgrounds',
+		swatch: 'light',
+	},
+	{
+		file: 'XFour-IT_Horizontal_Full-colour-on-dark',
+		label: 'Full colour, on dark',
+		use: 'Navy or other dark backgrounds',
+		swatch: 'dark',
+	},
+	{
+		file: 'XFour-IT_Horizontal_White',
+		label: 'White',
+		use: 'Photography or busy backgrounds',
+		swatch: 'dark',
+	},
+	{
+		file: 'XFour-Mark_Blue',
+		label: 'Mark, blue',
+		use: 'Small spaces: app icons, social avatars',
+		swatch: 'light',
+	},
+	{
+		file: 'XFour-Mark_White',
+		label: 'Mark, white',
+		use: 'Small spaces on dark backgrounds',
+		swatch: 'dark',
+	},
+];
+
+const colours = [
+	{ name: 'IT Blue', token: '--xf-it-blue', hex: '#2B6CF0' },
+	{ name: 'Navy', token: '--xf-navy', hex: '#0E1B33' },
+	{ name: 'Deep Blue', token: '--xf-deep-blue', hex: '#1B4FC2' },
+	{ name: 'Sky', token: '--xf-sky', hex: '#8DB4FF' },
+	{ name: 'Signal', token: '--xf-signal', hex: '#F5A524' },
+	{ name: 'Ice', token: '--xf-ice', hex: '#EAF1FE' },
+	{ name: 'Mist', token: '--xf-mist', hex: '#F4F6FA' },
+	{ name: 'Line', token: '--xf-line', hex: '#DCE2EC' },
+	{ name: 'Slate', token: '--xf-slate', hex: '#5A6478' },
+];
+---
+
+<BaseLayout
+	title="Brand Assets | XFour"
+	description="XFour logo files, colours and type for partners, press and advertising partners. Download the logo and see how to use it."
+	navCurrent="/brand"
+>
+<section class="clean-block clean-info dark">
+	<div class="container">
+		<div class="block-heading">
+			<h1 class="text-info">Brand assets</h1>
+			<p>Logo files, colours and type for partners, press and advertising partners who need to show the XFour name.</p>
+		</div>
+	</div>
+</section>
+
+<section class="clean-block light">
+	<div class="container">
+		<h2 class="h4 text-info">Logo</h2>
+		<p>Pick the version that matches your background. Each one is available as a scalable SVG or a high-resolution PNG.</p>
+		<div class="row">
+			{logos.map((logo) => (
+			<div class="col-md-6 col-lg-4 mb-4">
+				<div class:list={['card h-100 border-0', logo.swatch === 'dark' ? 'logo-card-dark' : 'logo-card-light']}>
+					<div class="card-body text-center d-flex flex-column">
+						<div class="logo-preview d-flex align-items-center justify-content-center flex-grow-1">
+							<img src={`/assets/img/brand/${logo.file}.svg`} alt={`XFour logo, ${logo.label.toLowerCase()}`} height="40">
+						</div>
+						<h3 class="h6 mt-3 mb-1">{logo.label}</h3>
+						<p class="small text-muted mb-3">{logo.use}</p>
+						<div class="d-flex gap-2 justify-content-center">
+							<a class="btn btn-outline-primary btn-sm" href={`/assets/img/brand/${logo.file}.svg`} download>SVG</a>
+							<a class="btn btn-outline-primary btn-sm" href={`/assets/img/brand/${logo.file}.png`} download>PNG</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			))}
+		</div>
+
+		<h3 class="h5 text-info mt-4">Using the logo</h3>
+		<div class="row">
+			<div class="col-md-6">
+				<h4 class="h6">Do</h4>
+				<ul>
+					<li>Leave clear space around the logo of at least half the mark's height.</li>
+					<li>Use the full-colour version on white or light backgrounds, and the white or on-dark version on Navy, photography or other dark backgrounds.</li>
+					<li>Scale the logo proportionally, keeping its original aspect ratio.</li>
+				</ul>
+			</div>
+			<div class="col-md-6">
+				<h4 class="h6">Don't</h4>
+				<ul>
+					<li>Don't recolour, add a shadow or outline, or apply a gradient to the logo.</li>
+					<li>Don't stretch, skew or rotate it.</li>
+					<li>Don't place it on a background that doesn't give it enough contrast to read clearly.</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="clean-block ice">
+	<div class="container">
+		<h2 class="h4 text-info">Colour</h2>
+		<p>The XFour palette. IT Blue and Navy carry most of the brand; the others are supporting tones.</p>
+		<div class="row">
+			{colours.map((colour) => (
+			<div class="col-6 col-md-4 col-lg-3 mb-4">
+				<div class="swatch rounded-4 mb-2" style={`background-color: ${colour.hex};`}></div>
+				<p class="mb-0 fw-semibold">{colour.name}</p>
+				<p class="small text-muted mb-0">{colour.hex}</p>
+			</div>
+			))}
+		</div>
+	</div>
+</section>
+
+<section class="clean-block light">
+	<div class="container">
+		<h2 class="h4 text-info">Type</h2>
+		<p>Headings are set in <strong>Funnel Display</strong>, body text in <strong>Host Grotesk</strong>. Both are open-source and self-hosted; if you need to set XFour's name in running text, Segoe UI or Arial at regular weight is a fair substitute.</p>
+	</div>
+</section>
+
+<section class="clean-block dark">
+	<div class="container text-center">
+		<h2 class="text-info">Need something that isn't here?</h2>
+		<p>For anything beyond the logo &mdash; interviews, additional imagery, or a question about how to credit XFour &mdash; get in touch.</p>
+		<p><a class="btn btn-primary btn-lg" role="button" href="/contact-us">Contact us</a></p>
+	</div>
+</section>
+</BaseLayout>
+
+<style>
+	.logo-card-light {
+		background-color: var(--xf-mist);
+	}
+
+	.logo-card-dark {
+		background-color: var(--xf-navy);
+	}
+
+	.logo-card-dark h3,
+	.logo-card-dark p.small {
+		color: var(--xf-sky);
+	}
+
+	.logo-preview {
+		min-height: 64px;
+	}
+
+	.swatch {
+		height: 72px;
+		border: 1px solid var(--xf-line);
+	}
+</style>

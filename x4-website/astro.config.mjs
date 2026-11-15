@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { FontaineTransform } from 'fontaine';
 
 // Pages that exist but are not for search: an error state, a maintenance
 // state, and the Slay app's privacy policy (deliberately chrome-less, read
@@ -35,4 +36,17 @@ export default defineConfig({
 	// Keep the built HTML readable. The pages are small and Cloudflare already
 	// compresses them in transit, so minifying only makes the diff unreadable.
 	compressHTML: false,
+
+	vite: {
+		plugins: [
+			// Brand guidelines v1.0: Funnel Display / Host Grotesk need a
+			// size-adjusted fallback so the page does not jump once the real
+			// font loads. Fontaine reads the actual .woff2 files and generates
+			// the ascent/descent/size-adjust overrides itself, rather than
+			// hand-typed numbers guessed from outside the font.
+			FontaineTransform.vite({
+				fallbacks: ['Segoe UI', 'Arial'],
+			}),
+		],
+	},
 });

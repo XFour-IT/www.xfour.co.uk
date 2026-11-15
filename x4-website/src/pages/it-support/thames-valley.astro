@@ -192,10 +192,11 @@ const questions = [
 </BaseLayout>
 
 <style>
-	/* Flat brand navy, matching /it-support. */
+	/* Same navy + pattern hero as /it-support -- see index.astro for why
+	   both the colour and the pattern image are set. */
 	.tv-hero {
-		color: #082044;
-		background-color: #082044;
+		color: var(--xf-navy);
+		background: var(--xf-navy) url('/assets/img/brand/patterns/XFour-Pattern_Navy_Right.svg') center right / cover no-repeat;
 	}
 
 	.tv-hero .text {
@@ -232,8 +233,7 @@ const questions = [
 	}
 
 	.town-list .fas {
-		/* 7.2:1 on white. */
-		color: #15479c;
+		color: var(--xf-it-blue);
 		margin-right: 0.4rem;
 	}
 
