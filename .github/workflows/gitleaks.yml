@@ -10,9 +10,13 @@ on:
 permissions:
   contents: read
 
-# A newer commit on the same PR or branch supersedes the running build (XFO-1106).
+# PRs: a newer commit supersedes the running scan, because each run rescans the
+# whole PR. Pushes: never cancelled. A push run scans only its own before..sha
+# range, so cancelling it would leave those commits unscanned (XFO-1146). Each
+# push run gets its own group; cancel-in-progress: false alone is not enough,
+# because GitHub still drops an older pending run in the same group.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
