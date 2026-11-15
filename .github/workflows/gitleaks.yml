@@ -2,12 +2,18 @@ name: Gitleaks
 
 on:
   pull_request:
+    branches: [develop, main]
   push:
     branches:
       - main
 
 permissions:
   contents: read
+
+# A newer commit on the same PR or branch supersedes the running build (XFO-1106).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   gitleaks:
