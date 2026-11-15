@@ -10,31 +10,31 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const logos = [
 	{
-		file: 'XFour-IT_Horizontal_Full-colour.svg',
+		file: 'XFour-IT_Horizontal_Full-colour',
 		label: 'Full colour',
 		use: 'White or light backgrounds',
 		swatch: 'light',
 	},
 	{
-		file: 'XFour-IT_Horizontal_Full-colour-on-dark.svg',
+		file: 'XFour-IT_Horizontal_Full-colour-on-dark',
 		label: 'Full colour, on dark',
 		use: 'Navy or other dark backgrounds',
 		swatch: 'dark',
 	},
 	{
-		file: 'XFour-IT_Horizontal_White.svg',
+		file: 'XFour-IT_Horizontal_White',
 		label: 'White',
 		use: 'Photography or busy backgrounds',
 		swatch: 'dark',
 	},
 	{
-		file: 'XFour-Mark_Blue.svg',
+		file: 'XFour-Mark_Blue',
 		label: 'Mark, blue',
 		use: 'Small spaces: app icons, social avatars',
 		swatch: 'light',
 	},
 	{
-		file: 'XFour-Mark_White.svg',
+		file: 'XFour-Mark_White',
 		label: 'Mark, white',
 		use: 'Small spaces on dark backgrounds',
 		swatch: 'dark',
@@ -71,18 +71,21 @@ const colours = [
 <section class="clean-block light">
 	<div class="container">
 		<h2 class="h4 text-info">Logo</h2>
-		<p>Pick the version that matches your background. Each file is an SVG and scales to any size.</p>
+		<p>Pick the version that matches your background. Each one is available as a scalable SVG or a high-resolution PNG.</p>
 		<div class="row">
 			{logos.map((logo) => (
 			<div class="col-md-6 col-lg-4 mb-4">
 				<div class:list={['card h-100 border-0', logo.swatch === 'dark' ? 'logo-card-dark' : 'logo-card-light']}>
 					<div class="card-body text-center d-flex flex-column">
 						<div class="logo-preview d-flex align-items-center justify-content-center flex-grow-1">
-							<img src={`/assets/img/brand/${logo.file}`} alt={`XFour logo, ${logo.label.toLowerCase()}`} height="40">
+							<img src={`/assets/img/brand/${logo.file}.svg`} alt={`XFour logo, ${logo.label.toLowerCase()}`} height="40">
 						</div>
 						<h3 class="h6 mt-3 mb-1">{logo.label}</h3>
 						<p class="small text-muted mb-3">{logo.use}</p>
-						<a class="btn btn-outline-primary btn-sm" href={`/assets/img/brand/${logo.file}`} download>Download SVG</a>
+						<div class="d-flex gap-2 justify-content-center">
+							<a class="btn btn-outline-primary btn-sm" href={`/assets/img/brand/${logo.file}.svg`} download>SVG</a>
+							<a class="btn btn-outline-primary btn-sm" href={`/assets/img/brand/${logo.file}.png`} download>PNG</a>
+						</div>
 					</div>
 				</div>
 			</div>
