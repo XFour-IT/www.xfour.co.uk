@@ -36,9 +36,14 @@ const EXISTING_PAGES = [
 
 // The two sample posts were pulled before the blog-engine PR could merge,
 // because a merge would have put "Sample post: ..." pages live under Ben's
-// byline where Google would index them. Newest first: A1 (15 November),
-// then B1 (1 November, merged via XFO-115).
-const PUBLISHED_POSTS = ['/blog/dynamics-365-cost-small-business', '/blog/managed-it-or-in-house-it'];
+// byline where Google would index them. Newest first: post #3 (1 December,
+// this branch, XFO-1212), then A1 (15 November), then B1 (1 November,
+// merged via XFO-115).
+const PUBLISHED_POSTS = [
+	'/blog/it-support-cost-per-user-per-month',
+	'/blog/dynamics-365-cost-small-business',
+	'/blog/managed-it-or-in-house-it',
+];
 
 const blogIndex = readFileSync(join(DIST, 'blog.html'), 'utf8');
 
