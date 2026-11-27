@@ -237,7 +237,8 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 Without it both forms answer 503 and show "call us instead", even with every
 Dynamics value in place.
 
-It is already set on the preview Worker.
+It is **not** set on the preview Worker (`x4-website-preview`), and must never
+be: see "Previewing it".
 
 ---
 
@@ -393,54 +394,41 @@ preview URL to force reporting on.
 
 ## Previewing it
 
-**https://x4-website-preview.xfour.workers.dev/contact-us**
+> **Changed on 27 Nov 2026 (XFO-1798).** The throwaway Worker described in the
+> first version of this section is gone, and so are the preview URLs of the
+> production Worker. This is how it works now. The README ("Previews") has the
+> rules and the addresses.
 
-The review address, put up on 11 Oct 2026 so both forms can be seen before
-anything reaches xfour.co.uk. It is the `x4-website-preview` Worker in the same
-Cloudflare account, and it is a throwaway — delete it once the forms are live.
+Every branch push is built on the **`x4-website-preview`** Worker, which is the
+`preview` environment in `x4-website/wrangler.jsonc`. Open the link in the
+**Workers Builds: x4-website-preview** check on the pull request, then
+`/contact-us`.
 
 What is real on it:
 
-- `src/index.js` from this branch, byte for byte. Same handler, same validation,
-  same honeypot, same origin allowlist.
-- Both forms and `enquiry-form.js` from this branch.
-- Turnstile, against the live widget.
+- `src/index.js` from the branch. Same handler, same validation, same honeypot.
+- Both forms and `enquiry-form.js` from the branch.
 
 What is different:
 
-- Static files come from the `xfour-preview-assets` KV namespace rather than the
-  Workers asset server, because this Worker was uploaded over the API and has no
-  asset bundle. Every page is served from that namespace, so the whole branch can
-  be clicked through, not only `/contact-us`.
-- `TURNSTILE_SECRET_KEY` is set on it. The Dataverse vars are not, so a
-  submission that passes Turnstile gets the same `503 not_configured` the live
-  site would give today, and the form shows its "call us instead" message. **A
-  preview submission cannot create a Lead.** That needs the four jobs above.
-- Every response carries `X-Robots-Tag: noindex, nofollow` and `robots.txt`
-  disallows everything, so the preview cannot show up in search results next to
-  the real site.
+- **A preview submission cannot create a Lead.** The preview Worker has no
+  Dataverse vars, no `ENTRA_CLIENT_SECRET`, no `TURNSTILE_SECRET_KEY`, no retry
+  KV and no cron, and with `X4_PREVIEW` set the Worker answers
+  `503 not_configured` before it calls anything. The form shows its "call us
+  instead" message. Do not "fix" this by adding a secret to the preview Worker:
+  only www.xfour.co.uk may run code that has the CRM key.
+- Turnstile only draws on a hostname that is on the widget.
+  `x4-website-preview.xfour.workers.dev` is on it; a branch or version address
+  is not. It does not matter for a review, because the answer is 503 either
+  way.
+- Every response carries `X-Robots-Tag: noindex`, so a preview cannot show up
+  in search results next to the real site.
+- The production Worker refuses a post whose `Origin` is a `workers.dev`
+  address. Only the preview Worker accepts its own `.xfour.workers.dev` origin.
 
-To rebuild it after a change, or to tear it down, the Worker, the KV namespace
-and the Turnstile hostname entry are all in the XFour IT Limited Cloudflare
-account.
-
-### Why not the Workers Builds preview URL
-
-The README is right that every branch push uploads a Worker version with its own
-preview URL, and that is the usual way to review a change here. It is not enough
-on its own for these forms, for two reasons:
-
-- **The hostname changes on every push.** Workers Builds names a stable alias
-  after the branch, but `feature/enquiry-forms` has a slash in it and gets none,
-  so the only address is `<version-prefix>-x4-website.xfour.workers.dev`, which
-  is a new link after every commit.
-- **Turnstile only answers on a hostname that is on the widget.** The stable
-  preview address is on it. A per-version hostname is not, so the widget refuses
-  to render there and neither form can be submitted.
-
-Both preview kinds now pass the origin check: the Worker allows any host under
-`.xfour.workers.dev` rather than a fixed list, because nobody outside this
-account can create one.
+To test the path into Dynamics end to end, use the unit tests (below) and the
+checks in "Testing it" against www.xfour.co.uk after the merge. There is no
+preview that can reach the CRM, on purpose.
 
 ## Testing it
 

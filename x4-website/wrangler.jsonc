@@ -6,6 +6,18 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "x4-website",
 	"compatibility_date": "2025-05-06",
+	/**
+	 * This Worker holds the production CRM key, so it answers on
+	 * www.xfour.co.uk and nowhere else (XFO-1798). Both must stay false:
+	 *   - workers_dev: no x4-website.xfour.workers.dev address;
+	 *   - preview_urls: no <version>-x4-website.xfour.workers.dev address for
+	 *     every stored version, old and unreleased ones included.
+	 * Wrangler turns both ON when they are left out, so do not delete them.
+	 * Branch previews are a different Worker: see "env.preview" at the bottom
+	 * and "Previews" in the README.
+	 */
+	"workers_dev": false,
+	"preview_urls": false,
 	// The enquiry form endpoint (/api/*). Everything else is static.
 	"main": "./src/index.js",
 	// Astro writes the site to ./dist. `wrangler deploy` runs the build itself
@@ -79,6 +91,49 @@
 		// No owner here. The Power Automate flow in dynamics/website-enquiries
 		// gives each Lead to its journey's owner, so the app user never needs
 		// Read on Leads it does not own. See docs/lead-forms.md.
+	},
+	"env": {
+		/**
+		 * The preview Worker, `x4-website-preview` (XFO-1798). Workers Builds
+		 * sends every branch push here, never to the production Worker.
+		 *
+		 * It is a different Worker, so it has none of production's secrets. Keep
+		 * it that way — never add to it:
+		 *   - ENTRA_CLIENT_SECRET or TURNSTILE_SECRET_KEY (no `wrangler secret
+		 *     put --env preview`);
+		 *   - the Dataverse vars, the ENQUIRY_RETRY_KV namespace or a cron.
+		 * With X4_PREVIEW set, src/index.js answers 503 on POST /api/enquiry,
+		 * skips the retry run, and sends `X-Robots-Tag: noindex, nofollow` on
+		 * every response. test/preview-config.test.mjs fails the build if any of
+		 * this changes.
+		 *
+		 * vars, kv_namespaces and triggers are written out because Wrangler does
+		 * not carry vars and bindings into an environment, but it does carry
+		 * triggers — without the empty list the preview would run the cron.
+		 */
+		"preview": {
+			"name": "x4-website-preview",
+			"workers_dev": true,
+			"preview_urls": true,
+			"assets": {
+				"directory": "./dist",
+				"not_found_handling": "404-page",
+				"html_handling": "auto-trailing-slash",
+				"binding": "ASSETS",
+				// Every request goes through the Worker here, so that it can add
+				// the noindex header to pages and assets as well as to /api/*.
+				"run_worker_first": true
+			},
+			"kv_namespaces": [],
+			"triggers": {
+				"crons": []
+			},
+			"vars": {
+				"X4_PREVIEW": "1",
+				// Public by design. Lets the form draw itself on the preview.
+				"TURNSTILE_SITE_KEY": "0x4AAAAAAFT_mDl3N3uC7M63"
+			}
+		}
 	}
 	/**
 	 * Smart Placement
