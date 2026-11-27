@@ -35,25 +35,77 @@ Two things worth knowing:
 
 **The site deploys itself. Do not run `wrangler deploy` on your laptop.**
 
-The `x4-website` Cloudflare Worker is connected to this repository with
+Two Cloudflare Workers are connected to this repository with
 [Cloudflare Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/).
 Cloudflare watches the repository and builds it:
 
-| Push to | Build command | Deploy command | Result |
-| --- | --- | --- | --- |
-| `main` | `npm ci` | `npx wrangler deploy` | Live on [www.xfour.co.uk](https://www.xfour.co.uk) |
-| any other branch | `npm ci` | `npx wrangler versions upload` | A preview version that gets no live traffic, on its own URL |
+| Push to | Worker | Build command | Deploy command | Result |
+| --- | --- | --- | --- | --- |
+| `main` | `x4-website` | `npm ci` | `npx wrangler deploy` | Live on [www.xfour.co.uk](https://www.xfour.co.uk) |
+| `main` | `x4-website-preview` | `npm ci` | `npx wrangler deploy --env preview` | A copy of `main` on <https://x4-website-preview.xfour.workers.dev> |
+| any other branch | `x4-website-preview` | `npm ci` | `npx wrangler versions upload --env preview` | A preview of the branch, on its own URL |
 
-Both run in the `x4-website` directory.
+All three run in the `x4-website` directory.
 
 Wrangler runs the Astro build itself before it uploads anything — `wrangler.jsonc`
-sets `build.command` to `npm run build`. So the two commands above are the whole
-pipeline, and the Cloudflare build settings did not have to change when the site
-moved to Astro.
+sets `build.command` to `npm run build`. So the commands above are the whole
+pipeline.
 
-So: open a pull request, wait for the **Workers Builds: x4-website** check,
-follow it for the preview URL, look at the site in a browser, then merge. What
-is on `main` is what is live.
+So: open a pull request, wait for the **Workers Builds: x4-website-preview**
+check, follow it for the preview URL, look at the site in a browser, then merge.
+What is on `main` is what is live.
+
+### Previews
+
+A branch is never built on the production Worker. It goes to a second Worker,
+`x4-website-preview`, which is the `preview` environment in `wrangler.jsonc`
+(XFO-1798, 27 Nov 2026). Two rules sit behind that, and both are tested in
+`test/preview-config.test.mjs` and `test/enquiry.test.mjs`:
+
+1. **Only www.xfour.co.uk runs code that has the CRM key.** The production
+   Worker has `workers_dev: false` and `preview_urls: false`, so it has no
+   `workers.dev` address at all — not for the live version, not for an old one,
+   not for a branch. The preview Worker has no `ENTRA_CLIENT_SECRET`, no
+   `TURNSTILE_SECRET_KEY`, no Dataverse vars, no `ENQUIRY_RETRY_KV` and no cron.
+   A form sent on a preview answers `503 not_configured` and shows "call us
+   instead". It cannot create a Lead.
+2. **A preview cannot be indexed.** Every response from the preview Worker
+   carries `X-Robots-Tag: noindex, nofollow`.
+
+Where to find a preview:
+
+| What | Address |
+| --- | --- |
+| The branch, latest push | `https://<branch-name>-x4-website-preview.xfour.workers.dev` — only when the branch name has no `/` in it |
+| One push | `https://<version-prefix>-x4-website-preview.xfour.workers.dev` — the link in the Workers Builds check |
+| `main` as built, not through the zone | <https://x4-website-preview.xfour.workers.dev> |
+
+Name a branch `xfo-123-short-title`, not `feature/short-title`, to get the
+stable branch address.
+
+Never do these, each one breaks rule 1:
+
+- `wrangler secret put … --env preview`, or a secret added to
+  `x4-website-preview` in the dashboard;
+- a KV namespace, a Dataverse var or a cron under `env.preview` in
+  `wrangler.jsonc`;
+- `workers_dev` or `preview_urls` deleted from, or set to `true` at, the top of
+  `wrangler.jsonc`. Wrangler turns both **on** when they are missing, and the
+  next deploy of `main` would then put every stored version of the production
+  Worker back on the internet;
+- a "Deploy non-production branches" trigger on the `x4-website` Worker.
+
+To check the production Worker's setting, read it back from the Cloudflare API.
+Both values must be `false`:
+
+```sh
+# GET /accounts/{account_id}/workers/scripts/x4-website/subdomain
+# → { "enabled": false, "previews_enabled": false }
+curl -s -o /dev/null -w '%{http_code}\n' https://x4-website.xfour.workers.dev/   # 404
+curl -s -o /dev/null -w '%{http_code}\n' https://www.xfour.co.uk/                # 200
+```
+
+Last read back: 27 Nov 2026 01:16 UTC, both `false` (XFO-1798).
 
 ### Why not by hand
 
@@ -80,15 +132,18 @@ Fonts and Rocket Loader turned on, so the edge rewrites the HTML on the way out.
 It replaces the Google Fonts stylesheet link with an inlined `@font-face` block
 and adds a loader script. The files themselves are untouched.
 
-Compare against the Worker version instead. Every version has its own URL that
-does not go through the zone, so it serves exactly what was uploaded:
+Compare against the preview Worker instead. It is on a `workers.dev` address,
+which does not go through the zone, so it serves exactly what was built. Its
+own address always has the latest `main`:
 
 ```sh
-# Worker → Deployments → the live version → Preview URL
 cd x4-website && npm ci && npm run build
-curl -sL https://<version-prefix>-x4-website.xfour.workers.dev/about-us \
+curl -sL https://x4-website-preview.xfour.workers.dev/about-us \
   | diff - dist/about-us.html
 ```
+
+The production Worker has no such address (see "Previews" above). To see which
+commit is live, look at Worker → Deployments → Builds.
 
 ### Working on it locally
 

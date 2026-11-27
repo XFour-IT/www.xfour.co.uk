@@ -377,18 +377,103 @@ test('a cross-site post is refused', async () => {
 	}
 });
 
-test('a post from a Worker preview URL is accepted', async () => {
-	// Workers Builds uploads a version per branch push, each on its own
-	// <prefix>-x4-website.xfour.workers.dev host. The prefix changes every time,
-	// so the suffix has to be allowed or no preview can ever be tested.
-	const { status, calls } = await post(VALID_DYNAMICS, CONFIGURED_ENV, {
-		origin: 'https://f0c50bb8-x4-website.xfour.workers.dev',
-	});
-	assert.equal(status, 200);
-	assert.ok(
-		calls.some((c) => c.url.includes('/api/data/v9.2/leads')),
-		'expected the preview post to reach Dataverse',
-	);
+test('production refuses a post that claims to come from a workers.dev address', async () => {
+	// The production Worker has no workers.dev address (XFO-1798), so this
+	// Origin is a cross-site post like any other.
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = async () => {
+		throw new Error('no outbound call expected');
+	};
+	try {
+		const request = new Request('https://www.xfour.co.uk/api/enquiry', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				Origin: 'https://f0c50bb8-x4-website.xfour.workers.dev',
+			},
+			body: new URLSearchParams(VALID_DYNAMICS),
+		});
+		const response = await worker.fetch(request, CONFIGURED_ENV, {});
+		assert.equal(response.status, 403);
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
+/* -------------------------------------------------------------------------- */
+/* The preview Worker (XFO-1798)                                              */
+/* -------------------------------------------------------------------------- */
+
+// What wrangler.jsonc gives the preview Worker: the flag, the public site key
+// and the asset server. Nothing else.
+const PREVIEW_ENV = {
+	X4_PREVIEW: '1',
+	TURNSTILE_SITE_KEY: '0xSITEKEY',
+	ASSETS: { fetch: async () => new Response('asset', { status: 200 }) },
+};
+const PREVIEW_ORIGIN = 'https://my-branch-x4-website-preview.xfour.workers.dev';
+
+async function postToPreview(env) {
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = async () => {
+		throw new Error('no outbound call expected');
+	};
+	try {
+		const request = new Request(`${PREVIEW_ORIGIN}/api/enquiry`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: PREVIEW_ORIGIN },
+			body: new URLSearchParams(VALID_DYNAMICS),
+		});
+		return await worker.fetch(request, env, {});
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+}
+
+test('a preview answers 503 to an enquiry and calls nothing', async () => {
+	const response = await postToPreview(PREVIEW_ENV);
+	assert.equal(response.status, 503);
+	assert.deepEqual(await response.json(), { ok: false, error: 'not_configured' });
+});
+
+test('a preview still answers 503 if production secrets are bound to it by mistake', async () => {
+	const kv = createFakeKV();
+	const response = await postToPreview({ ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv, X4_PREVIEW: '1' });
+	assert.equal(response.status, 503);
+	assert.equal(kv.size(), 0, 'a preview must not write a retry record');
+});
+
+test('a preview does not run the retry job', async () => {
+	const kv = createFakeKV();
+	await kv.put('enquiry:left-over', JSON.stringify({ journeyKey: 'dynamics', lead: {}, attempts: 0 }));
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = async () => {
+		throw new Error('no outbound call expected');
+	};
+	try {
+		const result = await worker.scheduled({}, { ...CONFIGURED_ENV, ENQUIRY_RETRY_KV: kv, X4_PREVIEW: '1' }, {});
+		assert.deepEqual(result, { attempted: 0, created: 0 });
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('every preview response tells search engines to keep out', async () => {
+	const page = await worker.fetch(new Request(`${PREVIEW_ORIGIN}/contact-us`), PREVIEW_ENV, {});
+	assert.equal(page.status, 200);
+	assert.equal(await page.text(), 'asset');
+	assert.equal(page.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+
+	const api = await worker.fetch(new Request(`${PREVIEW_ORIGIN}/api/form-config`), PREVIEW_ENV, {});
+	assert.equal(api.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+
+	const refused = await postToPreview(PREVIEW_ENV);
+	assert.equal(refused.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+});
+
+test('production responses carry no noindex header', async () => {
+	const page = await worker.fetch(new Request('https://www.xfour.co.uk/contact-us'), CONFIGURED_ENV, {});
+	assert.equal(page.headers.get('X-Robots-Tag'), null);
 });
 
 test('a host that only looks like our preview subdomain is refused', async () => {

@@ -58,46 +58,42 @@ const COMMON_FIELDS = [
 const ALLOWED_ORIGIN_HOSTS = ['www.xfour.co.uk', 'xfour.co.uk', 'localhost', '127.0.0.1'];
 
 /**
- * Every preview of this Worker is served from the account's own workers.dev
- * subdomain, which is `xfour`. Workers Builds uploads a version for each push
- * to a branch, and each version gets its own hostname there with a prefix that
- * changes every time, so the suffix is matched instead of listing hostnames.
- * Nobody else can create a host under it, because the subdomain is ours.
+ * Previews are served by a separate Worker, `x4-website-preview` (the
+ * `preview` environment in wrangler.jsonc), on the account's own workers.dev
+ * subdomain, which is `xfour` (XFO-1798). Each branch push gets its own
+ * hostname there with a prefix that changes every time, so the suffix is
+ * matched instead of listing hostnames. Nobody else can create a host under
+ * it, because the subdomain is ours.
+ *
+ * Only the preview Worker accepts this suffix. The production Worker has no
+ * workers.dev address any more, so a post to www.xfour.co.uk that claims to
+ * come from one is a cross-site post like any other.
  */
-const ALLOWED_ORIGIN_SUFFIX = '.xfour.workers.dev';
+const PREVIEW_ORIGIN_SUFFIX = '.xfour.workers.dev';
+
+/**
+ * True on the preview Worker only. wrangler.jsonc sets X4_PREVIEW to "1" in
+ * the `preview` environment and nowhere else. A preview:
+ *   - tells search engines to keep out, on every response;
+ *   - never talks to Dynamics — the enquiry endpoint answers 503 and the cron
+ *     handler does nothing, even if somebody binds a secret or the retry KV
+ *     to the preview Worker by mistake.
+ */
+function isPreview(env) {
+	return str(env.X4_PREVIEW) === '1';
+}
+
+/** A copy of `response` that search engines must not index. */
+function noindex(response) {
+	const copy = new Response(response.body, response);
+	copy.headers.set('X-Robots-Tag', 'noindex, nofollow');
+	return copy;
+}
 
 export default {
 	async fetch(request, env, ctx) {
-		const url = new URL(request.url);
-
-		// The browser asks for the Turnstile site key here rather than having it
-		// baked into the HTML, so all form configuration lives in one place.
-		if (url.pathname === '/api/form-config') {
-			if (request.method !== 'GET') {
-				return json({ ok: false, error: 'method_not_allowed' }, 405, { Allow: 'GET' });
-			}
-			return json(
-				{ turnstileSiteKey: str(env.TURNSTILE_SITE_KEY) },
-				200,
-				{ 'Cache-Control': 'public, max-age=300' },
-			);
-		}
-
-		if (url.pathname === '/api/enquiry') {
-			if (request.method !== 'POST') {
-				return json({ ok: false, error: 'method_not_allowed' }, 405, { Allow: 'POST' });
-			}
-			try {
-				return await handleEnquiry(request, env, ctx);
-			} catch (err) {
-				// Never leak internals to the browser. Observability is on, so the
-				// detail is in the Worker logs.
-				console.error('enquiry_unhandled_error', err && err.stack ? err.stack : String(err));
-				return json({ ok: false, error: 'server_error' }, 500);
-			}
-		}
-
-		return env.ASSETS.fetch(request);
+		const response = await route(request, env, ctx);
+		return isPreview(env) ? noindex(response) : response;
 	},
 
 	// Cron Trigger (see wrangler.jsonc). Retries every enquiry still sitting in
@@ -107,8 +103,41 @@ export default {
 	},
 };
 
+async function route(request, env, ctx) {
+	const url = new URL(request.url);
+
+	// The browser asks for the Turnstile site key here rather than having it
+	// baked into the HTML, so all form configuration lives in one place.
+	if (url.pathname === '/api/form-config') {
+		if (request.method !== 'GET') {
+			return json({ ok: false, error: 'method_not_allowed' }, 405, { Allow: 'GET' });
+		}
+		return json(
+			{ turnstileSiteKey: str(env.TURNSTILE_SITE_KEY) },
+			200,
+			{ 'Cache-Control': 'public, max-age=300' },
+		);
+	}
+
+	if (url.pathname === '/api/enquiry') {
+		if (request.method !== 'POST') {
+			return json({ ok: false, error: 'method_not_allowed' }, 405, { Allow: 'POST' });
+		}
+		try {
+			return await handleEnquiry(request, env, ctx);
+		} catch (err) {
+			// Never leak internals to the browser. Observability is on, so the
+			// detail is in the Worker logs.
+			console.error('enquiry_unhandled_error', err && err.stack ? err.stack : String(err));
+			return json({ ok: false, error: 'server_error' }, 500);
+		}
+	}
+
+	return env.ASSETS.fetch(request);
+}
+
 async function handleEnquiry(request, env, ctx) {
-	if (!originAllowed(request)) {
+	if (!originAllowed(request, env)) {
 		return json({ ok: false, error: 'bad_origin' }, 403);
 	}
 
@@ -136,6 +165,13 @@ async function handleEnquiry(request, env, ctx) {
 	}
 	if (Object.keys(errors).length > 0) {
 		return json({ ok: false, error: 'validation_failed', fields: errors }, 422);
+	}
+
+	// A preview has no business creating a Lead (XFO-1798). Say so before any
+	// outbound call, whatever happens to be bound to the preview Worker.
+	if (isPreview(env)) {
+		console.log('enquiry_refused_on_preview');
+		return json({ ok: false, error: 'not_configured' }, 503);
 	}
 
 	const turnstile = await verifyTurnstile(request, env, str(form.get('cf-turnstile-response')));
@@ -197,6 +233,7 @@ async function deleteRetryRecord(env, submissionId) {
  * for an entry already retried and creates no second Lead for it.
  */
 async function retryPendingEnquiries(env) {
+	if (isPreview(env)) return { attempted: 0, created: 0 };
 	if (!env.ENQUIRY_RETRY_KV) return { attempted: 0, created: 0 };
 
 	const config = dataverseConfig(env);
@@ -279,7 +316,7 @@ async function sendAlert(env, message) {
 /* Request helpers                                                            */
 /* -------------------------------------------------------------------------- */
 
-function originAllowed(request) {
+function originAllowed(request, env) {
 	const origin = request.headers.get('Origin');
 	// A same-origin form post without JS sends no Origin on some older browsers.
 	// Turnstile already requires JS, so treat a missing Origin as acceptable
@@ -287,7 +324,8 @@ function originAllowed(request) {
 	if (!origin) return true;
 	try {
 		const host = new URL(origin).hostname;
-		return ALLOWED_ORIGIN_HOSTS.includes(host) || host.endsWith(ALLOWED_ORIGIN_SUFFIX);
+		if (ALLOWED_ORIGIN_HOSTS.includes(host)) return true;
+		return isPreview(env) && host.endsWith(PREVIEW_ORIGIN_SUFFIX);
 	} catch {
 		return false;
 	}
