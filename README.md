@@ -70,7 +70,10 @@ A branch is never built on the production Worker. It goes to a second Worker,
    A form sent on a preview answers `503 not_configured` and shows "call us
    instead". It cannot create a Lead.
 2. **A preview cannot be indexed.** Every response from the preview Worker
-   carries `X-Robots-Tag: noindex, nofollow`.
+   carries an `X-Robots-Tag` header. From outside it reads `noindex`:
+   Cloudflare sends that itself on every `workers.dev` address. The Worker
+   sets `noindex, nofollow` as well, so the rule does not depend on that
+   default.
 
 Where to find a preview:
 

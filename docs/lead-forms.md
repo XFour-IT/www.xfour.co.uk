@@ -421,8 +421,8 @@ What is different:
   `x4-website-preview.xfour.workers.dev` is on it; a branch or version address
   is not. It does not matter for a review, because the answer is 503 either
   way.
-- Every response carries `X-Robots-Tag: noindex, nofollow`, so a preview cannot
-  show up in search results next to the real site.
+- Every response carries `X-Robots-Tag: noindex`, so a preview cannot show up
+  in search results next to the real site.
 - The production Worker refuses a post whose `Origin` is a `workers.dev`
   address. Only the preview Worker accepts its own `.xfour.workers.dev` origin.
 
